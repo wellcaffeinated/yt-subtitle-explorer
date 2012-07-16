@@ -1,6 +1,7 @@
 <?php
 
-$app->get('/install', function() use ($app) {
+$installer = $app['controllers_factory'];
+$installer->get('/', function() use ($app) {
 
 	$app['db']->query("CREATE TABLE {$app['db.tables']['videos']} (
 		ytid TEXT,
@@ -14,3 +15,5 @@ $app->get('/install', function() use ($app) {
 
 	return 'Installation Complete';
 });
+
+return $installer;

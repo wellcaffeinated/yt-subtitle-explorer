@@ -23,7 +23,7 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
 if (false and is_dir(YTSE_ROOT.'/install')){
 
 	// do installation
-	require YTSE_ROOT.'/install/install.php';
+	$app->mount('/install', include YTSE_ROOT.'/install/install.php');
 	$app->run();
 	exit;
 }
@@ -32,18 +32,22 @@ $app->get('/hello', function() {
     return 'Hello!';
 });
 
-$app->get('create', function() use ($app){
+$app->get('/create/{id}', function($id) use ($app){
 
-	$sql = "INSERT INTO {$app['db.tables']['videos']} (ytid, title) VALUES (?, ?)";
-	$app['db']->executeQuery($sql, array(42, 'Hello World of DB'));
+	$app['db']->insert($app['db.tables']['videos'], array(
+		'ytid'=>$id, 
+		'title'=>'Hello World of DB'
+	));
+
 	return 'created';
-});
 
-$app->get('read', function() use ($app){
+})->value('id', 42);
 
-	$sql = "SELECT * FROM {$app['db.tables']['videos']} WHERE ytid = ?";
-	$ret = $app['db']->fetchAssoc($sql, array(42));
+$app->get('/read/{id}', function($id) use ($app){
+
+	$sql = "SELECT * FROM {$app['db.tables']['videos']}". ($id? " WHERE ytid = ?" : '');
+	$ret = $app['db']->fetchAssoc($sql, array($id));
 	return "<p>ID: {$ret['ytid']}<br/>Title: {$ret['title']}</p>";
-});
+})->value('id', 42);
 
 $app->run();
