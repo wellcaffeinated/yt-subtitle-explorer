@@ -4,62 +4,91 @@ if (!defined('YTSE_ROOT')) die('Access Denied');
 
 class YTPlaylist {
 
-	static $RefreshInterval = new DateInterval('P12H'); // 12 hours
+	static $RefreshInterval = 'PT12H'; // 12 hours
 
-	public $data;
-	private $table = 'playlists'; // table name
-
-	public function __construct( $id, $db ){
+	private $data;
+	
+	public function __construct( $id, $app ){
 		
-		$this->db = $db;
+		$this->app = $app;
 
-		$this->sqlPrepared = $db->prepare("SELECT * FROM {$this->table} WHERE ytid = ?")
+		$this->sqlSelect = $app['db']->prepare("SELECT * FROM {$app['db.tables.playlists']} WHERE ytid = ?");
 
 		$this->fetchLocal( $id );
 	}
 
-	// fetch data from local db
-	public fetchLocal( $id ){
+	public function getData(){
+		return $this->data;
+	}
 
-		$this->sqlPrepared->bindValue(1, $id);
-		$this->sqlPrepared->execute();
-		$this->data = $this->sqlPrepared->fetch();
+	public function setData( $arr ){
+
+		foreach($this->data as $k=>$v){
+			if (array_key_exists($k, $arr)){
+				$this->data[$k] = $arr[$k];
+			}
+		}
+	}
+
+	// fetch data from local db
+	public function fetchLocal( $id ){
+
+		$this->sqlSelect->bindValue(1, $id);
+		$this->sqlSelect->execute();
+		$this->data = $this->sqlSelect->fetch();
+
+		foreach($this->data as $k=>$v){ 
+		    if(is_numeric($k))
+		    	unset($this->data[$k]);
+		} 
+
+		if ($this->data === false){
+
+			$this->data = array(
+				'ytid'=>$id,
+				'last_refresh'=> '1980-01-01T00:00:00+00:00'
+			);
+
+			// init
+			$this->app['db']->insert($this->app['db.tables.playlists'], $this->data);
+		}
 	}
 
 	// check to see if we need a refresh from remote
-	public isDirty(){
+	public function isDirty(){
 
 		if (!$this->data) return true;
 
 		$now = new DateTime('now');
-		$timeout = new DateTime($this->data['updated']);
-		$timeout->add( YTPlaylist::$RefreshInterval );
+		$timeout = new DateTime($this->data['last_refresh']);
+		$timeout->add( new DateInterval(YTPlaylist::$RefreshInterval) );
 		return $now > $timeout;
 	}
 
-	public getVideos( array $filter = array() ){
+	public function getVideos( array $filter = array() ){
 
 		// TODO
 
 	}
 
-	public getVideosWithLang( $lang_code ){
+	public function getVideosWithLang( $lang_code ){
 
 		return $this->getVideos(array('lang_code' => $lang_code));
 	}
 
-	public getVideosWithoutLang( $lang_code ){
+	public function getVideosWithoutLang( $lang_code ){
 
 		// TODO
 	}
 
-	public refreshRemote(){
+	public function refreshRemote(){
 
-
+		
 	}
 
-	public syncLocal(){
+	public function syncLocal(){
 
+		$this->app['db']->update($this->app['db.tables.playlists'], $this->data, array('ytid'=>$this->data['ytid']));
 	}
 
 }

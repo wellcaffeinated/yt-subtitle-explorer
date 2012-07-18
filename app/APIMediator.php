@@ -39,7 +39,7 @@ class APIMediator {
 
     }
 
-    private function getYTSubtitles($ytid){
+    public function getYTSubtitles($ytid){
 
         $ret = array();
 
@@ -58,6 +58,77 @@ class APIMediator {
         }
 
         return $ret;
+    }
+
+    public getYTPlaylist($ytid){
+    }
+
+    private getPlaylistData($ytid, $start = 1, &$data = array())
+
+        $str = $this->gdataAPI->get('/playlists/'.$ytid.'?'.http_build_query(array(
+            'v'=>'2',
+            'alt'=>'json',
+            'orderby'=>'published',
+            'max-results'=>'50', //max allowed
+            'start-index'=>$start
+            )
+        );
+
+        
+        if (!$str){
+            return false;
+        }
+
+        $json = json_decode($str);
+
+        if (!$json){
+            throw new Exception('Error parsing JSON data for playlist: '.$ytid);
+        }
+
+        $data['numVideos'] = (int) $json->feed->{'openSearch$totalResults'}->{'$t'};
+
+        if (empty($json->feed->entry)){
+            // no results
+            return $data;
+        }
+
+        // loop through video results and add to local array
+        foreach($json->feed->entry as $k=>$entry){
+
+            $thumb;
+            foreach($entry->{'media$thumbnail'} as $val){
+                if ($val->{'yt$name'} === 'default'){
+                    $thumb = $val->url;
+                    break;
+                }
+            }
+
+            $url;
+            foreach($entry->link as $val){
+                if ($val->rel === 'alternate'){
+                    $url = $val->href;
+                    break;
+                }
+            }
+
+            $data['videos'] = array(
+                'ytid' => $entry->{'media$group'}->{'yt$videoid'}->{'$t'},
+                'title' => $entry->title->{'$t'},
+                'playlist_id' => $ytid,
+                'url' => str_replace('https', 'http', $url),
+                'thumbnail' => $thumb,
+                'updated'=> $entry->updated->{'$t'},
+                'position' => (int) $entry->{'yt$position'}->{'$t'}
+            );
+        }
+
+        // results are paginated... get next list of results
+        if (($start+50) <= $$data['numVideos']){
+
+            $this->getPlaylistData($playlist, $start + 50, $data);
+        }
+
+        return $data;
     }
 
 }

@@ -2,6 +2,8 @@
 
 if (!defined('YTSE_ROOT')) die('Access Denied');
 
+require 'YTPlaylist.php';
+
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
@@ -17,7 +19,7 @@ class YTPlaylistProvider implements ServiceProviderInterface {
 
         $app['ytplaylist'] = $app->share(function($app){
 
-            return new YTPlaylist( $id, $app['db'] );
+            return new YTPlaylist( $id, $app );
         });
     }
 
