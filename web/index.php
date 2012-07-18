@@ -27,13 +27,29 @@ if (false and is_dir(YTSE_ROOT.'/install')){
 	exit;
 }
 
-require YTSE_ROOT.'/app/YTPlaylist.php';
+require YTSE_ROOT.'/app/APIMediatorProvider.php';
+require YTSE_ROOT.'/app/YTPlaylistProvider.php';
+
+// register api mediator provider
+$app->register(new APIMediatorProvider());
+// register playlist provider
+$app->register(new YTPlaylistProvider(), array(
+    'ytplaylist.id' => '3'
+));
 
 $app->get('/test', function(Silex\Application $app) {
-	$pl = new YTPlaylist('3', $app);
+	
+	$ret = var_export($app['api']->getYTPlaylist('908547EAA7E4AE74'));
+
+	$pl = $app['ytplaylist'];
+	
+	$ret .= '<br/>'.var_export($pl->getData());
+
+	$ret .= '<br/>'.'dirty: '.$pl->isDirty();
+
 	//$pl->setData(array('title'=>'forg'));
 	$pl->syncLocal();
-    return var_export($pl->getData()).'<br/>'.'dirty: '.$pl->isDirty();
+    return $ret;
 });
 
 $app->get('/create/{id}', function($id) use ($app){

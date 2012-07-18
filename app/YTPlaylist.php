@@ -88,6 +88,8 @@ class YTPlaylist {
 
 	public function syncLocal(){
 
+		$now = new Datetime('now');
+		$this->data['last_refresh'] = $now->format('c');
 		$this->app['db']->update($this->app['db.tables.playlists'], $this->data, array('ytid'=>$this->data['ytid']));
 	}
 

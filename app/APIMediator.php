@@ -2,8 +2,8 @@
 
 if (!defined('YTSE_ROOT')) die('Access Denied');
 
-require_once YTSE_ROOT.'/includes/Pest.php';
-require_once YTSE_ROOT.'/includes/PestXML.php';
+require_once YTSE_ROOT.'/include/Pest.php';
+require_once YTSE_ROOT.'/include/PestXML.php';
 
 class APIMediator {
 
@@ -13,11 +13,11 @@ class APIMediator {
 
     public function __construct(){
 
-        if(!defined('UNISUB_USERNAME') || empty(UNISUB_USERNAME)){
+        if(!defined('UNISUB_USERNAME') || count(UNISUB_USERNAME) === 0){
             throw new Exception('You MUST specify your Universal Subtitles username in config.php');
         }
 
-        if(!defined('UNISUB_KEY') || empty(UNISUB_KEY)){
+        if(!defined('UNISUB_KEY') || count(UNISUB_KEY) === 0){
             throw new Exception('You MUST specify your Universal Subtitles API Key in config.php');
         }
 
@@ -25,7 +25,7 @@ class APIMediator {
 
         $this->gdataAPI = new Pest('https://gdata.youtube.com/feeds/api');
 
-        if(defined('YOUTUBE_KEY') && !empty(YOUTUBE_KEY)){
+        if(defined('YOUTUBE_KEY') && count(YOUTUBE_KEY) !== 0){
             $this->gdataAPI->curl_opts[CURLOPT_HTTPHEADER] = array(
                 'X-GData-Key: key='.YOUTUBE_KEY
             );
@@ -60,19 +60,22 @@ class APIMediator {
         return $ret;
     }
 
-    public getYTPlaylist($ytid){
+    public function getYTPlaylist($ytid){
+
+        return $this->getPlaylistData($ytid);
     }
 
-    private getPlaylistData($ytid, $start = 1, &$data = array())
+    private function getPlaylistData($ytid, $start = 1, &$data = array()){
 
-        $str = $this->gdataAPI->get('/playlists/'.$ytid.'?'.http_build_query(array(
-            'v'=>'2',
-            'alt'=>'json',
-            'orderby'=>'published',
-            'max-results'=>'50', //max allowed
-            'start-index'=>$start
+        $str = $this->gdataAPI->get('/playlists/'.$ytid.'?'.http_build_query(
+            array(
+                'v'=>'2',
+                'alt'=>'json',
+                'orderby'=>'published',
+                'max-results'=>'50', //max allowed
+                'start-index'=>$start
             )
-        );
+        ));
 
         
         if (!$str){
@@ -96,7 +99,7 @@ class APIMediator {
         foreach($json->feed->entry as $k=>$entry){
 
             $thumb;
-            foreach($entry->{'media$thumbnail'} as $val){
+            foreach($entry->{'media$group'}->{'media$thumbnail'} as $val){
                 if ($val->{'yt$name'} === 'default'){
                     $thumb = $val->url;
                     break;
@@ -111,21 +114,22 @@ class APIMediator {
                 }
             }
 
-            $data['videos'] = array(
+            $data['videos'][] = array(
                 'ytid' => $entry->{'media$group'}->{'yt$videoid'}->{'$t'},
                 'title' => $entry->title->{'$t'},
                 'playlist_id' => $ytid,
                 'url' => str_replace('https', 'http', $url),
                 'thumbnail' => $thumb,
                 'updated'=> $entry->updated->{'$t'},
+                'published' => $entry->published->{'$t'},
                 'position' => (int) $entry->{'yt$position'}->{'$t'}
             );
         }
 
         // results are paginated... get next list of results
-        if (($start+50) <= $$data['numVideos']){
+        if (($start+50) <= $data['numVideos']){
 
-            $this->getPlaylistData($playlist, $start + 50, $data);
+            $this->getPlaylistData($ytid, $start + 50, $data);
         }
 
         return $data;

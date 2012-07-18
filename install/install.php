@@ -13,6 +13,7 @@ $installer->get('/', function() use ($app) {
 		url TEXT,
 		thumbnail TEXT,
 		updated TEXT,
+		published TEXT,
 		position INTEGER,
 		usid TEXT,
 		languages BLOB
