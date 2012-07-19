@@ -39,11 +39,11 @@ class APIMediator {
 
     }
 
-    public function getYTSubtitles($ytid){
+    public function getYTLanguages($ytid){
 
         $ret = array();
 
-        $xml = $ytAPI->get('/timedtext?type=list&v='.$ytid);
+        $xml = $this->ytAPI->get('/timedtext?type=list&v='.$ytid);
 
         if (!$xml) return $ret;
 

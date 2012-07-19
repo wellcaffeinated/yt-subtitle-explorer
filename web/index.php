@@ -34,40 +34,93 @@ require YTSE_ROOT.'/app/YTPlaylistProvider.php';
 $app->register(new APIMediatorProvider());
 // register playlist provider
 $app->register(new YTPlaylistProvider(), array(
-    'ytplaylist.id' => '3'
+    'ytplaylist.id' => '908547EAA7E4AE74'
+));
+// register twig templating
+$app->register(new Silex\Provider\TwigServiceProvider(), array(
+    'twig.path' => YTSE_ROOT.'/views'
 ));
 
-$app->get('/test', function(Silex\Application $app) {
-	
-	$ret = var_export($app['api']->getYTPlaylist('908547EAA7E4AE74'));
+$app['refresh.data'] = $app->protect(function() use ($app) {
 
 	$pl = $app['ytplaylist'];
-	
-	$ret .= '<br/>'.var_export($pl->getData());
 
-	$ret .= '<br/>'.'dirty: '.$pl->isDirty();
+	$data = $app['api']->getYTPlaylist($pl->getId());
 
-	//$pl->setData(array('title'=>'forg'));
+	foreach ($data['videos'] as &$video){
+
+		$langs = $app['api']->getYTLanguages($video['ytid']);
+
+		// place default lang first
+		usort($langs, function($a, $b){
+
+			if ($a['lang_default'] === 'true'){
+				return -1;
+			}
+
+			if ($b['lang_default'] === 'true'){
+				return 1;
+			}
+
+			return 0;
+		});
+
+		$video['languages'] = $langs;
+	}
+
+	$pl->setData($data);
 	$pl->syncLocal();
-    return $ret;
+
 });
 
-$app->get('/create/{id}', function($id) use ($app){
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-	$app['db']->insert($app['db.tables.videos'], array(
-		'ytid'=>$id, 
-		'title'=>'Hello World of DB'
+/**
+ * Before routing
+ *****************/
+$app->before(function(Request $request) use ($app) {
+
+	$pl = $app['ytplaylist'];
+
+	// check to see if we need an update from remote
+	if (!$pl->hasData() || $request->get('refresh') === 'true'){
+
+		// start update process
+		$app['refresh.data']();
+	}
+	
+});
+
+/**
+ * Routing
+ */
+$app->get('/', function(Silex\Application $app) {
+	
+	return $app['twig']->render('all.twig', array(
+
+		'videos' => $app['ytplaylist']->getVideos()
 	));
+});
 
-	return 'created';
+/**
+ * After response is sent
+ */
+$app->finish(function(Request $request, Response $response) use ($app) {
 
-})->value('id', 42);
+	$pl = $app['ytplaylist'];
 
-$app->get('/read/{id}', function($id) use ($app){
+	// check to see if we need an update from remote
+	if ($pl->isDirty()){
 
-	$sql = "SELECT * FROM {$app['db.tables.videos']}". ($id? " WHERE ytid = ?" : '');
-	$ret = $app['db']->fetchAssoc($sql, array($id));
-	return "<p>ID: {$ret['ytid']}<br/>Title: {$ret['title']}</p>";
-})->value('id', 42);
+		// start update process
+		$app['refresh.data']();
+	}
 
+});
+
+
+/**
+ * Start App
+ */
 $app->run();
