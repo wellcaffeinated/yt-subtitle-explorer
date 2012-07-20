@@ -107,7 +107,13 @@ class YTPlaylist {
 		// make sure $data only has valid video data
 		$data = array_intersect_key($data, array_flip($this->videoKeys));
 
-		$data['languages'] = serialize($data['languages']);
+		if (isset($data['languages'])){
+
+			foreach($data['languages'] as $lang){
+				$this->storeLangData( $lang );
+			}
+			$data['languages'] = $this->getLangStr( $data['languages'] );
+		}
 
 		// this replace command loses any not-specified data... not the best solution
 		$this->app['db']->executeQuery(
@@ -133,25 +139,64 @@ class YTPlaylist {
 		}
 	}
 
-	public function getVideos( array $filter = array() ){
+	private function fetchAllVideos(){
+		
+		return $this->app['db']->fetchAll("SELECT * FROM {$this->app['db.tables.videos']} WHERE playlist_id = ?", array($this->ytid));
+	}
 
-		$vids = $this->app['db']->fetchAll("SELECT * FROM {$this->app['db.tables.videos']} where playlist_id = ?", array($this->ytid));
+	public function getVideos(){
+
+		$vids = $this->fetchAllVideos();
 
 		foreach ($vids as &$vid){
-			$vid['languages'] = unserialize($vid['languages']);
+			$vid['languages'] = $this->getLangData($vid['languages']);
 		}
 
 		return $vids;
 	}
 
-	public function getVideosWithLang( $lang_code ){
+	// get videos that have every lang in lang_codes
+	public function getVideosEveryLang( array $lang_codes ){
 
-		return $this->getVideos(array('lang_code' => $lang_code));
+		$vids = $this->fetchAllVideos();
+		$vids = array_filter($vids, function($v) use ($lang_codes) {
+
+			$vl = explode(':', $v['languages']);
+			foreach ($lang_codes as $lang){
+				if(!in_array($lang, $vl)){
+					return false;
+				}
+			}
+			return true;
+		});
+
+		foreach ($vids as &$vid){
+			$vid['languages'] = $this->getLangData($vid['languages']);
+		}
+
+		return $vids;
 	}
 
-	public function getVideosWithoutLang( $lang_code ){
+	// get videos that have any lang in lang_codes
+	public function getVideosAnyLang( array $lang_codes ){
 
-		// TODO
+		$vids = $this->fetchAllVideos();
+		$vids = array_filter($vids, function($v) use ($lang_codes) {
+
+			$vl = explode(':', $v['languages']);
+			foreach ($lang_codes as $lang){
+				if(in_array($lang, $vl)){
+					return true;
+				}
+			}
+			return false;
+		});
+
+		foreach ($vids as &$vid){
+			$vid['languages'] = $this->getLangData($vid['languages']);
+		}
+
+		return $vids;
 	}
 
 	public function syncLocal(){
@@ -160,6 +205,38 @@ class YTPlaylist {
 		$this->data['last_refresh'] = $now->format('c');
 		$this->data['video_list'] = serialize(array_unique($this->videos));
 		$this->app['db']->update($this->app['db.tables.playlists'], $this->data, array('ytid'=>$this->data['ytid']));
+	}
+
+	private function getLangStr( array $langs ){
+
+		$ret = array();
+		foreach($langs as $lang){
+
+			$ret[] = $lang['lang_code'];
+		}
+
+		return implode(':', $ret);
+	}
+
+	private function getLangData( $str ){
+
+		$ret = array();
+		$codes = explode(':', $str);
+		$st = $this->app['db']->executeQuery(
+			"SELECT * FROM {$this->app['db.tables.languages']} WHERE lang_code in (?)",
+			array(array_values($codes)),
+			array(\Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+		);
+
+		return $st->fetchAll();
+	}
+
+	private function storeLangData( array $data ){
+
+		$this->app['db']->executeQuery(
+			"INSERT OR IGNORE INTO {$this->app['db.tables.languages']} (lang_code, lang_original, lang_translated) VALUES (?,?,?)",
+			array($data['lang_code'],$data['lang_original'],$data['lang_translated'])
+		);
 	}
 
 }

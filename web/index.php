@@ -11,6 +11,7 @@ $app['debug'] = defined('DEBUG');
 
 $app['db.tables.videos'] = YTSE_DB_PFX.'videos';
 $app['db.tables.playlists'] = YTSE_DB_PFX.'playlists';
+$app['db.tables.languages'] = YTSE_DB_PFX.'languages';
 
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
@@ -40,6 +41,8 @@ $app->register(new YTPlaylistProvider(), array(
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => YTSE_ROOT.'/views'
 ));
+// url service provider
+$app->register(new Silex\Provider\UrlGeneratorServiceProvider());
 
 $app['refresh.data'] = $app->protect(function() use ($app) {
 
@@ -76,6 +79,18 @@ $app['refresh.data'] = $app->protect(function() use ($app) {
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+$langListRegExp = '^([a-zA-Z]{2}([-][a-zA-Z]{2})?(~|$))*';
+$convertLangList = function($list, Request $request){
+
+	$langs = array_filter(array_unique(explode('~', $list)));
+
+	if (empty($langs)){
+		return array('en');
+	}
+
+	return $langs;
+};
+
 /**
  * Before routing
  *****************/
@@ -95,6 +110,8 @@ $app->before(function(Request $request) use ($app) {
 /**
  * Routing
  */
+
+// all videos
 $app->get('/', function(Silex\Application $app) {
 	
 	return $app['twig']->render('all.twig', array(
@@ -102,6 +119,48 @@ $app->get('/', function(Silex\Application $app) {
 		'videos' => $app['ytplaylist']->getVideos()
 	));
 });
+
+// meta data for languages (name, code, ...)
+$app->get('/languages/meta', function( Silex\Application $app, Request $request ) {
+
+	$q = $request->get('q').'%';
+
+	if (!$q){
+
+		$data = $app['db']->fetchAll("SELECT * FROM {$app['db.tables.languages']}");
+
+	} else {
+
+		$data = $app['db']->fetchAll(
+			"SELECT * FROM {$app['db.tables.languages']} WHERE lang_original LIKE ? OR lang_translated LIKE ?",
+			array($q, $q)
+		);
+	}
+	
+	return $app->json($data);
+})->bind('langmeta');
+
+// find every language provided
+$app->get('/languages/every/{lang_list}', function( array $lang_list, Silex\Application $app ) {
+	
+	return $app['twig']->render('all.twig', array(
+
+		'videos' => $app['ytplaylist']->getVideosEveryLang( $lang_list )
+	));
+})
+->assert('lang_list', $langListRegExp)
+->convert('lang_list', $convertLangList);
+
+// find any languages provided
+$app->get('/languages/any/{lang_list}', function( array $lang_list, Silex\Application $app ) {
+	
+	return $app['twig']->render('all.twig', array(
+
+		'videos' => $app['ytplaylist']->getVideosAnyLang( $lang_list )
+	));
+})
+->assert('lang_list', $langListRegExp)
+->convert('lang_list', $convertLangList);
 
 /**
  * After response is sent
