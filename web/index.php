@@ -114,9 +114,14 @@ $app->before(function(Request $request) use ($app) {
 // all videos
 $app->get('/', function(Silex\Application $app) {
 	
-	return $app['twig']->render('all.twig', array(
+	$vids = $app['twig']->render('videolist.twig', array(
 
 		'videos' => $app['ytplaylist']->getVideos()
+	));
+
+	return $app['twig']->render('all.twig', array(
+	
+		'body' => $vids
 	));
 });
 
@@ -140,27 +145,38 @@ $app->get('/languages/meta', function( Silex\Application $app, Request $request 
 	return $app->json($data);
 })->bind('langmeta');
 
+$app->get('/languages/all', function( Silex\Application $app ) {
+	
+	return $app['twig']->render('videolist.twig', array(
+
+		'videos' => $app['ytplaylist']->getVideos()
+	));
+})->bind('langall');
+
 // find every language provided
 $app->get('/languages/every/{lang_list}', function( array $lang_list, Silex\Application $app ) {
 	
-	return $app['twig']->render('all.twig', array(
+	return $app['twig']->render('videolist.twig', array(
 
 		'videos' => $app['ytplaylist']->getVideosEveryLang( $lang_list )
 	));
 })
+->bind('langevery')
 ->assert('lang_list', $langListRegExp)
 ->convert('lang_list', $convertLangList);
 
 // find any languages provided
 $app->get('/languages/any/{lang_list}', function( array $lang_list, Silex\Application $app ) {
 	
-	return $app['twig']->render('all.twig', array(
+	return $app['twig']->render('videolist.twig', array(
 
 		'videos' => $app['ytplaylist']->getVideosAnyLang( $lang_list )
 	));
 })
+->bind('langany')
 ->assert('lang_list', $langListRegExp)
 ->convert('lang_list', $convertLangList);
+
 
 /**
  * After response is sent

@@ -8,7 +8,7 @@
  *
  */
 
-(function ($) {
+define(['jquery'], function ($) {
 // Default settings
 var DEFAULT_SETTINGS = {
 	// Search settings
@@ -857,4 +857,4 @@ $.TokenList.Cache = function (options) {
         return data[query];
     };
 };
-}(jQuery));
+});

@@ -17,66 +17,27 @@
   <!-- Mobile viewport optimized: h5bp.com/viewport -->
   <meta name="viewport" content="width=device-width">
 
-  <link rel="stylesheet" href="css/token-input.css">
-  <link rel="stylesheet" href="css/token-input-facebook.css">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="library/css/token-input.css">
+  <link rel="stylesheet" href="library/css/token-input-facebook.css">
+  <link rel="stylesheet" href="library/css/styles.css">
 
-  <script src="js/lib/modernizr.js"></script>
+  <script src="library/js/libs/modernizr.js"></script>
+  <script src="library/js/require.js" data-main="library/js/core"></script>
 
 </head>
 <body>
 
-	<label>Search</label><input type="text" id="lang-search" name="lang-search" />
-  
-  <div class="video-list">
-		{% for vid in videos %}
-		<div class="video">
-			<h2><a href="{{vid.url}}">{{vid.title}}</a></h2>
-			<img src="{{vid.thumbnail}}" alt="{{vid.title}}" />
-			<ul class="languages">
-				{% for lang in vid.languages %}
-				<li class="lang-{{lang.lang_code}}">
-					<span class="lang-trans">{{lang.lang_translated}}</span> - 
-					<span class="lang-orig">{{lang.lang_original}}</span>
-				</li>
-				{% endfor %}
-				{% if vid.languages|length == 0 %}
-				<li class="lang-none">(none)</li>
-				{% endif %}
-			</ul>
-		</div>
-		{% endfor %}
+	<div id="language-search-wrap" data-all-langs="{{app.url_generator.generate("langall")}}">
+		<h2>Search Languages</h2>
+		<select id="filterSelect">
+			<option value="{{app.url_generator.generate("langany", {lang_list:""})}}">Any</option>
+			<option value="{{app.url_generator.generate("langevery", {lang_list:""})}}">every</option>
+		</select>
+		<label>of the following</label>
+		<input type="text" id="lang-search" name="lang-search" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
 	</div>
-
-  <!-- JavaScript at the bottom for fast page loading: http://developer.yahoo.com/performance/rules.html#js_bottom -->
-
-  <script src="js/lib/jquery.js"></script>
-  <script src="js/lib/jquery.tokeninput.js"></script>
-  <script>
-  	$(function(){
-
-  		$('#lang-search').tokenInput(
-  			'{{app.url_generator.generate("langmeta")}}',
-  			{
-  				theme: "facebook",
-  				onAdd: function( item ){
-  					console.log( item );
-  				},
-  				propertyToSearch: 'lang_original',
-  				tokenFormatter: function( item ){
-  					return '<li>'+item.lang_translated+' - '+item.lang_original+'</li>';
-  				},
-  				resultsFormatter: function( item ){
-  					return '<li>'+item.lang_translated+' - '+item.lang_original+'</li>';
-  				}
-
-  			}
-  		);
-
-  	});
-  </script>
-  <!-- scripts concatenated and minified via build script -->
-  <!-- end scripts -->
+  
+  {{body | raw}}
 
 </body>
 </html>
