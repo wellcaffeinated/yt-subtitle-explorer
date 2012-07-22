@@ -15,13 +15,23 @@ define(
 
             init: function(){
 
-                var filterSelect
+                var self = this
                     ,wrap
-                ;
+                    ;
 
                 $(function(){
-                    filterSelect = $('#filterSelect');
+                    var filterSelect = $('#filter-select :radio').on('change', function(){
+                        self.filterVids();
+                    });
+                    self.set('vid-filter', filterSelect);
+
+                    var filterNegate = $('#filter-negate :radio').on('change', function(){
+                        self.filterVids();
+                    });
+                    self.set('vid-negate', filterNegate);
+
                     wrap = $('#language-search-wrap');
+                    self.set('all-langs-url', wrap.attr('data-all-langs'));
                 });
 
                 languageSearch.create().init({
@@ -32,20 +42,31 @@ define(
 
                     'change:languages': function( langs ){
 
-                        var url = langs.length? filterSelect.val() + '/' + langs.join('~') : wrap.attr('data-all-langs');
-
-                        $.ajax({
-                            url: url,
-                            complete: function( xhr ){
-
-                                var el = $('.video-list');
-                                el.after(xhr.responseText);
-                                el.remove();
-                            }
-                        })
+                        self.set('languages', langs);
+                        self.filterVids();
                     }
                 });
+            },
+
+            filterVids: function(){
+
+                var langs = this.get('languages') || []
+                    ,url = langs.length? 
+                            '/languages/' + this.get('vid-negate').filter(':checked').attr('data-val') + '/' + this.get('vid-filter').filter(':checked').attr('data-val') + '/' + langs.join('~') 
+                            : this.get('all-langs-url')
+                    ;
+
+                $.ajax({
+                    url: url,
+                    complete: function( xhr ){
+
+                        var el = $('.video-list');
+                        el.after(xhr.responseText);
+                        el.remove();
+                    }
+                })
             }
+
         });
 
         mediator.init();

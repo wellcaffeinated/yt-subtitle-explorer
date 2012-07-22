@@ -43,7 +43,11 @@ class APIMediator {
 
         $ret = array();
 
-        $xml = $this->ytAPI->get('/timedtext?type=list&v='.$ytid);
+        try {
+            $xml = $this->ytAPI->get('/timedtext?type=list&v='.$ytid);
+        } catch (Exception $e) {
+            return false;
+        }
 
         if (!$xml) return $ret;
 
@@ -67,15 +71,22 @@ class APIMediator {
 
     private function getPlaylistData($ytid, $start = 1, &$data = array()){
 
-        $str = $this->gdataAPI->get('/playlists/'.$ytid.'?'.http_build_query(
-            array(
-                'v'=>'2',
-                'alt'=>'json',
-                'orderby'=>'published',
-                'max-results'=>'50', //max allowed
-                'start-index'=>$start
-            )
-        ));
+        try {
+
+            $str = $this->gdataAPI->get('/playlists/'.$ytid.'?'.http_build_query(
+                array(
+                    'v'=>'2',
+                    'alt'=>'json',
+                    'orderby'=>'published',
+                    'max-results'=>'50', //max allowed
+                    'start-index'=>$start
+                )
+            ));
+
+        } catch (Exception $e) {
+
+            return false;
+        }
 
         
         if (!$str){

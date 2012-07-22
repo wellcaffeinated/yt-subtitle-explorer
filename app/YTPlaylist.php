@@ -155,41 +155,24 @@ class YTPlaylist {
 		return $vids;
 	}
 
-	// get videos that have every lang in lang_codes
-	public function getVideosEveryLang( array $lang_codes ){
+	// get videos, filter by lang_codes.
+	// $filter['type'] => ('any'|'every') - includes any lang or every lang
+	// $filter['negate'] => (true|false) - exclude
+	public function getVideosFilterLang( array $lang_codes, array $filter ){
+
+		$type = array_key_exists('type', $filter) && ($filter['type'] === 'every');
+		$negate = array_key_exists('negate', $filter) && !$filter['negate'];
 
 		$vids = $this->fetchAllVideos();
-		$vids = array_filter($vids, function($v) use ($lang_codes) {
+		$vids = array_filter($vids, function($v) use ($lang_codes, $type, $negate) {
 
 			$vl = explode(':', $v['languages']);
 			foreach ($lang_codes as $lang){
-				if(!in_array($lang, $vl)){
-					return false;
+				if($type^$negate^in_array($lang, $vl)){
+					return !$type;
 				}
 			}
-			return true;
-		});
-
-		foreach ($vids as &$vid){
-			$vid['languages'] = $this->getLangData($vid['languages']);
-		}
-
-		return $vids;
-	}
-
-	// get videos that have any lang in lang_codes
-	public function getVideosAnyLang( array $lang_codes ){
-
-		$vids = $this->fetchAllVideos();
-		$vids = array_filter($vids, function($v) use ($lang_codes) {
-
-			$vl = explode(':', $v['languages']);
-			foreach ($lang_codes as $lang){
-				if(in_array($lang, $vl)){
-					return true;
-				}
-			}
-			return false;
+			return $type;
 		});
 
 		foreach ($vids as &$vid){

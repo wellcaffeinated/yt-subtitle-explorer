@@ -50,6 +50,11 @@ $app['refresh.data'] = $app->protect(function() use ($app) {
 
 	$data = $app['api']->getYTPlaylist($pl->getId());
 
+	if (!$data){
+
+		return false;
+	}
+
 	foreach ($data['videos'] as &$video){
 
 		$langs = $app['api']->getYTLanguages($video['ytid']);
@@ -153,30 +158,19 @@ $app->get('/languages/all', function( Silex\Application $app ) {
 	));
 })->bind('langall');
 
-// find every language provided
-$app->get('/languages/every/{lang_list}', function( array $lang_list, Silex\Application $app ) {
+// find videos filtered by languages provided
+$app->get('/languages/{withWithout}/{anyEvery}/{lang_list}', function( $withWithout, $anyEvery, array $lang_list, Silex\Application $app ) {
 	
 	return $app['twig']->render('videolist.twig', array(
 
-		'videos' => $app['ytplaylist']->getVideosEveryLang( $lang_list )
+		'videos' => $app['ytplaylist']->getVideosFilterLang( $lang_list, array('type' => $anyEvery, 'negate' => $withWithout === 'with') )
 	));
 })
-->bind('langevery')
+->bind('langfilter')
 ->assert('lang_list', $langListRegExp)
+->assert('withWithout', '(with|without)')
+->assert('anyEvery', '(any|every)')
 ->convert('lang_list', $convertLangList);
-
-// find any languages provided
-$app->get('/languages/any/{lang_list}', function( array $lang_list, Silex\Application $app ) {
-	
-	return $app['twig']->render('videolist.twig', array(
-
-		'videos' => $app['ytplaylist']->getVideosAnyLang( $lang_list )
-	));
-})
-->bind('langany')
-->assert('lang_list', $langListRegExp)
-->convert('lang_list', $convertLangList);
-
 
 /**
  * After response is sent

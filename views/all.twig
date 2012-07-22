@@ -23,16 +23,22 @@
 
   <script src="library/js/libs/modernizr.js"></script>
   <script src="library/js/require.js" data-main="library/js/core"></script>
-
+  
 </head>
 <body>
 
 	<div id="language-search-wrap" data-all-langs="{{app.url_generator.generate("langall")}}">
 		<h2>Search Languages</h2>
-		<select id="filterSelect">
-			<option value="{{app.url_generator.generate("langany", {lang_list:""})}}">Any</option>
-			<option value="{{app.url_generator.generate("langevery", {lang_list:""})}}">every</option>
-		</select>
+    <div id="filter-negate" class="radio-group">
+      <input id="radio-with" type="radio" name="filterNegate" checked="checked" data-val="with"/><label>with</label>
+      <input id="radio-without" type="radio" name="filterNegate" data-val="without"/><label>without</label>
+    </div>
+
+    <div id="filter-select" class="radio-group">
+      <input id="radio-any" type="radio" name="filterType" checked="checked" data-val="any"/><label>any</label>
+      <input id="radio-every" type="radio" name="filterType" data-val="every"/><label>every</label>
+    </div>
+		
 		<label>of the following</label>
 		<input type="text" id="lang-search" name="lang-search" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
 	</div>
