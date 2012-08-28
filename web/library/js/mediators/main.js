@@ -20,31 +20,33 @@ define(
                     ;
 
                 $(function(){
-                    var filterSelect = $('#filter-select :radio').on('change', function(){
+
+                    var filterSelect = $('#filter-select').on('click', '.btn', function(){
                         self.filterVids();
                     });
                     self.set('vid-filter', filterSelect);
 
-                    var filterNegate = $('#filter-negate :radio').on('change', function(){
+                    var filterNegate = $('#filter-negate').on('click', '.btn', function(){
                         self.filterVids();
                     });
                     self.set('vid-negate', filterNegate);
 
                     wrap = $('#language-search-wrap');
                     self.set('all-langs-url', wrap.attr('data-all-langs'));
-                });
 
-                languageSearch.create().init({
-                    
-                    el: '#lang-search'
 
-                }).on({
+                    languageSearch.create().init({
+                        
+                        el: '#lang-search'
 
-                    'change:languages': function( langs ){
+                    }).on({
 
-                        self.set('languages', langs);
-                        self.filterVids();
-                    }
+                        'change:languages': function( langs ){
+
+                            self.set('languages', langs);
+                            self.filterVids();
+                        }
+                    });
                 });
             },
 

@@ -15,8 +15,9 @@
   <meta name="description" content="">
 
   <!-- Mobile viewport optimized: h5bp.com/viewport -->
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <link rel="stylesheet" href="library/css/bootstrap.min.css">
   <link rel="stylesheet" href="library/css/token-input.css">
   <link rel="stylesheet" href="library/css/token-input-facebook.css">
   <link rel="stylesheet" href="library/css/styles.css">
@@ -27,23 +28,36 @@
 </head>
 <body>
 
-	<div id="language-search-wrap" data-all-langs="{{app.url_generator.generate("langall")}}">
-		<h2>Search Languages</h2>
-    <div id="filter-negate" class="radio-group">
-      <input id="radio-with" type="radio" name="filterNegate" checked="checked" data-val="with"/><label>with</label>
-      <input id="radio-without" type="radio" name="filterNegate" data-val="without"/><label>without</label>
-    </div>
+  <div class="container">
+  	<div id="language-search-wrap" class="well" data-all-langs="{{app.url_generator.generate("langall")}}">
+  		<h2>MinutePhysics Translations</h2>
 
-    <div id="filter-select" class="radio-group">
-      <input id="radio-any" type="radio" name="filterType" checked="checked" data-val="any"/><label>any</label>
-      <input id="radio-every" type="radio" name="filterType" data-val="every"/><label>every</label>
+      <div>
+
+        <span>Search for videos that </span>
+
+        <span class="btn-group">
+          <button id="radio-with" class="btn btn-small btn-success active" type="button" name="filterNegate" data-val="with">do</button>
+          <button id="radio-without" class="btn btn-small" type="button" name="filterNegate" data-val="without">don't</button>
+        </span>
+        
+        <span>have translations for</span>
+
+        <span class="btn-group">
+          <button id="radio-any" class="btn btn-small active" type="button" name="filterType" checked="checked" data-val="any">some</button>
+          <button id="radio-every" class="btn btn-small btn-inverse" type="button" name="filterType" data-val="every">all</button>
+        </span>
+
+        <span>of the following languages:</span>
+      </div>
+  		
+  		<input type="text" id="lang-search" name="lang-search" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
+  	</div>
+    
+    <div class="row-fluid">
+    {{body | raw}}
     </div>
-		
-		<label>of the following</label>
-		<input type="text" id="lang-search" name="lang-search" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
-	</div>
-  
-  {{body | raw}}
+  </div>
 
 </body>
 </html>

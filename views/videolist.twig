@@ -1,19 +1,25 @@
-<div class="video-list">
+<div class="video-list span12">
 	{% for vid in videos %}
 	<div class="video">
-		<h2><a href="{{vid.url}}">{{vid.title}}</a></h2>
-		<img src="{{vid.thumbnail}}" alt="{{vid.title}}"/>
-		<ul class="languages">
-			{% for lang in vid.languages %}
-			<li class="lang-{{lang.lang_code}}">
-				<span class="lang-trans">{{lang.lang_translated}}</span> - 
-				<span class="lang-orig">{{lang.lang_original}}</span>
-			</li>
-			{% endfor %}
-			{% if vid.languages|length == 0 %}
-			<li class="lang-none">(none)</li>
-			{% endif %}
-		</ul>
+		<h3><a href="{{vid.url}}">{{vid.title}}</a></h3>
+		<div class="row-fluid">
+			<div class="pull-left">
+				<img class="img-polaroid" src="{{vid.thumbnail}}" alt="{{vid.title}}"/>
+				<a href="{{vid.url}}" class="btn btn-block">Watch</a>
+			</div>
+			<ul class="languages unstyled">
+				<h4>Languages</h4>
+				{% for lang in vid.languages %}
+				<li class="lang-{{lang.lang_code}}">
+					<span class="lang-trans">{{lang.lang_translated}}</span> - 
+					<span class="lang-orig">{{lang.lang_original}}</span>
+				</li>
+				{% endfor %}
+				{% if vid.languages|length == 0 %}
+				<li class="lang-none">(none)</li>
+				{% endif %}
+			</ul>
+		</div>
 	</div>
 	{% endfor %}
 </div>
