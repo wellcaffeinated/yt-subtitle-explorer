@@ -2,12 +2,14 @@ define(
     [
         'jquery',
         'stapes',
-        'modules/language-search'
+        'modules/language-search',
+        'modules/toggle-ctrl'
     ],
     function(
         $,
         Stapes,
-        languageSearch
+        languageSearch,
+        toggleCtrl
     ){
         'use strict';
 
@@ -19,17 +21,28 @@ define(
                     ,wrap
                     ;
 
+                toggleCtrl().init({
+                    el: '#negate-ctrl'
+                }).on({
+                    'change:state': function(state){
+                        self.set('negate', state);
+                    }
+                });
+
+                toggleCtrl().init({
+                    el: '#scope-ctrl'
+                }).on({
+                    'change:state': function(state){
+                        self.set('scope', state);
+                    }
+                });
+
+                self.on({
+                    'change:negate': self.filterVids,
+                    'change:scope': self.filterVids
+                }, self);
+
                 $(function(){
-
-                    var filterSelect = $('#filter-select').on('click', '.btn', function(){
-                        self.filterVids();
-                    });
-                    self.set('vid-filter', filterSelect);
-
-                    var filterNegate = $('#filter-negate').on('click', '.btn', function(){
-                        self.filterVids();
-                    });
-                    self.set('vid-negate', filterNegate);
 
                     wrap = $('#language-search-wrap');
                     self.set('all-langs-url', wrap.attr('data-all-langs'));
@@ -54,7 +67,7 @@ define(
 
                 var langs = this.get('languages') || []
                     ,url = langs.length? 
-                            '/languages/' + this.get('vid-negate').filter(':checked').attr('data-val') + '/' + this.get('vid-filter').filter(':checked').attr('data-val') + '/' + langs.join('~') 
+                            '/languages/' + this.get('negate') + '/' + this.get('scope') + '/' + langs.join('~') 
                             : this.get('all-langs-url')
                     ;
 

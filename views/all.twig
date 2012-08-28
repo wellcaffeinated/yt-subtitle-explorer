@@ -36,16 +36,16 @@
 
         <span>Search for videos that </span>
 
-        <span class="btn-group">
-          <button id="radio-with" class="btn btn-small btn-success active" type="button" name="filterNegate" data-val="with">do</button>
-          <button id="radio-without" class="btn btn-small" type="button" name="filterNegate" data-val="without">don't</button>
+        <span class="btn-group" id="negate-ctrl">
+          <button id="radio-with" class="btn btn-small active" type="button" data-val="with">do</button>
+          <button id="radio-without" class="btn btn-small" type="button" data-val="without">don't</button>
         </span>
         
         <span>have translations for</span>
 
-        <span class="btn-group">
-          <button id="radio-any" class="btn btn-small active" type="button" name="filterType" checked="checked" data-val="any">some</button>
-          <button id="radio-every" class="btn btn-small btn-inverse" type="button" name="filterType" data-val="every">all</button>
+        <span class="btn-group" id="scope-ctrl">
+          <button id="radio-any" class="btn btn-small active" type="button" checked="checked" data-val="any">some</button>
+          <button id="radio-every" class="btn btn-small" type="button" data-val="every">all</button>
         </span>
 
         <span>of the following languages:</span>
