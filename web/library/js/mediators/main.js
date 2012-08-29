@@ -19,38 +19,31 @@ define(
 
                 var self = this
                     ,wrap
+                    ,scopeCtrl
+                    ,negateCtrl
                     ;
 
-                toggleCtrl().init({
+                negateCtrl = toggleCtrl().init({
                     el: '#negate-ctrl'
-                }).on({
-                    'change:state': function(state){
-                        self.set('negate', state);
-                    }
                 });
 
-                toggleCtrl().init({
+                scopeCtrl = toggleCtrl().init({
                     el: '#scope-ctrl'
-                }).on({
-                    'change:state': function(state){
-                        self.set('scope', state);
-                    }
                 });
 
-                self.on({
-                    'change:negate': self.filterVids,
-                    'change:scope': self.filterVids
-                }, self);
-
+                self.set({
+                    'ctrl.negate': negateCtrl,
+                    'ctrl.scope': scopeCtrl
+                });
+                
                 $(function(){
 
                     wrap = $('#language-search-wrap');
                     self.set('all-langs-url', wrap.attr('data-all-langs'));
 
-
                     languageSearch.create().init({
                         
-                        el: '#lang-search'
+                        el: $('#lang-search input')[0]
 
                     }).on({
 
@@ -60,6 +53,18 @@ define(
                             self.filterVids();
                         }
                     });
+
+                    negateCtrl.on('ready', function(){
+                        negateCtrl.on({
+                            'change:state': self.filterVids
+                        }, self);
+                    });
+
+                    scopeCtrl.on('ready', function(){
+                        scopeCtrl.on({
+                            'change:state': self.filterVids
+                        }, self);
+                    });
                 });
             },
 
@@ -67,7 +72,7 @@ define(
 
                 var langs = this.get('languages') || []
                     ,url = langs.length? 
-                            '/languages/' + this.get('negate') + '/' + this.get('scope') + '/' + langs.join('~') 
+                            '/languages/' + this.get('ctrl.negate').get('state') + '/' + this.get('ctrl.scope').get('state') + '/' + langs.join('~') 
                             : this.get('all-langs-url')
                     ;
 

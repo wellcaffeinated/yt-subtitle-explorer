@@ -10,7 +10,7 @@ define(
 
 		'use strict';
 
-        var MyModule = Stapes.create().extend({
+        var ToggleCtrl = Stapes.create().extend({
 
             // default options
             options: {
@@ -36,11 +36,12 @@ define(
                 	var el = $(self.options.el);
 	                self.set({
 	                	el: el,
-	                	state: el.data('val') 
+	                	state: el.find('.btn.active').data('val') 
 	                });
+
+	                self.emit('ready');
 	            });
 
-                self.emit('ready'); // if applicable
                 return self;
             },
 
@@ -84,7 +85,7 @@ define(
         return function(){
 
             // Create a "sub-module"
-            return MyModule.create();
+            return ToggleCtrl.create();
         };
 	}
 );

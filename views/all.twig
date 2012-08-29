@@ -36,22 +36,24 @@
 
         <span>Search for videos that </span>
 
-        <span class="btn-group" id="negate-ctrl">
-          <button id="radio-with" class="btn btn-small active" type="button" data-val="with">do</button>
-          <button id="radio-without" class="btn btn-small" type="button" data-val="without">don't</button>
+        <span class="btn-group toggle-group" id="negate-ctrl">
+          <button class="btn btn-small active" type="button" data-val="with">do</button>
+          <button class="btn btn-small" type="button" data-val="without">don't</button>
         </span>
         
         <span>have translations for</span>
 
-        <span class="btn-group" id="scope-ctrl">
-          <button id="radio-any" class="btn btn-small active" type="button" checked="checked" data-val="any">some</button>
-          <button id="radio-every" class="btn btn-small" type="button" data-val="every">all</button>
+        <span class="btn-group toggle-group" id="scope-ctrl">
+          <button class="btn btn-small active" type="button" data-val="any">some</button>
+          <button class="btn btn-small" type="button" data-val="every">all</button>
         </span>
 
         <span>of the following languages:</span>
       </div>
   		
-  		<input type="text" id="lang-search" name="lang-search" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
+      <div id="lang-search">
+  		  <input type="text" name="lang-search" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
+      </div>
   	</div>
     
     <div class="row-fluid">
