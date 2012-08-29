@@ -21,20 +21,26 @@ define(
 
             init: function( opts ){
 
-                var self = this;
+                var self = this
+                	,options = {}
+                	;
 
                 // prevent double initializations
                 if (self.inited) return self;
                 self.inited = true;
 
                 // extend default options
+                self.extend( options, self.options );
+                self.options = options;
                 self.extend( self.options, opts );
 
                 self.initEvents();
 
                 $(function(){
+
                 	var el = $(self.options.el);
-	                self.set({
+                	
+                	self.set({
 	                	el: el,
 	                	state: el.find('.btn.active').data('val') 
 	                });

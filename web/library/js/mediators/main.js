@@ -54,17 +54,13 @@ define(
                         }
                     });
 
-                    negateCtrl.on('ready', function(){
-                        negateCtrl.on({
-                            'change:state': self.filterVids
-                        }, self);
-                    });
+                    negateCtrl.on({
+                        'change:state': self.filterVids
+                    }, self);
 
-                    scopeCtrl.on('ready', function(){
-                        scopeCtrl.on({
-                            'change:state': self.filterVids
-                        }, self);
-                    });
+                    scopeCtrl.on({
+                        'change:state': self.filterVids
+                    }, self);
                 });
             },
 
