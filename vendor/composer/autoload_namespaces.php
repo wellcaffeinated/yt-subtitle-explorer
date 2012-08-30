@@ -15,6 +15,9 @@ return array(
     'SessionHandlerInterface' => $vendorDir . '/symfony/http-foundation/Symfony/Component/HttpFoundation/Resources/stubs',
     'Pimple' => $vendorDir . '/pimple/pimple/lib/',
     'Monolog' => $vendorDir . '/monolog/monolog/src/',
+    'Illuminate\\Socialite' => $vendorDir . '/illuminate/socialite/src/',
+    'Guzzle\\Tests' => $vendorDir . '/guzzle/guzzle/tests/',
+    'Guzzle' => $vendorDir . '/guzzle/guzzle/src/',
     'Doctrine\\DBAL' => $vendorDir . '/doctrine/dbal/lib/',
     'Doctrine\\Common' => $vendorDir . '/doctrine/common/lib/',
 );

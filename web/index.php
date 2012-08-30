@@ -30,6 +30,7 @@ if (false and is_dir(YTSE_ROOT.'/install')){
 
 require YTSE_ROOT.'/app/APIMediatorProvider.php';
 require YTSE_ROOT.'/app/YTPlaylistProvider.php';
+require YTSE_ROOT.'/app/TwitterProvider.php';
 
 // register api mediator provider
 $app->register(new APIMediatorProvider());
@@ -37,12 +38,19 @@ $app->register(new APIMediatorProvider());
 $app->register(new YTPlaylistProvider(), array(
     'ytplaylist.id' => '908547EAA7E4AE74'
 ));
+$app->register(new TwitterProvider(), array(
+	'twitter.consumer_key' => 'ixzkZUeGEFL4X0lpP1HZg',
+	'twitter.consumer_secret' => 'q2zhoaVly7KUZ0P7Soi0wssDK69pW2pxv2io5igc'
+));
+
 // register twig templating
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => YTSE_ROOT.'/views'
 ));
 // url service provider
 $app->register(new Silex\Provider\UrlGeneratorServiceProvider());
+// register the session extension
+$app->register(new Silex\Provider\SessionServiceProvider());
 
 $app['refresh.data'] = $app->protect(function() use ($app) {
 
@@ -171,6 +179,11 @@ $app->get('/languages/{withWithout}/{anyEvery}/{lang_list}', function( $withWith
 ->assert('withWithout', '(with|without)')
 ->assert('anyEvery', '(any|every)')
 ->convert('lang_list', $convertLangList);
+
+/**
+ * OAuth test
+ */
+$app->mount('/admin', include YTSE_ROOT.'/app/routes/oauth.php');
 
 /**
  * After response is sent

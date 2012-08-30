@@ -1,5 +1,5 @@
 {
-    "hash": "e8aa77845b4ae98d7510c3151a14f806",
+    "hash": "75a91bec94981398f622930652696c3c",
     "packages": [
         {
             "package": "doctrine/common",
@@ -10,6 +10,16 @@
             "version": "2.2.x-dev",
             "source-reference": "da4b7b4d965db0c1c1d23333e87ee5ae8994e249",
             "commit-date": "1344978731"
+        },
+        {
+            "package": "guzzle/guzzle",
+            "version": "v2.8.5"
+        },
+        {
+            "package": "illuminate/socialite",
+            "version": "dev-master",
+            "source-reference": "v1.0.1",
+            "commit-date": "1344541211"
         },
         {
             "package": "monolog/monolog",
