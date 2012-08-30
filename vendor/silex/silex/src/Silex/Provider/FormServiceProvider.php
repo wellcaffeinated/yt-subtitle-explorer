@@ -13,13 +13,15 @@ namespace Silex\Provider;
 
 use Silex\Application;
 use Silex\ServiceProviderInterface;
+use Symfony\Component\Form\Extension\Core\CoreExtension;
+use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\DefaultCsrfProvider;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
+use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension as FormValidatorExtension;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormRegistry;
-use Symfony\Component\Form\Extension\Core\CoreExtension;
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension as FormValidatorExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
+use Symfony\Component\Form\ResolvedFormTypeFactory;
 
 /**
  * Symfony Form component Provider.
@@ -51,6 +53,7 @@ class FormServiceProvider implements ServiceProviderInterface
             $extensions = array(
                 new CoreExtension(),
                 new CsrfExtension($app['form.csrf_provider']),
+                new HttpFoundationExtension(),
             );
 
             if (isset($app['validator'])) {
@@ -65,12 +68,16 @@ class FormServiceProvider implements ServiceProviderInterface
             return $extensions;
         });
 
+        $app['form.resolved_type_factory'] = $app->share(function ($app) {
+            return new ResolvedFormTypeFactory();
+        });
+
         $app['form.registry'] = $app->share(function ($app) {
-            return new FormRegistry($app['form.extensions']);
+            return new FormRegistry($app['form.extensions'], $app['form.resolved_type_factory']);
         });
 
         $app['form.factory'] = $app->share(function ($app) {
-            return new FormFactory($app['form.registry']);
+            return new FormFactory($app['form.registry'], $app['form.resolved_type_factory']);
         });
 
         $app['form.csrf_provider'] = $app->share(function ($app) {

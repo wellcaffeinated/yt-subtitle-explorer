@@ -1,6 +1,17 @@
-* 1.9.1 (2012-XX-XX)
+* 1.9.3 (2012-XX-XX)
 
- * n/a
+ * fixed an error when a token parser pass a closure as a test to the subparse() method
+
+* 1.9.2 (2012-08-25)
+
+ * fixed the in operator for objects that contain circular references
+ * fixed the C extension when accessing a public property of an object implementing the \ArrayAccess interface
+
+* 1.9.1 (2012-07-22)
+
+ * optimized macro calls when auto-escaping is on
+ * fixed wrong parent class for Twig_Function_Node
+ * made Twig_Loader_Chain more explicit about problems
 
 * 1.9.0 (2012-07-13)
 
