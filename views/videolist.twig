@@ -1,28 +1,40 @@
-<div class="video-list span12">
-	{% for vid in videos %}
-	<div class="video well">
-		<h4><a href="{{vid.url}}">{{vid.title}}</a></h4>
-		<div class="row-fluid">
-			<div class="pull-left thumbnail span2">
-				<img src="{{vid.thumbnail}}" alt="{{vid.title}}"/>
-				<a href="{{vid.url}}" class="btn btn-small btn-block">Watch</a>
-				<a href="#" class="btn btn-small btn-success btn-block">Help Translate</a>
-			</div>
-			<div class="languages pull-left span10">
-				<h5>Languages</h5>
-				<ul class="unstyled clearfix">
-					{% for lang in vid.languages %}
-					<li class="lang-{{lang.lang_code}} label label-info">
-						<span class="lang-trans">{{lang.lang_translated}}</span> - 
-						<span class="lang-orig">{{lang.lang_original}}</span>
-					</li>
-					{% endfor %}
-					{% if vid.languages|length == 0 %}
-					<li class="lang-none muted">(none)</li>
-					{% endif %}
-				</ul>
+{% set columns = 2 %}
+
+<div class="video-list">
+{% for vid in videos %}
+	{% if loop.index0 % columns == 0 %}
+	<div class="row-fluid">
+	{% endif %}
+		<div class="video well span{{ 12/columns }}" data-ytid="{{vid.ytid}}">
+			<div class="inner">
+				<h4 class="video-title"><a href="{{vid.url}}">{{vid.title}}</a></h4>
+				<div class="video-meta row-fluid">
+					<div class="thumbnail span6">
+						<img src="{{vid.thumbnail}}" alt="{{vid.title}}"/>
+					</div>
+					<div class="span6 video-ctrls btn-group btn-group-vertical">
+						<a href="{{vid.url}}" class="watch-btn btn btn-block">Watch</a>
+						<a href="#" class="help-btn btn btn-success btn-block">Help Translate</a>
+					</div>
+				</div>
+				<div class="languages">
+					<h5>Languages</h5>
+					<ul class="unstyled clearfix">
+						{% for lang in vid.languages %}
+						<li class="lang-{{lang.lang_code}} label label-info">
+							<span class="lang-trans">{{lang.lang_translated}}</span> - 
+							<span class="lang-orig">{{lang.lang_original}}</span>
+						</li>
+						{% endfor %}
+						{% if vid.languages|length == 0 %}
+						<li class="lang-none muted">(none)</li>
+						{% endif %}
+					</ul>
+				</div>
 			</div>
 		</div>
+	{% if loop.index % columns == 0 %}
 	</div>
-	{% endfor %}
+	{% endif %}
+{% endfor %}
 </div>

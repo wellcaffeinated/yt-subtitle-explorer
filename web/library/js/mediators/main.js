@@ -3,13 +3,16 @@ define(
         'jquery',
         'stapes',
         'modules/language-search',
-        'modules/toggle-ctrl'
+        'modules/toggle-ctrl',
+        'plugins/tpl!templates/video-modal.tpl',
+        'bootstrap'
     ],
     function(
         $,
         Stapes,
         languageSearch,
-        toggleCtrl
+        toggleCtrl,
+        tplModal
     ){
         'use strict';
 
@@ -22,6 +25,28 @@ define(
                     ,scopeCtrl
                     ,negateCtrl
                     ;
+
+                // open overlays on watch click
+                $(document).on('click', '.video .watch-btn', function(e){
+
+                    var $this = $(this)
+                        ,$video = $this.parents('.video')
+                        ;
+
+                    e.preventDefault();
+
+                    $(tplModal.render({
+
+                        title: $video.find('.video-title').text(),
+                        ytid: $video.data('ytid')
+
+                    })).modal().on('hidden', function () {
+                        
+                        // destroy it when closed so video stops
+                        $(this).remove();
+                    });
+
+                });
 
                 negateCtrl = toggleCtrl().init({
                     el: '#negate-ctrl'
@@ -61,6 +86,7 @@ define(
                     scopeCtrl.on({
                         'change:state': self.filterVids
                     }, self);
+
                 });
             },
 
