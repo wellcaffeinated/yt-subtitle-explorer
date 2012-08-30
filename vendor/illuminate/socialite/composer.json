@@ -1,0 +1,22 @@
+{
+    "name": "illuminate/socialite",
+    "description": "A simple library for OAuth 2 authentication.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylorotwell@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "symfony/http-foundation": "2.*",
+        "guzzle/guzzle": "2.*"
+    },
+    "require-dev": {
+        "mockery/mockery": "0.7.*"
+    },
+    "autoload": {
+        "psr-0": {"Illuminate\\Socialite": "src/"}
+    }
+}
