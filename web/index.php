@@ -30,7 +30,7 @@ if (false and is_dir(YTSE_ROOT.'/install')){
 
 require YTSE_ROOT.'/app/APIMediatorProvider.php';
 require YTSE_ROOT.'/app/YTPlaylistProvider.php';
-require YTSE_ROOT.'/app/TwitterProvider.php';
+require YTSE_ROOT.'/app/GoogleOAuthProvider.php';
 
 // register api mediator provider
 $app->register(new APIMediatorProvider());
@@ -38,9 +38,9 @@ $app->register(new APIMediatorProvider());
 $app->register(new YTPlaylistProvider(), array(
     'ytplaylist.id' => '908547EAA7E4AE74'
 ));
-$app->register(new TwitterProvider(), array(
-	'twitter.consumer_key' => 'ixzkZUeGEFL4X0lpP1HZg',
-	'twitter.consumer_secret' => 'q2zhoaVly7KUZ0P7Soi0wssDK69pW2pxv2io5igc'
+$app->register(new GoogleOAuthProvider(), array(
+	'google.consumer_key' => '800287186226.apps.googleusercontent.com',
+	'google.consumer_secret' => 'adOMrJ-Kika6t7onDCARC7GB'
 ));
 
 // register twig templating
