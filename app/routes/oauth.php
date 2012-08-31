@@ -62,24 +62,6 @@ $route->get('/auth', function(Request $request) use ($app) {
 
     $app['session']->set('username', $userdata['entry']['yt$username']['$t']);
 
-	//return $app->json($userdata);
-
-	// $oauth = new OAuth(CONS_KEY, CONS_SECRET, OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
-	// $oauth->setToken($oauth_token, $secret);
-
-	// try {
-	// 	$oauth_token_info = $oauth->getAccessToken('https://twitter.com/oauth/access_token');
-	// } catch (OAuthException $e) {
-	// 	$app->abort(401, $e->getMessage());
-	// }
-
-	// // retrieve Twitter user details
-	// $oauth->setToken($oauth_token_info['oauth_token'], $oauth_token_info['oauth_token_secret']);
-	// $oauth->fetch('https://twitter.com/account/verify_credentials.json');
-	// $json = json_decode($oauth->getLastResponse());
-
-	// $app['session']->set('username', $json->screen_name);
-
 	return $app->redirect($app['url_generator']->generate('admin'));
 })->bind('auth');
 

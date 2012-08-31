@@ -15,7 +15,7 @@ $app['db.tables.languages'] = YTSE_DB_PFX.'languages';
 
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
-        'driver'   => 'pdo_sqlite',
+    	'driver'   => 'pdo_sqlite',
         'path'     => YTSE_DB_PATH,
     ),
 ));
@@ -50,7 +50,11 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 // url service provider
 $app->register(new Silex\Provider\UrlGeneratorServiceProvider());
 // register the session extension
-$app->register(new Silex\Provider\SessionServiceProvider());
+$app->register(new Silex\Provider\SessionServiceProvider(), array(
+	'session.storage.options' => array(
+		'secure' => true
+	)
+));
 
 $app['refresh.data'] = $app->protect(function() use ($app) {
 
