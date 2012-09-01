@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'YTSE' => $baseDir . '/app/',
     'Twig_' => $vendorDir . '/twig/twig/lib/',
     'Symfony\\Component\\Routing' => $vendorDir . '/symfony/routing/',
     'Symfony\\Component\\HttpKernel' => $vendorDir . '/symfony/http-kernel/',

@@ -28,19 +28,15 @@ if (false and is_dir(YTSE_ROOT.'/install')){
 	exit;
 }
 
-require YTSE_ROOT.'/app/APIMediatorProvider.php';
-require YTSE_ROOT.'/app/YTPlaylistProvider.php';
-require YTSE_ROOT.'/app/GoogleOAuthProvider.php';
-
 // register api mediator provider
-$app->register(new APIMediatorProvider());
+$app->register(new YTSE\API\APIMediatorProvider());
 // register playlist provider
-$app->register(new YTPlaylistProvider(), array(
-    'ytplaylist.id' => '908547EAA7E4AE74'
+$app->register(new YTSE\Playlist\YTPlaylistProvider(), array(
+    'ytplaylist.id' => YT_PLAYLIST
 ));
-$app->register(new GoogleOAuthProvider(), array(
-	'google.consumer_key' => '800287186226.apps.googleusercontent.com',
-	'google.consumer_secret' => 'adOMrJ-Kika6t7onDCARC7GB'
+$app->register(new YTSE\OAuth\GoogleOAuthProvider(), array(
+	'google.consumer_key' => G_OAUTH_KEY,
+	'google.consumer_secret' => G_OAUTH_SECRET
 ));
 
 // register twig templating

@@ -7,5 +7,10 @@
         "swiftmailer/swiftmailer": ">=4.1.2,<4.2-dev",
         "illuminate/socialite": "*"
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "YTSE": "app/"
+        }
+    }
 }

@@ -48,59 +48,6 @@
         ]
     },
     {
-        "name": "twig/twig",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "git://github.com/fabpot/Twig.git",
-            "reference": "f76ed618c890165fd107a9cd4a06c7d73da75b9c"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/fabpot/Twig/zipball/f76ed618c890165fd107a9cd4a06c7d73da75b9c",
-            "reference": "f76ed618c890165fd107a9cd4a06c7d73da75b9c",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2.4"
-        },
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.9-dev"
-            }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Twig_": "lib/"
-            }
-        },
-        "license": [
-            "BSD-3"
-        ],
-        "authors": [
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com",
-                "homepage": null,
-                "role": null
-            },
-            {
-                "name": "Armin Ronacher",
-                "email": "armin.ronacher@active-4.com",
-                "homepage": null,
-                "role": null
-            }
-        ],
-        "description": "Twig, the flexible, fast, and secure template language for PHP",
-        "homepage": "http://twig.sensiolabs.org",
-        "keywords": [
-            "templating"
-        ]
-    },
-    {
         "name": "silex/silex",
         "version": "dev-master",
         "version_normalized": "9999999-dev",
@@ -547,6 +494,37 @@
         }
     },
     {
+        "name": "twig/twig",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "git://github.com/fabpot/Twig.git",
+            "reference": "459720ff3b74ee0c0d159277c6f2f5df89d8a4f6"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/fabpot/Twig/zipball/459720ff3b74ee0c0d159277c6f2f5df89d8a4f6",
+            "reference": "459720ff3b74ee0c0d159277c6f2f5df89d8a4f6",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2.4"
+        },
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.9-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Twig_": "lib/"
+            }
+        }
+    },
+    {
         "name": "symfony/routing",
         "version": "dev-master",
         "version_normalized": "9999999-dev",
@@ -554,12 +532,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/Routing",
-            "reference": "20633ec11b727ad0916812810751ef89cfff2985"
+            "reference": "475c0550543c882a7e31b9aca7a5dc0615f59547"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/symfony/Routing/zipball/20633ec11b727ad0916812810751ef89cfff2985",
-            "reference": "20633ec11b727ad0916812810751ef89cfff2985",
+            "url": "https://github.com/symfony/Routing/zipball/475c0550543c882a7e31b9aca7a5dc0615f59547",
+            "reference": "475c0550543c882a7e31b9aca7a5dc0615f59547",
             "shasum": ""
         },
         "require": {

@@ -1,5 +1,5 @@
 {
-    "hash": "75a91bec94981398f622930652696c3c",
+    "hash": "fb75778c623abbc7019ca25375500a2b",
     "packages": [
         {
             "package": "doctrine/common",
@@ -100,8 +100,8 @@
         {
             "package": "symfony/routing",
             "version": "dev-master",
-            "source-reference": "20633ec11b727ad0916812810751ef89cfff2985",
-            "commit-date": "1346337330"
+            "source-reference": "475c0550543c882a7e31b9aca7a5dc0615f59547",
+            "commit-date": "1346394981"
         },
         {
             "package": "twig/twig",
@@ -112,8 +112,8 @@
         {
             "package": "twig/twig",
             "version": "dev-master",
-            "source-reference": "f76ed618c890165fd107a9cd4a06c7d73da75b9c",
-            "commit-date": "1346324412"
+            "source-reference": "459720ff3b74ee0c0d159277c6f2f5df89d8a4f6",
+            "commit-date": "1346397138"
         }
     ],
     "packages-dev": null,
