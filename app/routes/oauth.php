@@ -3,7 +3,7 @@
 use Illuminate\Socialite\OAuthTwo;
 use Symfony\Component\HttpFoundation\Request;
 
-require_once YTSE_ROOT.'/include/Pest.php';
+use Guzzle\Service\Client;
 
 $route = $app['controllers_factory'];
 
@@ -52,13 +52,20 @@ $route->get('/auth', function(Request $request) use ($app) {
 		$app->abort(400, 'Invalid token');
 	}
 
-	$pest = new Pest('https://gdata.youtube.com');
+	$gdata = new Client('https://gdata.youtube.com');
 
-	$pest->curl_opts[CURLOPT_HTTPHEADER] = array(
-        'Authorization: Bearer ' . $oauth_token->getValue()
-    );
-
-    $userdata = json_decode($pest->get('/feeds/api/users/default?alt=json'), true);
+	$userdata = json_decode($gdata->get(array(
+	    	'/feeds/api/users/default{?params*}',
+	    	array(
+	    		'params' => array(
+	    			'alt' => 'json'
+	    		)
+	    	)
+	    ), 
+    	array(
+	        'Authorization' => 'Bearer ' . $oauth_token->getValue()
+	    )
+    )->send()->getBody(true), true);
 
     $app['session']->set('username', $userdata['entry']['yt$username']['$t']);
 

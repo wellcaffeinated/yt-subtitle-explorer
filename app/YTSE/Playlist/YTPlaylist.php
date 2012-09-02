@@ -90,16 +90,16 @@ class YTPlaylist {
 
 		if (!$this->data) return true;
 
-		$now = new DateTime('now');
-		$timeout = new DateTime($this->data['last_refresh']);
-		$timeout->add( new DateInterval(YTPlaylist::$RefreshInterval) );
+		$now = new \DateTime('now');
+		$timeout = new \DateTime($this->data['last_refresh']);
+		$timeout->add( new \DateInterval(YTPlaylist::$RefreshInterval) );
 		return ($now > $timeout);
 	}
 
 	public function updateVideo( array $data ){
 
 		if (!isset($data['ytid'])){
-			throw Exception('Can not add video. "ytid" must be specified.');
+			throw \Exception('Can not add video. "ytid" must be specified.');
 		}
 
 		$this->videos[] = $data['ytid'];
@@ -184,7 +184,7 @@ class YTPlaylist {
 
 	public function syncLocal(){
 
-		$now = new Datetime('now');
+		$now = new \Datetime('now');
 		$this->data['last_refresh'] = $now->format('c');
 		$this->data['video_list'] = serialize(array_unique($this->videos));
 		$this->app['db']->update($this->app['db.tables.playlists'], $this->data, array('ytid'=>$this->data['ytid']));

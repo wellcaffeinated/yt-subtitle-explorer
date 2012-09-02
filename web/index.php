@@ -5,7 +5,6 @@ require_once __DIR__.'/../vendor/autoload.php';
 define('YTSE_ROOT', __DIR__.'/..');
 require YTSE_ROOT.'/config.php';
 
-global $app;
 $app = new Silex\Application();
 $app['debug'] = defined('DEBUG');
 
@@ -23,7 +22,7 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
 if (false and is_dir(YTSE_ROOT.'/install')){
 
 	// do installation
-	$app->mount('/install', include YTSE_ROOT.'/install/install.php');
+	$app->mount('/install', include YTSE_ROOT.'/app/install/install.php');
 	$app->run();
 	exit;
 }
@@ -41,7 +40,7 @@ $app->register(new YTSE\OAuth\GoogleOAuthProvider(), array(
 
 // register twig templating
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path' => YTSE_ROOT.'/views'
+    'twig.path' => YTSE_ROOT.'/app/views'
 ));
 // url service provider
 $app->register(new Silex\Provider\UrlGeneratorServiceProvider());

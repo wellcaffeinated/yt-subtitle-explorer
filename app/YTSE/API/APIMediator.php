@@ -1,12 +1,8 @@
 <?php
 
-namespace YTSE\Mediator;
+namespace YTSE\API;
 
-/*
-@TODO Change this to use autoloader
- */
-require_once YTSE_ROOT.'/include/Pest.php';
-require_once YTSE_ROOT.'/include/PestXML.php';
+use Guzzle\Service\Client;
 
 class APIMediator {
 
@@ -24,33 +20,74 @@ class APIMediator {
             throw new Exception('You MUST specify your Universal Subtitles API Key in config.php');
         }
 
-        $this->ytAPI = new PestXML('http://www.youtube.com/api');
+        $this->ytAPI = new Client('http://www.youtube.com/api', array(
+            'curl.CURLOPT_SSL_VERIFYHOST' => false,
+            'curl.CURLOPT_SSL_VERIFYPEER' => false,
+        ));
 
-        $this->gdataAPI = new Pest('https://gdata.youtube.com/feeds/api');
+        $this->gdataAPI = new Client('https://gdata.youtube.com/feeds/api', array(
+            'curl.CURLOPT_SSL_VERIFYHOST' => false,
+            'curl.CURLOPT_SSL_VERIFYPEER' => false,
+        ));
 
         if(defined('YOUTUBE_KEY') && count(YOUTUBE_KEY) !== 0){
-            $this->gdataAPI->curl_opts[CURLOPT_HTTPHEADER] = array(
-                'X-GData-Key: key='.YOUTUBE_KEY
-            );
+            $this->gdataAPI->setDefaultHeaders(array(
+                'X-GData-Key' => 'key='.YOUTUBE_KEY
+            ));
         }
 
-        $this->unisubAPI = new Pest('https://www.universalsubtitles.org/api2/partners');
-        $this->unisubAPI->curl_opts[CURLOPT_HTTPHEADER] = array(
-            'X-api-username: '.UNISUB_USERNAME,
-            'X-apikey: '.UNISUB_KEY
-        );
+        // $this->unisubAPI = new Client('https://www.universalsubtitles.org/api2/partners');
+        // $this->unisubAPI->setDefaultHeaders(array(
+        //     'X-api-username' => UNISUB_USERNAME,
+        //     'X-apikey' => UNISUB_KEY
+        // ));
 
+    }
+
+    private function parseXML( $body ){
+        
+        libxml_use_internal_errors(true);
+
+        if (empty($body) || preg_match('/^\s+$/', $body))
+            return null;
+        
+        $xml = simplexml_load_string($body);
+        
+        if (!$xml) {
+
+          $err = "Couldn't parse XML response because:\n";
+          $xml_errors = libxml_get_errors();
+          
+          if(!empty($xml_errors)) {
+
+            foreach(libxml_get_errors() as $xml_err)
+                $err .= "\n    - " . $xml_err->message;
+            
+            $err .= "\nThe response was:\n";
+            $err .= $body;
+            throw new \Exception($err);
+          }
+        }
+        
+        return $xml;
     }
 
     public function getYTLanguages($ytid){
 
         $ret = array();
 
-        try {
-            $xml = $this->ytAPI->get('/timedtext?type=list&v='.$ytid);
-        } catch (Exception $e) {
-            return false;
-        }
+        $xml = $this->parseXML(
+            $this->ytAPI->get(
+                array('timedtext{?params*}',
+                    array(
+                        'params' => array(
+                            'type' => 'list',
+                            'v' => $ytid,
+                        )
+                    )
+                )
+            )->send()->getBody(true)
+        );
 
         if (!$xml) return $ret;
 
@@ -76,17 +113,21 @@ class APIMediator {
 
         try {
 
-            $str = $this->gdataAPI->get('/playlists/'.$ytid.'?'.http_build_query(
-                array(
-                    'v'=>'2',
-                    'alt'=>'json',
-                    'orderby'=>'published',
-                    'max-results'=>'50', //max allowed
-                    'start-index'=>$start
+            $str = $this->gdataAPI->get(
+                array('playlists/{id}{?params*}',
+                    array(
+                        'id' => $ytid,
+                        'params' => array(
+                            'v' => '2',
+                            'alt' => 'json',
+                            'orderby' => 'published',
+                            'max-results' => '50', //max allowed
+                            'start-index' => $start
+                        )
+                    )
                 )
-            ));
-
-        } catch (Exception $e) {
+            )->send()->getBody(true);
+        } catch (\Exception $e) {
 
             return false;
         }
@@ -99,7 +140,7 @@ class APIMediator {
         $json = json_decode($str);
 
         if (!$json){
-            throw new Exception('Error parsing JSON data for playlist: '.$ytid);
+            throw new \Exception('Error parsing JSON data for playlist: '.$ytid);
         }
 
         $data['numVideos'] = (int) $json->feed->{'openSearch$totalResults'}->{'$t'};

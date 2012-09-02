@@ -6,7 +6,7 @@ if (!defined('YTSE_ROOT')) die('Access Denied');
 define('DEBUG', TRUE);
 
 // path to create sqlite database
-define('YTSE_DB_PATH', YTSE_ROOT.'/db/ytse.db');
+define('YTSE_DB_PATH', YTSE_ROOT.'/app/db/ytse.db');
 // table prefix
 define('YTSE_DB_PFX', ''); 
 
