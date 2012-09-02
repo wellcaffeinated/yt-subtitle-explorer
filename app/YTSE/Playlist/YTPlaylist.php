@@ -190,6 +190,23 @@ class YTPlaylist {
 		$this->app['db']->update($this->app['db.tables.playlists'], $this->data, array('ytid'=>$this->data['ytid']));
 	}
 
+	public function getAvailableLanguagesLike( $str = false ){
+
+		if (!$str || strlen($str) === 0){
+			
+			return $this->app['db']->fetchAll(
+				"SELECT * FROM {$this->app['db.tables.languages']}"
+			);
+		}
+
+		$str .= '%';
+
+		return $this->app['db']->fetchAll(
+			"SELECT * FROM {$this->app['db.tables.languages']} WHERE lang_original LIKE ? OR lang_translated LIKE ?",
+			array($str, $str)
+		);
+	}
+
 	private function getLangStr( array $langs ){
 
 		$ret = array();

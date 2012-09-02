@@ -62,50 +62,37 @@ $app['refresh.data'] = $app->protect(function() use ($app) {
 		return false;
 	}
 
+	$ids = array();
+
 	foreach ($data['videos'] as &$video){
 
-		$langs = $app['api']->getYTLanguages($video['ytid']);
-
-		// place default lang first
-		usort($langs, function($a, $b){
-
-			if ($a['lang_default'] === 'true'){
-				return -1;
-			}
-
-			if ($b['lang_default'] === 'true'){
-				return 1;
-			}
-
-			return 0;
-		});
-
-		$video['languages'] = $langs;
+		$ids[] = $video['ytid'];
 	}
 
-	$pl->setData($data);
-	$pl->syncLocal();
+	$allLangs = $app['api']->getYTLanguages($ids);
 
+	foreach ($data['videos'] as &$video){
+
+		if (array_key_exists($video['ytid'], $allLangs))
+			$video['languages'] = $allLangs[ $video['ytid'] ];
+	}
+
+	try {
+
+		$pl->setData($data);
+		$pl->syncLocal();
+		
+	} catch (\Exception $e){
+		// don't care for now
+	}
 });
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-$langListRegExp = '^([a-zA-Z]{2}([-][a-zA-Z]{2})?(~|$))*';
-$convertLangList = function($list, Request $request){
-
-	$langs = array_filter(array_unique(explode('~', $list)));
-
-	if (empty($langs)){
-		return array('en');
-	}
-
-	return $langs;
-};
-
 /**
  * Before routing
- *****************/
+ */
 $app->before(function(Request $request) use ($app) {
 
 	$pl = $app['ytplaylist'];
@@ -120,10 +107,8 @@ $app->before(function(Request $request) use ($app) {
 });
 
 /**
- * Routing
+ * Main Site
  */
-
-// all videos
 $app->get('/', function(Silex\Application $app) {
 	
 	$vids = $app['twig']->render('videolist.twig', array(
@@ -137,52 +122,15 @@ $app->get('/', function(Silex\Application $app) {
 	));
 });
 
-// meta data for languages (name, code, ...)
-$app->get('/languages/meta', function( Silex\Application $app, Request $request ) {
-
-	$q = $request->get('q').'%';
-
-	if (!$q){
-
-		$data = $app['db']->fetchAll("SELECT * FROM {$app['db.tables.languages']}");
-
-	} else {
-
-		$data = $app['db']->fetchAll(
-			"SELECT * FROM {$app['db.tables.languages']} WHERE lang_original LIKE ? OR lang_translated LIKE ?",
-			array($q, $q)
-		);
-	}
-	
-	return $app->json($data);
-})->bind('langmeta');
-
-$app->get('/languages/all', function( Silex\Application $app ) {
-	
-	return $app['twig']->render('videolist.twig', array(
-
-		'videos' => $app['ytplaylist']->getVideos()
-	));
-})->bind('langall');
-
-// find videos filtered by languages provided
-$app->get('/languages/{withWithout}/{anyEvery}/{lang_list}', function( $withWithout, $anyEvery, array $lang_list, Silex\Application $app ) {
-	
-	return $app['twig']->render('videolist.twig', array(
-
-		'videos' => $app['ytplaylist']->getVideosFilterLang( $lang_list, array('type' => $anyEvery, 'negate' => $withWithout === 'with') )
-	));
-})
-->bind('langfilter')
-->assert('lang_list', $langListRegExp)
-->assert('withWithout', '(with|without)')
-->assert('anyEvery', '(any|every)')
-->convert('lang_list', $convertLangList);
+/**
+ * Language Data
+ */
+$app->mount('/videos', new YTSE\Routes\LanguageDataControllerProvider());
 
 /**
  * OAuth test
  */
-$app->mount('/admin', include YTSE_ROOT.'/app/routes/oauth.php');
+//$app->mount('/admin', include YTSE_ROOT.'/app/Routes/oauth.php');
 
 /**
  * After response is sent

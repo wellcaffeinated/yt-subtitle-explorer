@@ -72,33 +72,65 @@ class APIMediator {
         return $xml;
     }
 
-    public function getYTLanguages($ytid){
+    public function getYTLanguages($ytids){
 
         $ret = array();
+        $requests = array();
 
-        $xml = $this->parseXML(
-            $this->ytAPI->get(
+        if (!is_array($ytids)){
+
+            $ret = $this->getYTLanguages( array($ytids) );
+            return $ret[ $ytids ];
+        }
+
+        foreach ($ytids as &$id){
+
+            $requests[] = $this->ytAPI->get(
                 array('timedtext{?params*}',
                     array(
                         'params' => array(
                             'type' => 'list',
-                            'v' => $ytid,
+                            'v' => $id,
                         )
                     )
                 )
-            )->send()->getBody(true)
-        );
-
-        if (!$xml) return $ret;
-
-        foreach($xml->track as $track){
-
-            $ret[] = array(
-                'lang_code' => (string) $track['lang_code'],
-                'lang_original' => (string) $track['lang_original'],
-                'lang_translated' => (string) $track['lang_translated'],
-                'lang_default' => (string) $track['lang_default']
             );
+        }
+
+        $responses = $this->ytAPI->send( $requests );
+
+        foreach ($responses as $key => &$r){
+
+            if ($r->isSuccessful()){
+                
+                $xml = $this->parseXML($r->getBody(true));
+                $langs = array();
+
+                foreach($xml->track as $track){
+                    $langs[] = array(
+                        'lang_code' => (string) $track['lang_code'],
+                        'lang_original' => (string) $track['lang_original'],
+                        'lang_translated' => (string) $track['lang_translated'],
+                        'lang_default' => (string) $track['lang_default']
+                    );
+
+                    // place default lang first
+                    usort($langs, function($a, $b){
+
+                        if ($a['lang_default'] === 'true'){
+                            return -1;
+                        }
+
+                        if ($b['lang_default'] === 'true'){
+                            return 1;
+                        }
+
+                        return 0;
+                    });
+                }
+
+                $ret[ $ytids[$key] ] = $langs;
+            }
         }
 
         return $ret;
@@ -127,6 +159,7 @@ class APIMediator {
                     )
                 )
             )->send()->getBody(true);
+
         } catch (\Exception $e) {
 
             return false;

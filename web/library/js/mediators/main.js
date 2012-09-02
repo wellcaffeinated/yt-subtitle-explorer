@@ -94,7 +94,7 @@ define(
 
                 var langs = this.get('languages') || []
                     ,url = langs.length? 
-                            'languages/' + this.get('ctrl.negate').get('state') + '/' + this.get('ctrl.scope').get('state') + '/' + langs.join('~') 
+                            '/videos/languages/' + this.get('ctrl.negate').get('state') + '/' + this.get('ctrl.scope').get('state') + '/' + langs.join('~') 
                             : this.get('all-langs-url')
                     ;
 
