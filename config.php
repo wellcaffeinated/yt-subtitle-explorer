@@ -10,6 +10,8 @@ define('YTSE_DB_PATH', YTSE_ROOT.'/app/db/ytse.db');
 // table prefix
 define('YTSE_DB_PFX', ''); 
 
+// Youtube username of the administrator
+define('ADMIN_YT_USERNAME', 'caffeinatedphysicist');
 // Youtube Playlist to use
 define('YT_PLAYLIST', '908547EAA7E4AE74');
 

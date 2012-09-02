@@ -25,17 +25,17 @@ class LanguageDataControllerProvider implements ControllerProviderInterface {
 
     public function connect(Application $app){
 
-    	$route = $app['controllers_factory'];
+    	$controller = $app['controllers_factory'];
 
 		// meta data for languages (name, code, ...)
-		$route->get('/meta', function(Application $app, Request $request ) {
+		$controller->get('/meta', function(Application $app, Request $request ) {
 
 			$data = $app['ytplaylist']->getAvailableLanguagesLike( $request->get('q') );
 			return $app->json($data);
 
 		})->bind('langmeta');
 
-		$route->get('/languages', function(Application $app ) {
+		$controller->get('/languages', function(Application $app ) {
 			
 			return $app['twig']->render('videolist.twig', array(
 
@@ -45,7 +45,7 @@ class LanguageDataControllerProvider implements ControllerProviderInterface {
 		})->bind('langall');
 
 		// find videos filtered by languages provided
-		$route->get('/languages/{withWithout}/{anyEvery}/{lang_list}', function( $withWithout, $anyEvery, array $lang_list, Application $app ) {
+		$controller->get('/languages/{withWithout}/{anyEvery}/{lang_list}', function( $withWithout, $anyEvery, array $lang_list, Application $app ) {
 			
 			return $app['twig']->render('videolist.twig', array(
 
@@ -64,6 +64,6 @@ class LanguageDataControllerProvider implements ControllerProviderInterface {
 		->assert('anyEvery', '(any|every)')
 		->convert('lang_list', array(&$this, 'convertLangList'));
 
-		return $route;
+		return $controller;
 	}
 }

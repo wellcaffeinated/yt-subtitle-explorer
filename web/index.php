@@ -90,6 +90,29 @@ $app['refresh.data'] = $app->protect(function() use ($app) {
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+$checkAuthorization = function(Request $req, Silex\Application $app){
+
+	$username = $app['session']->get('username');
+
+	// if you are not the administrator, get lost (or login)
+	if ( $username !== null && $username !== ADMIN_YT_USERNAME ){
+		
+		return $app->abort(401, "You are not authorized.");
+	}
+};
+
+$checkAuthentication = function(Request $req, Silex\Application $app){
+
+	if ($app['session']->get('username') === null){
+		// redirect to login page
+		return new \Symfony\Component\HttpFoundation\RedirectResponse(
+			$app['url_generator']->generate('login') . '?' . http_build_query(array(
+				'route' => $req->getRequestUri()
+			))
+		);
+	}
+};
+
 /**
  * Before routing
  */
@@ -126,6 +149,30 @@ $app->get('/', function(Silex\Application $app) {
  * Language Data
  */
 $app->mount('/videos', new YTSE\Routes\LanguageDataControllerProvider());
+
+/**
+ * OAuth Authentication
+ */
+
+$app->mount('/', new YTSE\Routes\AuthenticationControllerProvider());
+
+/**
+ * Contributions
+ */
+$contrib = new YTSE\Routes\ContributionControllerProvider();
+$contrib = $contrib->connect($app);
+$contrib->before($checkAuthentication);
+$app->mount('/contribute', $contrib);
+
+/**
+ * Administration
+ */
+
+$admin = new YTSE\Routes\AdministrationControllerProvider();
+$admin = $admin->connect($app);
+$admin->before($checkAuthentication);
+$admin->before($checkAuthorization);
+$app->mount('/admin', $admin);
 
 /**
  * OAuth test
