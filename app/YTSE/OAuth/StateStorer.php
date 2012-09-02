@@ -6,9 +6,11 @@ use Illuminate\Socialite\OAuthTwo\StateStoreInterface;
 
 class StateStorer implements StateStoreInterface {
 
-	function StateStorer(Application $app){
+    private $session;
 
-		$this->app = $app;
+	function StateStorer(\Symfony\Component\HttpFoundation\Session\Session $session){
+
+		$this->session = $session;
 	}
 
     /**
@@ -18,7 +20,7 @@ class StateStorer implements StateStoreInterface {
      */
     public function getState(){
 
-        return $this->app['session']->get('twitter.state');
+        return $this->session->get('state');
     }
 
     /**
@@ -29,7 +31,7 @@ class StateStorer implements StateStoreInterface {
      */
     public function setState($state){
 
-        $this->app['session']->set('twitter.state', $state);
+        $this->session->set('state', $state);
     }
 
 }

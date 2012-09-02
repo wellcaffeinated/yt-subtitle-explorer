@@ -7,20 +7,23 @@ use Illuminate\Socialite\OAuthTwo\GoogleProvider;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
-class GoogleOAuthProvider implements ServiceProviderInterface {
+class OAuthProvider implements ServiceProviderInterface {
     
     public function register(Application $app){
 
-        $app['google.oauth'] = $app->share(function($app){
+        $app['oauth'] = $app->share(function($app){
 
-            $key = $app['google.consumer_key'];
-            $secret = $app['google.consumer_secret'];
+            if ( array_key_exists('google', $app['oauth.config']) ){
 
-            if (!$key || !$secret){
-                throw new Exception('Please define google.consumer_key and google.consumer_secret');
+                $config = $app['oauth.config']['google'];
+
+                if (!array_key_exists('key', $config) || !array_key_exists('secret', $config))
+                    throw new \Exception('Please define oauth.config credentials.');
+
+                return new GoogleProvider( new YTSE\OAuth\StateStorer($app), $config['key'], $config['secret'] );
             }
-
-            return new GoogleProvider( new YTSE\OAuth\StateStorer($app), $key, $secret );
+            
+            throw new \Exception('Unsupported OAuth Provider.');
         });
     }
 

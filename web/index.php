@@ -33,9 +33,13 @@ $app->register(new YTSE\API\APIMediatorProvider());
 $app->register(new YTSE\Playlist\YTPlaylistProvider(), array(
     'ytplaylist.id' => YT_PLAYLIST
 ));
-$app->register(new YTSE\OAuth\GoogleOAuthProvider(), array(
-	'google.consumer_key' => G_OAUTH_KEY,
-	'google.consumer_secret' => G_OAUTH_SECRET
+$app->register(new YTSE\OAuth\OAuthProvider(), array(
+	'oauth.config' => array(
+		'provider' => 'google',
+		'key' => G_OAUTH_KEY,
+		'secret' => G_OAUTH_SECRET,
+		'admin' => ADMIN_YT_USERNAME,
+	)
 ));
 
 // register twig templating
@@ -92,10 +96,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 $checkAuthorization = function(Request $req, Silex\Application $app){
 
-	$username = $app['session']->get('username');
-
 	// if you are not the administrator, get lost (or login)
-	if ( $username !== null && $username !== ADMIN_YT_USERNAME ){
+	if ( !$app['oauth']->isAuthorized() ){
 		
 		return $app->abort(401, "You are not authorized.");
 	}
@@ -103,12 +105,13 @@ $checkAuthorization = function(Request $req, Silex\Application $app){
 
 $checkAuthentication = function(Request $req, Silex\Application $app){
 
-	if ($app['session']->get('username') === null){
+	if ( !$app['oauth']->isLoggedIn() ){
+
+		$app['session']->set('login_referrer', $req->getRequestUri());
+
 		// redirect to login page
 		return new \Symfony\Component\HttpFoundation\RedirectResponse(
-			$app['url_generator']->generate('login') . '?' . http_build_query(array(
-				'route' => $req->getRequestUri()
-			))
+			$app['url_generator']->generate('login')
 		);
 	}
 };
@@ -134,14 +137,9 @@ $app->before(function(Request $request) use ($app) {
  */
 $app->get('/', function(Silex\Application $app) {
 	
-	$vids = $app['twig']->render('videolist.twig', array(
-
-		'videos' => $app['ytplaylist']->getVideos()
-	));
-
-	return $app['twig']->render('all.twig', array(
+	return $app['twig']->render('page-video-search.twig', array(
 	
-		'body' => $vids
+		'videos' => $app['ytplaylist']->getVideos()
 	));
 });
 
@@ -154,7 +152,7 @@ $app->mount('/videos', new YTSE\Routes\LanguageDataControllerProvider());
  * OAuth Authentication
  */
 
-$app->mount('/', new YTSE\Routes\AuthenticationControllerProvider());
+$app->mount('/', new YTSE\Routes\AuthenticationControllerProvider( $app['oauth'] ));
 
 /**
  * Contributions
