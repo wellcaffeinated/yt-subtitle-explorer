@@ -182,6 +182,11 @@ class YTPlaylist {
 		return $vids;
 	}
 
+	public function getVideoById($id){
+
+		return $this->app['db']->fetchAssoc("SELECT * FROM {$this->app['db.tables.videos']} WHERE ytid = ?", array($id));
+	}
+
 	public function syncLocal(){
 
 		$now = new \Datetime('now');

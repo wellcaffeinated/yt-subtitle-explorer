@@ -16,7 +16,18 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
 		$controller->get('/{videoId}', function(Application $app, $videoId){
 
-			return 'Contribute to the translations';
+			$video = $app['ytplaylist']->getVideoById($videoId);
+
+			if (!$video){
+				
+				$app->abort(404, 'Video not found.');
+			}
+
+			return $app['twig']->render('page-contribute.twig', array(
+
+				'video' => $video,
+
+			));
 		})->bind('contribute');
 
 		return $controller;
