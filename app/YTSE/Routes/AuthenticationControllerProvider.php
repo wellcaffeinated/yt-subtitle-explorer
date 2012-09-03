@@ -12,7 +12,7 @@ class AuthenticationControllerProvider implements ControllerProviderInterface {
 
 	private $oauth;
 
-	public function AuthenticationControllerProvider(\YTSE\OAuth\LoginManager $oauth){
+	public function __construct(\YTSE\OAuth\LoginManager $oauth){
 
 		$this->oauth = $oauth;
 	}
@@ -27,12 +27,18 @@ class AuthenticationControllerProvider implements ControllerProviderInterface {
 
 		$controller = $app['controllers_factory'];
 
+		/**
+		 * Show login page
+		 */
 		$controller->get('/login', function(Request $req, Application $app) use ($data) {
 
 			return $app['twig']->render('page-login.twig', $data);
 
 		})->bind('login');
 
+		/**
+		 * Do logout action
+		 */
 		$controller->get('/logout', function () use ($app, $self) {
 
 			$self->logOut();
@@ -40,23 +46,59 @@ class AuthenticationControllerProvider implements ControllerProviderInterface {
 			return $app->redirect($app['url_generator']->generate('login'));
 		})->bind('logout');
 
-		$controller->get('/login/authenticate', function() use ($app){
+		/**
+		 * Redirect to youtube for authentication
+		 */
+		$controller->get('/login/authenticate', function() use ($app, $self){
 
-			
+			return $app->redirect($self->getAuthUrl(
+				$app['url_generator']->generate('auth_callback', array(), true)
+			));
 		})->bind('authenticate');
 
-		$controller->get('/login/authenticate/callback', function() use ($app) {
+		/**
+		 * Redirected from youtube to complete authentication
+		 */
+		$controller->get('/login/authenticate/callback', function(Request $request) use ($app, $self) {
 
-			$route = $req->get('route');
+			try {
+				$self->authenticate($request, $app['url_generator']->generate('auth_callback', array(), true));
+			}
+			catch(\Exception $e){
 
-			return $app->redirect($route? $route : '/');
+				$app->abort(400, 'Problem Authenticating');
+			}
+
+			if ( !$self->isLoggedIn() ) {
+				$app->abort(400, 'Problem Authenticating');
+			}
+
+			$route = $app['session']->get('login_referrer');
+
+			return $app->redirect($route? $route : $request->getBaseUrl());
 		})->bind('auth_callback');
 
 		return $controller;
 	}
 
-	public function logOut(){
+	public function isLoggedIn(){
+		return $this->oauth->isLoggedIn();
+	}
 
+	public function logOut(){
 		$this->oauth->logOut();
+	}
+
+	public function authenticate(Request $request, $redirectUri){
+		
+		$token = $this->oauth->getAccessToken($request, array(
+			'redirect_uri' => $redirectUri
+		));
+
+		$this->oauth->authenticate( $token );
+	}
+
+	public function getAuthUrl($redirect_url){
+		return $this->oauth->getAuthUrl( $redirect_url );
 	}
 }

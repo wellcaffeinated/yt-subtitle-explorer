@@ -11,6 +11,7 @@ $app['debug'] = defined('DEBUG');
 $app['db.tables.videos'] = YTSE_DB_PFX.'videos';
 $app['db.tables.playlists'] = YTSE_DB_PFX.'playlists';
 $app['db.tables.languages'] = YTSE_DB_PFX.'languages';
+define('YTSE_DB_ADMIN_TABLE', YTSE_DB_PFX.'admin');
 
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
@@ -18,14 +19,6 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
         'path'     => YTSE_DB_PATH,
     ),
 ));
-
-if (false and is_dir(YTSE_ROOT.'/install')){
-
-	// do installation
-	$app->mount('/install', include YTSE_ROOT.'/app/install/install.php');
-	$app->run();
-	exit;
-}
 
 // register api mediator provider
 $app->register(new YTSE\API\APIMediatorProvider());
@@ -94,12 +87,41 @@ $app['refresh.data'] = $app->protect(function() use ($app) {
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * OAuth Authentication
+ */
+
+$app->mount('/', new YTSE\Routes\AuthenticationControllerProvider( $app['oauth'] ));
+
+function dbDefOk($conn){
+	$schema = $conn->getSchemaManager();
+	return $schema->tablesExist(YTSE_DB_ADMIN_TABLE);
+}
+
+if (!dbDefOk($app['db']) || !$app['oauth']->adminTokenAvailable()){
+
+	// do installation
+	$app->mount('/', new YTSE\Routes\InstallationControllerProvider());
+	$app->run();
+	exit;
+}
+
 $checkAuthorization = function(Request $req, Silex\Application $app){
 
-	// if you are not the administrator, get lost (or login)
+	if ( !$app['oauth']->hasYoutubeAuth() ){
+
+		$app['oauth']->doYoutubeAuth();
+		$app['session']->set('login_referrer', $req->getRequestUri());
+
+		return new \Symfony\Component\HttpFoundation\RedirectResponse(
+			$app['url_generator']->generate('authenticate')
+		);
+	}
+
+	// if you are not the administrator, get lost
 	if ( !$app['oauth']->isAuthorized() ){
 		
-		return $app->abort(401, "You are not authorized.");
+		return $app->abort(401, "You are not authorized. Please log out and try again.");
 	}
 };
 
@@ -114,6 +136,11 @@ $checkAuthentication = function(Request $req, Silex\Application $app){
 			$app['url_generator']->generate('login')
 		);
 	}
+};
+
+$needYoutubeAuth = function(Request $req, Silex\Application $app){
+
+	$app['oauth']->doYoutubeAuth();
 };
 
 /**
@@ -141,18 +168,12 @@ $app->get('/', function(Silex\Application $app) {
 	
 		'videos' => $app['ytplaylist']->getVideos()
 	));
-});
+})->bind('search_page');
 
 /**
  * Language Data
  */
 $app->mount('/videos', new YTSE\Routes\LanguageDataControllerProvider());
-
-/**
- * OAuth Authentication
- */
-
-$app->mount('/', new YTSE\Routes\AuthenticationControllerProvider( $app['oauth'] ));
 
 /**
  * Contributions
@@ -168,6 +189,7 @@ $app->mount('/contribute', $contrib);
 
 $admin = new YTSE\Routes\AdministrationControllerProvider();
 $admin = $admin->connect($app);
+$admin->before($needYoutubeAuth);
 $admin->before($checkAuthentication);
 $admin->before($checkAuthorization);
 $app->mount('/admin', $admin);

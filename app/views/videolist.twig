@@ -14,7 +14,7 @@
 					</div>
 					<div class="span6 video-ctrls btn-group btn-group-vertical">
 						<a href="{{vid.url}}" class="watch-btn btn btn-block">Watch</a>
-						<a href="#" class="help-btn btn btn-success btn-block">Help Translate</a>
+						<a href="{{app.url_generator.generate("contribute", {videoId: vid.ytid})}}}}" class="help-btn btn btn-success btn-block">Help Translate</a>
 					</div>
 				</div>
 				<div class="languages">

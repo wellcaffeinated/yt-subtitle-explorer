@@ -14,10 +14,10 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
 		$controller = $app['controllers_factory'];
 
-		$controller->get('/', function(Application $app){
+		$controller->get('/{videoId}', function(Application $app, $videoId){
 
 			return 'Contribute to the translations';
-		});
+		})->bind('contribute');
 
 		return $controller;
 	}

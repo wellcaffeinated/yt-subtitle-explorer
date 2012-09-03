@@ -22,15 +22,12 @@
   <div class="container">
   	
     <div class="row-fluid">
-      <div class="col6 hero-unit">
-        {% if loggedIn %}
-          <p>You are already logged in as: {{username}}</p>
-          <a class="btn btn-danger" href="{{app.url_generator.generate("logout")}}">Log Out</a>
-        {% else %}
-          <p>You need YouTube authentication to access this area. Please Sign In.</p>
-          <a class="btn btn-primary" href="{{app.url_generator.generate("authenticate")}}">Login with YouTube</a>
-          <a class="btn" href="{{app.url_generator.generate("search_page")}}">Cancel</a>
-        {% endif %}
+      <div class="col6 alert alert-success">
+        <h1>Success</h1>
+        <p>
+          {{msg | default('Action Successful')}}
+          <a class="btn" href="{{ok_action | default(app.url_generator.generate("search_page"))}}">Ok</a>
+        </p>
       </div>
     </div>
     

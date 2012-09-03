@@ -18,8 +18,7 @@ class OAuthProvider implements ServiceProviderInterface {
                 if (!array_key_exists('key', $config) || !array_key_exists('secret', $config) || !array_key_exists('admin', $config))
                     throw new \Exception('Please define oauth.config credentials: "key", "secret", and "admin"');
 
-
-                $manager = new LoginManager($app['session'], $config['key'], $config['secret']);
+                $manager = new LoginManager($app['session'], $app['db'], $config['key'], $config['secret']);
                 $manager->setAdmin($config['admin']);
                 return $manager;
             }

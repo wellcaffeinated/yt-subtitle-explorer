@@ -8,7 +8,7 @@ class StateStorer implements StateStoreInterface {
 
     private $session;
 
-	function StateStorer(\Symfony\Component\HttpFoundation\Session\Session $session){
+	function __construct(\Symfony\Component\HttpFoundation\Session\Session $session){
 
 		$this->session = $session;
 	}
