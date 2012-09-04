@@ -13,7 +13,7 @@ define('YTSE_DB_PFX', '');
 // Youtube username of the administrator
 define('ADMIN_YT_USERNAME', 'caffeinatedphysicist');
 // Youtube Playlist to use
-define('YT_PLAYLIST', '908547EAA7E4AE74');
+define('YT_PLAYLIST', 'PLB4B992CFA7A233BC');//'908547EAA7E4AE74');
 
 // API Keys
 

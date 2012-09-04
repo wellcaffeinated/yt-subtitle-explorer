@@ -19,7 +19,7 @@ class YTPlaylist {
 		$this->app = $app;
 		$this->ytid = $id;
 		$this->videos = array();
-		$this->videoKeys = array('ytid','title','playlist_id','url','thumbnail','updated','published','position','usid','languages');
+		$this->videoKeys = array('ytid','title','playlist_id','url','thumbnail','updated','published','position','caption_links','languages');
 		
 		$this->sqlSelect = $app['db']->prepare("SELECT * FROM {$app['db.tables.playlists']} WHERE ytid = ?");
 
@@ -115,6 +115,11 @@ class YTPlaylist {
 			$data['languages'] = $this->getLangStr( $data['languages'] );
 		}
 
+		if (isset($data['caption_links'])){
+
+			$data['caption_links'] = serialize($data['caption_links']);
+		}
+
 		// this replace command loses any not-specified data... not the best solution
 		$this->app['db']->executeQuery(
 			"REPLACE INTO {$this->app['db.tables.videos']} (".implode(',',array_keys($data)).") VALUES (?)",
@@ -177,6 +182,7 @@ class YTPlaylist {
 
 		foreach ($vids as &$vid){
 			$vid['languages'] = $this->getLangData($vid['languages']);
+			$vid['caption_links'] = unserialize($vid['caption_links']);
 		}
 
 		return $vids;
@@ -184,7 +190,10 @@ class YTPlaylist {
 
 	public function getVideoById($id){
 
-		return $this->app['db']->fetchAssoc("SELECT * FROM {$this->app['db.tables.videos']} WHERE ytid = ?", array($id));
+		$vid = $this->app['db']->fetchAssoc("SELECT * FROM {$this->app['db.tables.videos']} WHERE ytid = ?", array($id));
+		$vid['languages'] = $this->getLangData($vid['languages']);
+		$vid['caption_links'] = unserialize($vid['caption_links']);
+		return $vid;
 	}
 
 	public function syncLocal(){

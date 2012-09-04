@@ -19,7 +19,7 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 			$video = $app['ytplaylist']->getVideoById($videoId);
 
 			if (!$video){
-				
+
 				$app->abort(404, 'Video not found.');
 			}
 

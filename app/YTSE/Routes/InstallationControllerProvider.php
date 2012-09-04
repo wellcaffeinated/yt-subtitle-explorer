@@ -64,7 +64,7 @@ class InstallationControllerProvider implements ControllerProviderInterface {
                 updated TEXT,
                 published TEXT,
                 position INTEGER,
-                usid TEXT,
+                caption_links TEXT,
                 languages TEXT
                 )"
             );

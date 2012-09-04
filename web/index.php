@@ -67,11 +67,15 @@ $app['refresh.data'] = $app->protect(function() use ($app) {
 	}
 
 	$allLangs = $app['api']->getYTLanguages($ids);
+	$capData = $app['api']->getYTCaptions($ids, $app['oauth']->getValidAdminToken());
 
 	foreach ($data['videos'] as &$video){
 
 		if (array_key_exists($video['ytid'], $allLangs))
 			$video['languages'] = $allLangs[ $video['ytid'] ];
+
+		if (array_key_exists($video['ytid'], $capData))
+			$video['caption_links'] = $capData[ $video['ytid'] ];
 	}
 
 	try {

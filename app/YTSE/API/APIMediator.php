@@ -3,6 +3,7 @@
 namespace YTSE\API;
 
 use Guzzle\Service\Client;
+use Illuminate\Socialite\OAuthTwo\AccessToken;
 
 class APIMediator {
 
@@ -21,13 +22,13 @@ class APIMediator {
         }
 
         $this->ytAPI = new Client('http://www.youtube.com/api', array(
-            'curl.CURLOPT_SSL_VERIFYHOST' => false,
-            'curl.CURLOPT_SSL_VERIFYPEER' => false,
+            // 'curl.CURLOPT_SSL_VERIFYHOST' => false,
+            // 'curl.CURLOPT_SSL_VERIFYPEER' => false,
         ));
 
         $this->gdataAPI = new Client('https://gdata.youtube.com/feeds/api', array(
-            'curl.CURLOPT_SSL_VERIFYHOST' => false,
-            'curl.CURLOPT_SSL_VERIFYPEER' => false,
+            // 'curl.CURLOPT_SSL_VERIFYHOST' => false,
+            // 'curl.CURLOPT_SSL_VERIFYPEER' => false,
         ));
 
         if(defined('YOUTUBE_KEY') && count(YOUTUBE_KEY) !== 0){
@@ -130,6 +131,78 @@ class APIMediator {
                 }
 
                 $ret[ $ytids[$key] ] = $langs;
+            }
+        }
+
+        return $ret;
+    }
+
+    public function getYTCaptions($ytids, AccessToken $token){
+
+        $ret = array();
+        $requests = array();
+
+        if (!is_array($ytids)){
+
+            $ret = $this->getYTCaptions( array($ytids) );
+            return $ret[ $ytids ];
+        }
+
+        foreach ($ytids as &$id){
+
+            // queue up requests
+            $requests[] = $this->gdataAPI->get(
+                array('videos/{video}/captions{?params*}',
+                    array(
+                        'video' => $id,
+                        'params' => array(
+                            'alt' => 'json',
+                        )
+                    )
+                ),
+                array(
+                    'Authorization' => 'Bearer ' . $token->getValue(),
+                )
+            );
+        }
+
+        try {
+            // send a batch
+            $responses = $this->ytAPI->send( $requests );
+        } catch (\Guzzle\Common\Exception\ExceptionCollection $e){
+            foreach ($e as $exception) {
+                if ($exception instanceof \Guzzle\Http\Exception\BadResponseException
+                    && $exception->getResponse()->getStatusCode() !== 403 // means you weren't authorized to view the captions of this video
+                ){
+                    throw $exception;
+                }
+            }
+        }
+
+        if (!$responses) return $ret;
+
+        // process the responses
+        foreach ($responses as $key => &$r){
+
+            if ($r->isSuccessful()){
+                
+                $json = json_decode($r->getBody(true), true);
+                $json = $json['feed'];
+
+                if ($json['openSearch$totalResults']['$t'] > 0){
+
+                    $caps = array();
+
+                    foreach ($json['entry'] as $caption){
+
+                        $caps[] = array(
+                            'lang_code' => $caption['content']['xml$lang'],
+                            'src' => $caption['content']['src'],
+                        );
+                    }
+
+                    $ret[ $ytids[$key] ] = $caps;
+                }
             }
         }
 

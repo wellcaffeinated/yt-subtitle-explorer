@@ -30,6 +30,12 @@
       {{ videoList.video(video, 6) }}
 
       <div class="span6 translation-ctrl">
+        Have captions for:
+        <ul>
+        {% for cap in video.caption_links %}
+          <li>{{cap.lang_code}}</li>
+        {% endfor %}
+        </ul>
       </div>
 
     </div>

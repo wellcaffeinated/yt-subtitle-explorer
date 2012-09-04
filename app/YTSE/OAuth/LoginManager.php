@@ -140,6 +140,19 @@ class LoginManager extends GoogleProvider {
 		return $this->adminToken;
 	}
 
+	public function getValidAdminToken(){
+
+		$token = $this->getAdminToken();
+
+        if (!$token) return false;
+
+        if ($this->isAdminTokenExpired()){
+        	$token = $this->refreshAdminToken();
+        }
+
+        return $token;
+	}
+
 	public function adminTokenAvailable(){
 
 		if ($this->getAdminToken() !== false){
@@ -213,7 +226,7 @@ class LoginManager extends GoogleProvider {
 			array('username' => $this->getAdmin())
 		);
 
-		$this->adminToken = $token;
+		return $this->adminToken = $token;
 	}
 
 	public function hasYoutubeAuth(){
