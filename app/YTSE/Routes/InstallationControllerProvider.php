@@ -116,6 +116,7 @@ class InstallationControllerProvider implements ControllerProviderInterface {
 
             // save the current admin token as the one to use to get subtitle text
             $app['oauth']->saveAdminToken();
+            $app['oauth']->logout();
 
             return $app['twig']->render('page-success-msg.twig', array(
     

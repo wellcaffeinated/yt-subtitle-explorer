@@ -100,6 +100,9 @@ class LoginManager extends GoogleProvider {
 		if ($this->session->get('youtube_auth') && !in_array($this->ytdataScope, $this->getScope())){
 
 			$this->addScope($this->ytdataScope);
+			if ( !isset($options['access_type']) ){
+				$options['access_type'] = 'offline';
+			}
 		}
 		
 		return parent::getAuthUrl($callbackUrl, $options);
@@ -168,7 +171,7 @@ class LoginManager extends GoogleProvider {
 		if (!$this->isAuthorized()) return;
 
 		$token = $this->session->get('admin_token');
-
+		
 		if (!$token) return;
 
 		$expires = new \Datetime('now');
