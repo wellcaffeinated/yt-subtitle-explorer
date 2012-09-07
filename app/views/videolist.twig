@@ -1,15 +1,17 @@
-{% macro video(data, span) %}
+{% macro video(data, span, nobuttons) %}
     <div class="video well span{{ span }}" data-ytid="{{data.ytid}}">
 		<div class="inner">
 			<h4 class="video-title"><a href="{{data.url}}">{{data.title}}</a></h4>
 			<div class="video-meta row-fluid">
-				<div class="thumbnail span6">
+				<div class="thumbnail {{ nobuttons ? '' : 'span6' }}">
 					<img src="{{data.thumbnail}}" alt="{{data.title}}"/>
 				</div>
+				{% if not nobuttons %}
 				<div class="span6 video-ctrls btn-group btn-group-vertical">
 					<a href="{{data.url}}" class="watch-btn btn btn-block">Watch</a>
 					<a href="{{app.url_generator.generate("contribute", {videoId: data.ytid})}}" class="help-btn btn btn-success btn-block">Help Translate</a>
 				</div>
+				{% endif %}
 			</div>
 			<div class="languages">
 				<h5>Languages</h5>

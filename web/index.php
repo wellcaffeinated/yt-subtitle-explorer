@@ -34,6 +34,12 @@ $app->register(new YTSE\OAuth\OAuthProvider(), array(
 		'admin' => ADMIN_YT_USERNAME,
 	)
 ));
+// caption manager
+$app->register(new YTSE\Captions\CaptionManagerProvider(), array(
+    'captions.config' => array(
+    	'caption_dir' => CAPTION_DIR,
+    )
+));
 
 // register twig templating
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
@@ -184,7 +190,7 @@ $app->mount('/videos', new YTSE\Routes\LanguageDataControllerProvider());
  */
 $contrib = new YTSE\Routes\ContributionControllerProvider();
 $contrib = $contrib->connect($app);
-$contrib->before($checkAuthentication);
+//$contrib->before($checkAuthentication);
 $app->mount('/contribute', $contrib);
 
 /**

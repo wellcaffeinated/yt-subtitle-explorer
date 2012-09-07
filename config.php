@@ -10,10 +10,14 @@ define('YTSE_DB_PATH', YTSE_ROOT.'/app/db/ytse.db');
 // table prefix
 define('YTSE_DB_PFX', ''); 
 
+define('CAPTION_DIR', YTSE_ROOT.'/app/uploads');
+
 // Youtube username of the administrator
 define('ADMIN_YT_USERNAME', 'caffeinatedphysicist');
 // Youtube Playlist to use
 define('YT_PLAYLIST', 'PLB4B992CFA7A233BC');//'908547EAA7E4AE74');
+// the default language code to highlight
+define('YT_PLAYLIST_DEFAULT_LANG', 'en');
 
 // API Keys
 

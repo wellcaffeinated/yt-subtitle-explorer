@@ -14,7 +14,7 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
 		$controller = $app['controllers_factory'];
 
-		$controller->get('/{videoId}', function(Application $app, $videoId){
+		$controller->get('/{videoId}', function(Request $request, Application $app, $videoId){
 
 			$video = $app['ytplaylist']->getVideoById($videoId);
 
@@ -22,15 +22,31 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
 				$app->abort(404, 'Video not found.');
 			}
+
+			$video['caption_details'] = array_map(function($cap) use ($video) {
+
+				foreach ( $video['languages'] as &$lang ){
+					if ($lang['lang_code'] === $cap['lang_code'])
+						return $lang;
+				}
+
+				return null;
+
+			}, $video['caption_links']);
 
 			return $app['twig']->render('page-contribute.twig', array(
 
 				'video' => $video,
+				'errors' => array(
+					'file' => $request->get('error_file'),
+					'lang' => $request->get('error_lang'),
+				),
+				'success_msg' => $request->get('success_msg'),
 
 			));
 		})->bind('contribute');
 
-		$controller->get('/{videoId}/caption/{capId}', function(Request $request, Application $app, $videoId, $capId){
+		$controller->get('/{videoId}/caption', function(Request $request, Application $app, $videoId){
 
 			$video = $app['ytplaylist']->getVideoById($videoId);
 
@@ -39,6 +55,7 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 				$app->abort(404, 'Video not found.');
 			}
 
+			$capId = $request->get('capId');
 			$caption = false;
 
 			foreach( $video['caption_links'] as $cap ){
@@ -55,14 +72,65 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 			$format = $request->get('format');
 			$format = $request->get('format') ?: 'srt';
 			$content = $app['api']->getYTCaptionContent($caption['src'], $app['oauth']->getValidAdminToken(), $format);
-			$filename = str_replace(' ', '_', 'captions_'.$capId.'_'.$video['title'].$format);
+			$filename = str_replace(' ', '_', 'captions_'.$capId.'_'.$video['title']. '.' .$format);
 
 			return new Response($content, 200, array(
+
 				'Content-type' => 'application/octet-stream',
 				'Content-disposition' => "attachment;filename=$filename",
 			));
 
 		})->bind('contribute_cap');
+
+		$controller->post('/{videoId}/upload', function(Request $request, Application $app, $videoId){
+
+			$video = $app['ytplaylist']->getVideoById($videoId);
+
+			if (!$video){
+
+				$app->abort(404, 'Video not found.');
+			}
+
+			$file = $request->files->get('cap_file');
+			$lang = $request->get('lang_code');
+
+			// if form data invalid, redirect with error messages
+			if (empty($file) || empty($lang)){
+
+				return $app->redirect(
+					$app['url_generator']->generate('contribute',
+						array(
+							'videoId' => $videoId,
+							'error_file' => empty($file),
+							'error_lang' => empty($lang),
+						)
+					)
+				);
+			}
+
+			preg_match('/\.([a-zA-Z]*)$/', $file->getClientOriginalName(), $matches);
+
+			$format = isset($matches[1])? $matches[1] : 'txt';
+
+			try {
+
+				$app['captions']->saveCaption($file, $videoId, $lang, $app['oauth']->getUserName(), $format);
+
+			} catch (\Exception $e){
+
+				$app->abort(500, 'Problem uploading file.');
+			}
+
+			return $app->redirect(
+				$app['url_generator']->generate('contribute',
+					array(
+						'videoId' => $videoId,
+						'success_msg' => true,
+					)
+				)
+			);
+
+		})->bind('contribute_upload');
 
 		return $controller;
 	}

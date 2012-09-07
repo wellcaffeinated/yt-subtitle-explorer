@@ -154,10 +154,34 @@ class YTPlaylist {
 		$vids = $this->fetchAllVideos();
 
 		foreach ($vids as &$vid){
-			$vid['languages'] = $this->getLangData($vid['languages']);
+			$this->filterVidData($vid);
 		}
 
 		return $vids;
+	}
+
+	public function getVideoById($id){
+
+		$vid = $this->app['db']->fetchAssoc("SELECT * FROM {$this->app['db.tables.videos']} WHERE ytid = ?", array($id));
+		$this->filterVidData($vid);
+		return $vid;
+	}
+
+	private function filterVidData(&$vid){
+
+		$cmp = function($a, $b){
+
+			if ($a['lang_code'] === YT_PLAYLIST_DEFAULT_LANG) return -1;
+			if ($b['lang_code'] === YT_PLAYLIST_DEFAULT_LANG) return 1;
+
+			return 0;
+		};
+
+		$vid['languages'] = $this->getLangData($vid['languages']);
+		$vid['caption_links'] = unserialize($vid['caption_links']);
+
+		usort($vid['languages'], $cmp);
+		usort($vid['caption_links'], $cmp);
 	}
 
 	// get videos, filter by lang_codes.
@@ -186,14 +210,6 @@ class YTPlaylist {
 		}
 
 		return $vids;
-	}
-
-	public function getVideoById($id){
-
-		$vid = $this->app['db']->fetchAssoc("SELECT * FROM {$this->app['db.tables.videos']} WHERE ytid = ?", array($id));
-		$vid['languages'] = $this->getLangData($vid['languages']);
-		$vid['caption_links'] = unserialize($vid['caption_links']);
-		return $vid;
 	}
 
 	public function syncLocal(){

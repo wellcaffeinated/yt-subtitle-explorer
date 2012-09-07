@@ -79,6 +79,21 @@ define(
                         }
                     });
 
+                    // the language selector on the caption upload page
+                    languageSearch.create().init({
+                        
+                        el: $('#cap-upload-lang input')[0],
+                        tokenLimit: 1,
+                        theme: null
+
+                    }).on({
+
+                        'change:languages': function( langs ){
+
+                            this.get('el').val(langs[0]);
+                        }
+                    });
+
                     negateCtrl.on({
                         'change:state': self.filterVids
                     }, self);

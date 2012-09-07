@@ -22,20 +22,101 @@
   {% import "videolist.twig" as videoList %}
 
   <div class="container">
-  	
-    <h1>Contribute</h1>
+  	 
+    <div class="page-header">
+      <h1>Help Translate</h1>
+    </div>
 
     <div class="row-fluid">
       
-      {{ videoList.video(video, 6) }}
+      {{ videoList.video(video, 4, true) }}
 
-      <div class="span6 translation-ctrl">
-        Have captions for:
-        <ul>
-        {% for cap in video.caption_links %}
-          <li><a href="{{app.url_generator.generate('contribute_cap', { videoId: video.ytid, capId: cap.lang_code })}}">{{cap.lang_code}}</a></li>
-        {% endfor %}
-        </ul>
+      <div class="span8 translation-ctrl">
+
+        {% if success_msg %}
+          <div class="alert alert-success">
+            <p>Your translation has been successfully uploaded and is awaiting processing.</p>
+            <p>Thank you!</p>
+          </div>
+        {% endif %}
+        
+        <h2>Thank you for deciding to help!</h2>
+        <p>Let's step through the process...</p>
+
+        <h3>Step 1 - Download a premade caption file</h3>
+
+        <form action="{{app.url_generator.generate('contribute_cap', { videoId: video.ytid})}}" method="GET" class="form-horizontal">
+
+          <div class="control-group">
+            <label class="control-label" for="cap-id">Select the language of the caption file:</label>
+            <div class="controls">
+              <select id="cap-id" name="capId">
+              {% for cap in video.caption_details %}
+                <option value="{{cap.lang_code}}">
+                    {{cap.lang_translated}} - {{cap.lang_original}}
+                </option>
+              {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="cap-fmt">Select the format:</label>
+            <div class="controls">
+              <select id="cap-fmt" name="fmt">
+                <option value="srt">Subrip-compatible (srt)</option>
+                <option value="sbv">Subviewer-compatible (srv)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn">Download</button>
+            </div>
+          </div>
+
+        </form>
+
+        <h3>Step 2 - Go Forth and Translate</h3>
+        <p>Edit that file and translate all captions to the language of your choice.</p>
+
+        <h3>Step 3 - Upload the New Translated Captions</h3>
+
+        <form action="{{app.url_generator.generate('contribute_upload', { videoId: video.ytid})}}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+
+          <label for="cap-upload-lang">Type in text area to select the language of the captions you want to upload:</label>          
+          <div id="cap-upload-lang">
+            <input type="text" name="lang_code" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
+          </div>
+
+          {% if errors is defined and errors.lang %}
+          <div class="alert alert-error">
+            You must select a valid language for your caption by typing in the language input above.
+          </div>
+          {% endif %}
+
+          <div class="control-group">
+            <label class="control-label" for="cap-file">Select your caption file:</label>
+            <div class="controls">
+              <input required="required" type="file" name="cap_file" id="cap-file" />
+            </div>
+          </div>
+
+          {% if errors is defined and errors.file %}
+          <div class="alert alert-error">
+            You need to select a caption file to upload.
+          </div>
+          {% endif %}
+
+          <div class="control-group">
+            <div class="controls">
+              <button type="submit" class="btn">Upload</button>
+            </div>
+          </div>
+
+        </form>
+        
       </div>
 
     </div>

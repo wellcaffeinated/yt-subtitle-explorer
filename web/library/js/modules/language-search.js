@@ -13,13 +13,16 @@ define(
 		var LanguageSearch = Stapes.create().extend({
 
 			options: {
-				el: null
+				el: null,
+                theme: 'facebook',
+                tokenLimit: null
 			},
 
 			init: function( opts ){
 
 				var self = this;
 
+                this.options = Stapes.util.clone(this.options);
 				this.extend(this.options, opts);
 
 				$(function(){
@@ -34,11 +37,12 @@ define(
                     el.tokenInput(
                         el.attr('data-autocomplete-url'),
                         {
-                            theme: 'facebook',
+                            theme: self.options.theme,
                             hintText: 'Type in a language to search...',
                             preventDuplicates: true,
                             propertyToSearch: 'lang_code',
                             tokenValue: 'lang_code',
+                            tokenLimit: self.options.tokenLimit,
                             onResult: function( r ){
                             	return Stapes.util.map(r, function(l){
 
