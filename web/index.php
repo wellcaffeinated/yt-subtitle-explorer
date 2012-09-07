@@ -190,7 +190,7 @@ $app->mount('/videos', new YTSE\Routes\LanguageDataControllerProvider());
  */
 $contrib = new YTSE\Routes\ContributionControllerProvider();
 $contrib = $contrib->connect($app);
-//$contrib->before($checkAuthentication);
+$contrib->before($checkAuthentication);
 $app->mount('/contribute', $contrib);
 
 /**
