@@ -39,6 +39,6 @@ class CaptionManager {
 
 		$ts = time();
 
-		return "{$username}_{$ts}.{$format}";
+		return "{$username}%{$ts}.{$format}";
 	}
 }
