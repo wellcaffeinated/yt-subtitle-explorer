@@ -137,6 +137,24 @@ class APIMediator {
         return $ret;
     }
 
+    public function getYTCaptionContent($url, AccessToken $token, $format = 'srt'){
+
+        $req = $this->gdataAPI->get(
+            array($url . '{?params}',
+                array(
+                    'params' => array(
+                        'fmt' => $format === 'srt' ? 'srt' : 'sbv',
+                    )
+                )
+            ),
+            array(
+                'Authorization' => 'Bearer ' . $token->getValue(),
+            )
+        );
+
+        return $req->send()->getBody(true);
+    }
+
     public function getYTCaptions($ytids, AccessToken $token){
 
         $ret = array();
@@ -156,7 +174,7 @@ class APIMediator {
                     array(
                         'video' => $id,
                         'params' => array(
-                            'alt' => 'json',
+                            'alt' => 'json'
                         )
                     )
                 ),

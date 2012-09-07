@@ -33,7 +33,7 @@
         Have captions for:
         <ul>
         {% for cap in video.caption_links %}
-          <li>{{cap.lang_code}}</li>
+          <li><a href="{{app.url_generator.generate('contribute_cap', { videoId: video.ytid, capId: cap.lang_code })}}">{{cap.lang_code}}</a></li>
         {% endfor %}
         </ul>
       </div>

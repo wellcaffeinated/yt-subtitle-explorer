@@ -102,6 +102,7 @@ class LoginManager extends GoogleProvider {
 			$this->addScope($this->ytdataScope);
 			if ( !isset($options['access_type']) ){
 				$options['access_type'] = 'offline';
+				$options['approval_prompt'] = 'force';
 			}
 		}
 		
@@ -171,7 +172,7 @@ class LoginManager extends GoogleProvider {
 		if (!$this->isAuthorized()) return;
 
 		$token = $this->session->get('admin_token');
-		
+
 		if (!$token) return;
 
 		$expires = new \Datetime('now');
@@ -224,7 +225,7 @@ class LoginManager extends GoogleProvider {
 			YTSE_DB_ADMIN_TABLE, 
 			array(
 				'access_token' => $token->getValue(),
-				'expires' => $expires,
+				'expires' => $expires->format('c'),
 			),
 			array('username' => $this->getAdmin())
 		);
