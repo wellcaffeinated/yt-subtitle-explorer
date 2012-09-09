@@ -108,9 +108,11 @@ define(
             filterVids: function(){
 
                 var langs = this.get('languages') || []
-                    ,url = langs.length? 
-                            '/videos/languages/' + this.get('ctrl.negate').get('state') + '/' + this.get('ctrl.scope').get('state') + '/' + langs.join('~') 
-                            : this.get('all-langs-url')
+                    ,url = this.get('all-langs-url') + (
+                            langs.length? 
+                                '/' + this.get('ctrl.negate').get('state') + '/' + this.get('ctrl.scope').get('state') + '/' + langs.join('~') 
+                                : ''
+                            )
                     ;
 
                 $.ajax({
