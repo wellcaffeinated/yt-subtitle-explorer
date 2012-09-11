@@ -6,7 +6,6 @@ use Guzzle\Common\Collection;
 use Guzzle\Service\Inspector;
 use Guzzle\Service\Description\ApiCommand;
 use Guzzle\Service\Description\ApiParam;
-use Guzzle\Service\Description\ServiceDescription;
 use Guzzle\Service\Exception\ValidationException;
 
 /**
@@ -354,5 +353,36 @@ class ApiCommandTest extends \Guzzle\Tests\GuzzleTestCase
                 ))
             )
         ));
+    }
+
+    /**
+     * @covers Guzzle\Service\Description\ApiCommand
+     */
+    public function testCanBuildUpCommands()
+    {
+        $c = new ApiCommand(array());
+        $c->setName('foo')
+            ->setConcreteClass('Baz')
+            ->setDeprecated(false)
+            ->setDoc('doc')
+            ->setDocUrl('http://www.foo.com')
+            ->setMethod('PUT')
+            ->setResultDoc('oh')
+            ->setResultType('string')
+            ->setUri('/foo/bar')
+            ->addParam(new ApiParam(array(
+                'name' => 'test'
+            )));
+
+        $this->assertEquals('foo', $c->getName());
+        $this->assertEquals('Baz', $c->getConcreteClass());
+        $this->assertEquals(false, $c->isDeprecated());
+        $this->assertEquals('doc', $c->getDoc());
+        $this->assertEquals('http://www.foo.com', $c->getDocUrl());
+        $this->assertEquals('PUT', $c->getMethod());
+        $this->assertEquals('oh', $c->getResultDoc());
+        $this->assertEquals('string', $c->getResultType());
+        $this->assertEquals('/foo/bar', $c->getUri());
+        $this->assertEquals(array('test'), $c->getParamNames());
     }
 }

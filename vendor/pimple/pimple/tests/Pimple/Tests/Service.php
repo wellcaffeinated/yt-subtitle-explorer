@@ -26,8 +26,6 @@
 
 namespace Pimple\Tests;
 
-use Pimple;
-
 /**
  * Pimple Test Service
  *

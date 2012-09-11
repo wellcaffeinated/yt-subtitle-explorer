@@ -101,7 +101,7 @@ under ``/admin/``::
 
     $app['security.firewalls'] = array(
         'admin' => array(
-            'pattern' => '^/admin/',
+            'pattern' => '^/admin',
             'http' => true,
             'users' => array(
                 // raw password is foo
@@ -405,6 +405,7 @@ store the users::
     use Symfony\Component\Security\Core\User\UserProviderInterface;
     use Symfony\Component\Security\Core\User\UserInterface;
     use Symfony\Component\Security\Core\User\User;
+    use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
     use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
     use Doctrine\DBAL\Connection;
 
@@ -476,12 +477,12 @@ sample users::
     entities.
 
 Defining a custom Authentication Provider
------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The Symfony Security component provides a lot of ready-to-use authentication
 providers (form, HTTP, X509, remember me, ...), but you can add new ones
 easily. To register a new authentication provider, create a service named
-``security.authentication.factory.XXX`` where ``XXX`` is the name you want to
+``security.authentication_listener.factory.XXX`` where ``XXX`` is the name you want to
 use in your configuration::
 
     $app['security.authentication_listener.factory.wsse'] = $app->protect(function ($name, $options) use ($app) {

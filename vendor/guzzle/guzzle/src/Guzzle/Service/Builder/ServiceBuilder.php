@@ -25,9 +25,9 @@ class ServiceBuilder extends AbstractHasDispatcher implements ServiceBuilderInte
     protected $clients = array();
 
     /**
-     * @var ServiceBuilderAbstractFactory
+     * @var ServiceBuilderAbstractFactory Cached instance of the abstract factory
      */
-    protected static $defaultFactory;
+    protected static $cachedFactory;
 
     /**
      * Create a new ServiceBuilder using configuration data sourced from an
@@ -46,12 +46,12 @@ class ServiceBuilder extends AbstractHasDispatcher implements ServiceBuilderInte
     public static function factory($config = null, array $globalParameters = null)
     {
         // @codeCoverageIgnoreStart
-        if (!self::$defaultFactory) {
-            self::$defaultFactory = new ServiceBuilderAbstractFactory();
+        if (!static::$cachedFactory) {
+            static::$cachedFactory = new ServiceBuilderAbstractFactory();
         }
         // @codeCoverageIgnoreEnd
 
-        return self::$defaultFactory->build($config, $globalParameters);
+        return self::$cachedFactory->build($config, $globalParameters);
     }
 
     /**
@@ -116,7 +116,7 @@ class ServiceBuilder extends AbstractHasDispatcher implements ServiceBuilderInte
 
         // Convert references to the actual client
         foreach ($this->builderConfig[$name]['params'] as &$v) {
-            if (0 === strpos($v, '{') && strlen($v) - 1 == strrpos($v, '}')) {
+            if (is_string($v) && 0 === strpos($v, '{') && strlen($v) - 1 == strrpos($v, '}')) {
                 $v = $this->get(trim(str_replace(array('{', '}'), '', $v)));
             }
         }

@@ -30,7 +30,7 @@ The recommended way to install Guzzle is through [Composer](http://getcomposer.o
             }
         }
 
-    Consider tightening your dependencies to a known version when deploying mission critical applications (e.g. ``2.7.*``).
+    Consider tightening your dependencies to a known version when deploying mission critical applications (e.g. ``2.8.*``).
 
 2. Download and install Composer:
 
@@ -195,7 +195,7 @@ The resulting URL would become ``http://test.com?a=hi&b=there``
 Unit testing
 ------------
 
-[![Build Status](https://secure.travis-ci.org/guzzle/guzzle.png)](http://travis-ci.org/guzzle/guzzle)
+[![Build Status](https://secure.travis-ci.org/guzzle/guzzle.png?branch=master)](http://travis-ci.org/guzzle/guzzle)
 
 You will first need to clone the GitHub repository:
 
