@@ -16,8 +16,32 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 
 		$controller->get('/', function(Application $app){
 
-			return 'Hello Admin.';
+			return $app['twig']->render('page-admin.twig', array(
+
+				'submissions' => $app['captions']->getSubmissions(),
+
+			));
 		});
+
+		$controller->get('/caption', function(Request $req, Application $app){
+
+			$path = $req->get('path');
+			$content = '';
+
+			if ($path){
+
+				try{
+
+					$content = file_get_contents($path);
+				} catch (\Exception $e) {}
+			}
+
+			return new Response($content, 200, array(
+
+				'Content-type' => 'text/plain',
+			));
+
+		})->bind('caption_contents');
 
 		return $controller;
 	}

@@ -108,13 +108,13 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 				);
 			}
 
-			preg_match('/\.([a-zA-Z]*)$/', $file->getClientOriginalName(), $matches);
-
-			$format = isset($matches[1])? $matches[1] : 'txt';
-
 			try {
 
-				$app['captions']->saveCaption($file, $videoId, $lang, $app['oauth']->getUserName(), $format);
+				$app['captions']->saveCaption($file, $videoId, $lang, $app['oauth']->getUserName());
+
+			} catch (\YTSE\Captions\InvalidFileFormatException $e){
+
+				$app->abort(403, 'Invalid caption file format: ' . $file->guessExtension());
 
 			} catch (\Exception $e){
 
