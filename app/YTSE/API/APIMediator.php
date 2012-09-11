@@ -137,6 +137,103 @@ class APIMediator {
         return $ret;
     }
 
+    public function createYTCaption(AccessToken $token, array $info, $content){
+
+        $draft = false;
+
+        $req = $this->gdataAPI->post(
+            array('videos/{videoId}/captions' . '{?params}',
+                array(
+                    'videoId' => $info['videoId'],
+                    'params' => array(
+                        'alt' => 'json'
+                    )
+                )
+            ),
+            array(
+                'Authorization' => 'Bearer ' . $token->getValue(),
+                'Content-Type' => 'application/vnd.youtube.timedtext; charset=UTF-8',
+                'Content-Language' => $info['lang_code'],
+            ),
+            $content
+        );
+
+        $json = json_decode($req->send()->getBody(true), true);
+
+        if (!empty($json['entry']) &&
+            !empty($json['entry']['app$control']) &&
+            !empty($json['entry']['app$control']['yt$state'])
+        ){
+
+            if ($json['entry']['app$control']['app$draft']['$t'] === 'yes'){
+
+                $draft = true;
+            }
+
+            if ($json['entry']['app$control']['yt$state']['name'] === 'failed'){
+
+                if ( $json['entry']['app$control']['yt$state']['reasonCode'] === 'invalidFormat' )
+                    throw new \Exception('Invalid subtitle format');
+
+                throw new \Exception('Trouble saving caption');
+            }
+        }
+
+        return array(
+            'lang_code' => $json['entry']['content']['xml$lang'],
+            'src' => $json['entry']['content']['src'],
+            'draft' => $draft,
+        );
+    }
+
+    public function updateYTCaption($url, AccessToken $token, array $info, $content){
+
+        $draft = false;
+
+        $req = $this->gdataAPI->put(
+            array($url . '{?params}',
+                array(
+                    'params' => array(
+                        'alt' => 'json'
+                    )
+                )
+            ),
+            array(
+                'Authorization' => 'Bearer ' . $token->getValue(),
+                'Content-Type' => 'application/vnd.youtube.timedtext; charset=UTF-8',
+                'Content-Language' => $info['lang_code'],
+            ),
+            $content
+        );
+
+        $json = json_decode($req->send()->getBody(true), true);
+
+        if (!empty($json['entry']) &&
+            !empty($json['entry']['app$control']) &&
+            !empty($json['entry']['app$control']['yt$state'])
+        ){
+
+            if ($json['entry']['app$control']['app$draft']['$t'] === 'yes'){
+
+                $draft = true;
+            }
+
+            if ($json['entry']['app$control']['yt$state']['name'] === 'failed'){
+
+                if ( $json['entry']['app$control']['yt$state']['reasonCode'] === 'invalidFormat' )
+                    throw new \Exception('Invalid subtitle format');
+
+                throw new \Exception('Trouble saving caption');
+            }
+        }
+
+        return array(
+            'lang_code' => $json['entry']['content']['xml$lang'],
+            'src' => $json['entry']['content']['src'],
+            'draft' => $draft,
+        );
+    }
+
     public function getYTCaptionContent($url, AccessToken $token, $format = 'srt'){
 
         $req = $this->gdataAPI->get(

@@ -24,6 +24,35 @@ class CaptionManager {
 		));
 	}
 
+	public function getCaptionContents($path){
+
+		$filename = $this->base . '/' . $path;
+
+		if (!is_file($filename)) return false;
+
+		try{
+
+			return file_get_contents($filename);
+
+		} catch (\Exception $e) {}
+
+		return false;
+	}
+
+	public function deleteCaption($path){
+
+		$filename = $this->base . '/' . $path;
+
+		if (!is_file($filename)) return false;
+
+		unlink($filename);
+
+		$dir = dirname($filename);
+		@rmdir($dir); // remove if empty
+
+		return true;
+	}
+
 	public function getSubmissions(){
 
 		return $this->generateIndex();
@@ -88,6 +117,29 @@ class CaptionManager {
 		return $langs;
 	}
 
+	public function extractCaptionInfo($path){
+
+		$path = preg_replace('/^\//', '', $path); // remove leading slash
+		$dirs = explode('/', $path);
+
+		if (count($dirs) !== 3) return false;
+
+		$filename = $dirs[2];
+		$count = preg_match('/^([^%]+)%([0-9]+)\.(\w+)$/', $filename, $matches);
+
+		if (!$count) return false;
+
+		return array(
+			'videoId' => $dirs[0],
+			'lang_code' => $dirs[1],
+			'path' => $path,
+			'filename' => $filename,
+			'user' => $matches[1],
+			'timestamp' => $matches[2],
+			'ext' => $matches[3],
+		);
+	}
+
 	protected function generateCaptionsForVideoAndLang($videoId, $lang_code){
 
 		$dirname = $this->base . '/' . $videoId . '/' . $lang_code;
@@ -103,16 +155,11 @@ class CaptionManager {
 
 			if (preg_match('/^\./', $entry)) continue; // begins with .
 
-			if (!preg_match('/^([^%]+)%([0-9]+)\.(\w+)$/', $entry, $matches)) continue;
+			$info = $this->extractCaptionInfo(str_replace($this->base, '', $dirname) . '/' . $entry);
 
-			$caps[] = array(
-				'lang_code' => $lang_code,
-				'path' => $dirname . '/' . $entry,
-				'filename' => $entry,
-				'user' => $matches[1],
-				'timestamp' => $matches[2],
-				'ext' => $matches[3],
-			);
+			if (!$info) continue;
+
+			$caps[] = $info;
 		}
 
 		$d->close();

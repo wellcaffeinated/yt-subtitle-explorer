@@ -39,6 +39,11 @@ Videos
     margin-bottom: 0.4em;
 }
 
+.video .thumbnail > a {
+    display: block;
+    text-align: center;
+}
+
 .video-title {
     margin: 0 0 1em;
 }
@@ -121,4 +126,13 @@ Modals
     width: 590px;
 }
 
+.caption-modal textarea {
+    width: 100%;
+    height: 22em;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
 

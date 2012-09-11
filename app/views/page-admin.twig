@@ -20,12 +20,29 @@
 </head>
 <body>
 
-  <div class="container">
+  <div class="container admin">
 
     <h1 class="page-header">Administration</h1>
+
+    {% if error is defined and error is not empty %}
+    <div class="alert alert-error">
+      <p><strong>Error</strong></p>
+      <p>{{error}}</p>
+    </div>
+    {% endif %}
+
+    {% if msg is defined and msg is not empty %}
+    <div class="alert alert-warning">
+      <p><strong>Attention</strong></p>
+      <p>{{msg}}</p>
+    </div>
+    {% endif %}
+
+    {% if submissions is empty %}
+      <p>All up to date! No new submissions.</p>
+    {% endif %}
   	
     {% for sub in submissions %}
-
     {% set video = app.ytplaylist.getVideoById(sub.videoId) %}
 
     <div class="row-fluid">
@@ -36,34 +53,36 @@
 
         <h3>Submissions Pending Approval</h3>
 
-        <table class="table">
-          <thead>
-            <tr>
-              <th><input type="checkbox" class="ctrl-select-all"/></th>
-              <th>Language</th>
-              <th>Submitted By</th>
-              <th>Date</th>
-              <th><button class="btn btn-primary ctrl-approve-all">Approve Selected</button></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for lang in sub.captions %}
-            {% for cap in lang %}
-            <tr>
-              <td><input type="checkbox" class="ctrl-select"/></td>
-              <td>{{cap.lang_code}}</td>
-              <td>{{cap.user}}</td>
-              <td>{{cap.timestamp | date('m/d/Y')}}</td>
-              <td class="btn-group">
-                <a class="btn ctrl-view" title="view" href="{{app.url_generator.generate('caption_contents', { path: cap.path })}}"><i class="icon-search"></i></a>
-                <a class="btn btn-success ctrl-approve" title="approve"><i class="icon-ok"></i></a>
-                <a class="btn btn-danger ctrl-delete" title="delete"><i class="icon-remove"></i></a>
-              </td>
-            </tr>
-            {% endfor %}
-            {% endfor %}
-          </tbody>
-        </table>
+        <form action="{{app.url_generator.generate('admin_main')}}" method="POST">
+          <table class="table captions select-root">
+            <thead>
+              <tr>
+                <th><input type="checkbox" class="ctrl-select-all"/></th>
+                <th>Language</th>
+                <th>Submitted By</th>
+                <th>Date</th>
+                <th><button class="btn btn-primary ctrl-approve-all" type="submit" name="action" value="batch_approve">Approve Selected</button></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for lang in sub.captions %}
+              {% for cap in lang %}
+              <tr>
+                <td><input type="checkbox" class="ctrl-select"/></td>
+                <td>{{cap.lang_code}}</td>
+                <td>{{cap.user}}</td>
+                <td>{{cap.timestamp | date('m/d/Y')}}</td>
+                <td class="btn-group">
+                  <a class="btn ctrl-view" title="view" href="{{app.url_generator.generate('admin_main', { path: cap.path, action: 'view' })}}"><i class="icon-search"></i></a>
+                  <button class="btn btn-success ctrl-approve" title="approve" type="submit" name="action" value="approve:{{cap.path}}"><i class="icon-ok"></i></button>
+                  <a class="btn btn-danger ctrl-delete" title="delete" href="{{app.url_generator.generate('admin_main', { path: cap.path, action: 'delete' })}}"><i class="icon-remove"></i></a>
+                </td>
+              </tr>
+              {% endfor %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </form>
       </div>
     </div>
     {% endfor %}

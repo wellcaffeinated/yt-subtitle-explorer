@@ -5,6 +5,7 @@ define(
         'modules/language-search',
         'modules/toggle-ctrl',
         'plugins/tpl!templates/video-modal.tpl',
+        'plugins/tpl!templates/caption-modal.tpl',
         'bootstrap'
     ],
     function(
@@ -12,7 +13,8 @@ define(
         Stapes,
         languageSearch,
         toggleCtrl,
-        tplModal
+        tplVideoModal,
+        tplCaptionModal
     ){
         'use strict';
 
@@ -27,7 +29,7 @@ define(
                     ;
 
                 // open overlays on watch click
-                $(document).on('click', '.video .watch-btn', function(e){
+                $(document).on('click', '.video .ctrl-watch', function(e){
 
                     var $this = $(this)
                         ,$video = $this.parents('.video')
@@ -35,7 +37,7 @@ define(
 
                     e.preventDefault();
 
-                    $(tplModal.render({
+                    $(tplVideoModal.render({
 
                         title: $video.find('.video-title').text(),
                         ytid: $video.data('ytid')
@@ -103,6 +105,35 @@ define(
                     }, self);
 
                 });
+
+                /**
+                 * Admin controls
+                 */
+                $(document).on('click', '.admin .captions .ctrl-view', function(e){
+
+                    e.preventDefault();
+                    var href = $(this).attr('href');
+                    self.showRemoteModal(href, 'Caption');
+
+                }).on('change', '.ctrl-select-all', function(e){
+
+                    var $this = $(this)
+                        ,checked = $this.is(':checked')
+                        ,checkboxes = $this.parents('.select-root').find('.ctrl-select')
+                        ;
+
+                    e.preventDefault();
+
+                    if (checked){
+
+                        checkboxes.attr('checked', 'checked');
+                        
+                    } else {
+
+                        checkboxes.removeAttr('checked');
+                    }
+
+                })
             },
 
             filterVids: function(){
@@ -124,6 +155,27 @@ define(
                         el.remove();
                     }
                 })
+            },
+
+            showRemoteModal: function(url, title){
+
+                $.ajax({
+
+                    url: url
+
+                }).done(function( content ){
+
+                    $(tplCaptionModal.render({
+
+                        title: title,
+                        content: content
+
+                    })).modal().on('hidden', function () {
+                        
+                        // destroy it when closed so video stops
+                        $(this).remove();
+                    });
+                });      
             }
 
         });

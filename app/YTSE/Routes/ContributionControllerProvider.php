@@ -23,16 +23,15 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 				$app->abort(404, 'Video not found.');
 			}
 
-			$video['caption_details'] = array_map(function($cap) use ($video) {
+			$video['caption_details'] = array();
 
+			foreach ( $video['caption_links'] as $cap ){
+			
 				foreach ( $video['languages'] as &$lang ){
 					if ($lang['lang_code'] === $cap['lang_code'])
-						return $lang;
+						$video['caption_details'][] = $lang;
 				}
-
-				return null;
-
-			}, $video['caption_links']);
+			}
 
 			return $app['twig']->render('page-contribute.twig', array(
 
@@ -60,8 +59,10 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
 			foreach( $video['caption_links'] as $cap ){
 
-				if ($cap['lang_code'] === $capId)
+				if ($cap['lang_code'] === $capId){
 					$caption = $cap;
+					break;
+				}
 			}
 
 			if (!$caption){
@@ -110,11 +111,11 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
 			try {
 
-				$app['captions']->saveCaption($file, $videoId, $lang, $app['oauth']->getUserName());
+				$app['captions']->saveCaption($file, $videoId, $lang, $app['oauth']->getUserName(), $format);
 
 			} catch (\YTSE\Captions\InvalidFileFormatException $e){
 
-				$app->abort(403, 'Invalid caption file format: ' . $file->guessExtension());
+				$app->abort(403, 'Invalid caption file format.');
 
 			} catch (\Exception $e){
 
