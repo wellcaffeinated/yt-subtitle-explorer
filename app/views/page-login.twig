@@ -25,7 +25,7 @@
       <div class="col6 hero-unit">
         {% if loggedIn %}
           <p>You are already logged in as: {{username}}</p>
-          <a class="btn btn-danger" href="{{app.url_generator.generate("logout")}}">Log Out</a>
+          <a class="btn btn-danger" href="{{app.url_generator.generate("logout", { redirect: 'login' })}}">Log Out</a>
         {% else %}
           <p>You need YouTube authentication to access this area. Please Sign In.</p>
           <a class="btn btn-primary" href="{{app.url_generator.generate("authenticate")}}">Login with YouTube</a>

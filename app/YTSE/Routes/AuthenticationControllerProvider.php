@@ -39,11 +39,13 @@ class AuthenticationControllerProvider implements ControllerProviderInterface {
 		/**
 		 * Do logout action
 		 */
-		$controller->get('/logout', function () use ($app, $self) {
+		$controller->get('/logout', function (Request $req, Application $app) use ($self) {
 
 			$self->logOut();
 
-			return $app->redirect($app['url_generator']->generate('login'));
+			$page = $req->get('redirect')? $req->get('redirect') : 'search_page';
+
+			return $app->redirect($app['url_generator']->generate($page));
 		})->bind('logout');
 
 		/**

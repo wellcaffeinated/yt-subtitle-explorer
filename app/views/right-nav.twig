@@ -1,0 +1,7 @@
+<div class="btn-group pull-right">
+	<a class="btn btn-primary" href="{{app.url_generator.generate('search_page')}}">Back to Search</a>
+
+	{% if app.oauth.isLoggedIn() %}
+	<a class="btn" href="{{app.url_generator.generate('logout')}}">Logout</a>
+	{% endif %}
+</div>

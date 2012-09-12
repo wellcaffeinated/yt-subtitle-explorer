@@ -20,6 +20,19 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     ),
 ));
 
+// url service provider
+$app->register(new Silex\Provider\UrlGeneratorServiceProvider());
+// register the session extension
+$app->register(new Silex\Provider\SessionServiceProvider(), array(
+	'session.storage.options' => array(
+		'secure' => true
+	)
+));
+// register twig templating
+$app->register(new Silex\Provider\TwigServiceProvider(), array(
+    'twig.path' => YTSE_ROOT.'/app/views'
+));
+
 // register api mediator provider
 $app->register(new YTSE\API\APIMediatorProvider());
 // register playlist provider
@@ -41,18 +54,6 @@ $app->register(new YTSE\Captions\CaptionManagerProvider(), array(
     )
 ));
 
-// register twig templating
-$app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path' => YTSE_ROOT.'/app/views'
-));
-// url service provider
-$app->register(new Silex\Provider\UrlGeneratorServiceProvider());
-// register the session extension
-$app->register(new Silex\Provider\SessionServiceProvider(), array(
-	'session.storage.options' => array(
-		'secure' => true
-	)
-));
 
 $app['refresh.data'] = $app->protect(function() use ($app) {
 

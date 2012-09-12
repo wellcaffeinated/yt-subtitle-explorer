@@ -139,63 +139,57 @@ class APIMediator {
 
     public function createYTCaption(AccessToken $token, array $info, $content){
 
-        $draft = false;
-
-        $req = $this->gdataAPI->post(
-            array('videos/{videoId}/captions' . '{?params}',
-                array(
-                    'videoId' => $info['videoId'],
-                    'params' => array(
-                        'alt' => 'json'
-                    )
-                )
-            ),
-            array(
-                'Authorization' => 'Bearer ' . $token->getValue(),
-                'Content-Type' => 'application/vnd.youtube.timedtext; charset=UTF-8',
-                'Content-Language' => $info['lang_code'],
-            ),
-            $content
+        $params = array(
+            'alt' => 'json'
         );
-
-        $json = json_decode($req->send()->getBody(true), true);
-
-        if (!empty($json['entry']) &&
-            !empty($json['entry']['app$control']) &&
-            !empty($json['entry']['app$control']['yt$state'])
-        ){
-
-            if ($json['entry']['app$control']['app$draft']['$t'] === 'yes'){
-
-                $draft = true;
-            }
-
-            if ($json['entry']['app$control']['yt$state']['name'] === 'failed'){
-
-                if ( $json['entry']['app$control']['yt$state']['reasonCode'] === 'invalidFormat' )
-                    throw new \Exception('Invalid subtitle format');
-
-                throw new \Exception('Trouble saving caption');
-            }
-        }
-
-        return array(
-            'lang_code' => $json['entry']['content']['xml$lang'],
-            'src' => $json['entry']['content']['src'],
-            'draft' => $draft,
-        );
+        
+        $req = $this->createCaptionRequest('POST', "videos/{$info['videoId']}/captions", $params, $content, $info, $token);
+        $ret = $this->execCaptionRequests(array($req));
+        return $ret[0];
     }
 
     public function updateYTCaption($url, AccessToken $token, array $info, $content){
 
-        $draft = false;
+        $params = array(
+            'alt' => 'json'
+        );
 
-        $req = $this->gdataAPI->put(
-            array($url . '{?params}',
+        $req = $this->createCaptionRequest('PUT', $url, $params, $content, $info, $token);
+        $ret = $this->execCaptionRequests(array($req));
+        return $ret[0];
+    }
+
+    public function batchSaveCaptions(array $batch, AccessToken $token){
+
+        $params = array(
+            'alt' => 'json'
+        );
+
+        foreach ($batch as $cap) {
+                
+            $url = $cap['url'];
+
+            if ($url){
+
+                $requests[] = $this->createCaptionRequest('PUT', $url, $params, $cap['content'], $cap['info'], $token);
+
+            } else {
+
+                $videoId = $cap['info']['videoId'];
+                $requests[] = $this->createCaptionRequest('POST', "videos/$videoId/captions", $params, $cap['content'], $cap['info'], $token);
+            }
+        }
+
+        return $this->execCaptionRequests( $requests );
+    }
+
+    private function createCaptionRequest($method, $url, array $params, $content, array $info, AccessToken $token){
+
+        return $this->gdataAPI->createRequest(
+            $method,
+            array($url . '{?params*}',
                 array(
-                    'params' => array(
-                        'alt' => 'json'
-                    )
+                    'params' => $params
                 )
             ),
             array(
@@ -205,33 +199,81 @@ class APIMediator {
             ),
             $content
         );
+    }
 
-        $json = json_decode($req->send()->getBody(true), true);
+    private function execCaptionRequests( array $requests ){
 
-        if (!empty($json['entry']) &&
-            !empty($json['entry']['app$control']) &&
-            !empty($json['entry']['app$control']['yt$state'])
-        ){
+        $errorResponses = array();
+        $ret = array();
 
-            if ($json['entry']['app$control']['app$draft']['$t'] === 'yes'){
+        try {
+            // send a batch
+            $responses = $this->gdataAPI->send( $requests );
 
-                $draft = true;
-            }
-
-            if ($json['entry']['app$control']['yt$state']['name'] === 'failed'){
-
-                if ( $json['entry']['app$control']['yt$state']['reasonCode'] === 'invalidFormat' )
-                    throw new \Exception('Invalid subtitle format');
-
-                throw new \Exception('Trouble saving caption');
+        } catch (\Guzzle\Common\Exception\ExceptionCollection $e){
+            foreach ($e as $exception) {
+                if ($exception instanceof \Guzzle\Http\Exception\BadResponseException){
+                    $errorResponses[] = $exception->getResponse();
+                }
             }
         }
 
-        return array(
-            'lang_code' => $json['entry']['content']['xml$lang'],
-            'src' => $json['entry']['content']['src'],
-            'draft' => $draft,
-        );
+        foreach ( $responses as &$resp ){
+
+            $draft = false;
+            $json = json_decode($resp->getBody(true), true);
+
+            $cont = array(
+                'caption_data' => array(
+                    'lang_code' => $json['entry']['content']['xml$lang'],
+                    'src' => $json['entry']['content']['src'],
+                ),
+                'draft' => $draft,
+                'response' => array(
+                    'code' => $resp->getStatusCode(),
+                    'msg' => $resp->getReasonPhrase(),
+                ),
+            );
+
+            if (!empty($json['entry']) &&
+                !empty($json['entry']['app$control'])
+            ){
+                
+                if ($json['entry']['app$control']['app$draft']['$t'] === 'yes'){
+
+                    $draft = true;
+                }
+
+                if ($json['entry']['app$control']['yt$state']['name'] === 'failed'){
+
+                    if ( $json['entry']['app$control']['yt$state']['reasonCode'] === 'invalidFormat' ){
+
+                        $cont[] = array(
+                            'type' => 'formatError',
+                            'msg' => 'Invalid subtitle format',
+                        );
+
+                    } else {
+
+                        $cont[] = array(
+                            'type' => 'generalError',
+                            'msg' => 'Problem saving caption.',
+                        );
+                    }
+                }
+            }
+
+            if (in_array($resp, $errorResponses)){
+                $cont['errors'][] = array(
+                    'type' => 'requestError',
+                    'msg' => 'Problem connecting with youtube API.',
+                );
+            }
+
+            $ret[] = $cont;
+        }
+
+        return $ret;
     }
 
     public function getYTCaptionContent($url, AccessToken $token, $format = 'srt'){
