@@ -40,7 +40,8 @@ define(
                     $(tplVideoModal.render({
 
                         title: $video.find('.video-title').text(),
-                        ytid: $video.data('ytid')
+                        ytid: $video.data('ytid'),
+                        subtitle: $this.data('lang')
 
                     })).modal().on('hidden', function () {
                         
@@ -127,7 +128,7 @@ define(
                     if (checked){
 
                         checkboxes.attr('checked', 'checked');
-                        
+
                     } else {
 
                         checkboxes.removeAttr('checked');

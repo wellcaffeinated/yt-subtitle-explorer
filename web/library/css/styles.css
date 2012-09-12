@@ -71,6 +71,9 @@ Videos
     float: left;
     margin: 0 0.4em 0.4em 0.2em;
 }
+.video .languages li a {
+    color: inherit;
+}
 
 /* flexbox corrections */
 

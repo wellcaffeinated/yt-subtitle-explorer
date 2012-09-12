@@ -6,7 +6,7 @@
 		<h3 id="video-modal-title">{{title}}</h3>
 	</div>
 	<div class="modal-body">
-		<iframe width="560" height="315" src="http://www.youtube.com/embed/{{ytid}}?autoplay=1" frameborder="0" allowfullscreen></iframe>
+		<iframe width="560" height="315" src="http://www.youtube.com/embed/{{ytid}}?autoplay=1{{#subtitle}}&cc_lang_pref={{subtitle}}&cc_load_policy=1&hl={{subtitle}}{{/subtitle}}" frameborder="0" allowfullscreen></iframe>
 	</div>
 	<div class="modal-footer">
 		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>

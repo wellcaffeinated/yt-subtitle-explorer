@@ -19,8 +19,10 @@
 				<ul class="unstyled clearfix">
 					{% for lang in data.languages %}
 					<li class="lang-{{lang.lang_code}} label label-info">
-						<span class="lang-trans">{{lang.lang_translated}}</span> - 
-						<span class="lang-orig">{{lang.lang_original}}</span>
+						<a href="{{data.url}}" class="ctrl-watch" data-lang="{{lang.lang_code}}">
+							<span class="lang-trans">{{lang.lang_translated}}</span> - 
+							<span class="lang-orig">{{lang.lang_original}}</span>
+						</a>
 					</li>
 					{% endfor %}
 					{% if data.languages|length == 0 %}
