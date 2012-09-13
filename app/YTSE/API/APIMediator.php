@@ -477,6 +477,7 @@ class APIMediator {
         }
 
         $data['numVideos'] = (int) $json->feed->{'openSearch$totalResults'}->{'$t'};
+        $data['title'] = $json->feed->title->{'$t'};
 
         if (empty($json->feed->entry)){
             // no results
