@@ -45,10 +45,13 @@
       <div id="lang-search">
   		  <input type="text" name="lang-search" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
       </div>
+
+      {% include 'credit.twig' %}
   	</div>
     
     {% include 'videolist.twig' %}
     
+    {% include 'footer.twig' %}
   </div>
 
 </body>
