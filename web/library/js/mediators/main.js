@@ -13,7 +13,8 @@ define(
         'modules/toggle-ctrl',
         'plugins/tpl!templates/video-modal.tpl',
         'plugins/tpl!templates/caption-modal.tpl',
-        'bootstrap'
+        'bootstrap',
+        'modules/userreport'
     ],
     function(
         $,
