@@ -7,9 +7,9 @@
  * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__.'/vendor/autoload.php';
 
-define('YTSE_ROOT', __DIR__.'/..');
+define('YTSE_ROOT', __DIR__);
 //require_once YTSE_ROOT.'/config.php';
 define('YTSE_CONFIG_FILE', YTSE_ROOT.'/config/config.yaml');
 
