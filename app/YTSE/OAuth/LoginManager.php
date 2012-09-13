@@ -1,4 +1,11 @@
 <?php
+/**
+ * YouTube Subtitle Explorer
+ * 
+ * @author  Jasper Palfree <jasper@wellcaffeinated.net>
+ * @copyright 2012 Jasper Palfree
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 
 namespace YTSE\OAuth;
 
@@ -9,6 +16,7 @@ use Illuminate\Socialite\UserData;
 use Illuminate\Socialite\OAuthTwo\AccessToken;
 use Guzzle\Service\Client;
 
+// manages google oauth
 class LoginManager extends GoogleProvider {
 
 	private $session; // the symfony session
@@ -17,6 +25,13 @@ class LoginManager extends GoogleProvider {
 	private $ytdataScope = 'https://gdata.youtube.com';
 	private $adminToken;
 
+	/**
+	 * Constructor
+	 * @param Session       $session The symfony session
+	 * @param Connection    $conn    The dbal connection
+	 * @param string        $key     The oauth key
+	 * @param string        $secret  The oauth secret
+	 */
 	public function __construct(\Symfony\Component\HttpFoundation\Session\Session $session, Connection $conn, $key, $secret){
 
 		$this->session = $session;
@@ -26,6 +41,10 @@ class LoginManager extends GoogleProvider {
 		$this->scope = $this->getDefaultScope();
 	}
 	
+	/**
+	 * Is user the admin?
+	 * @return boolean
+	 */
 	public function isAuthorized(){
 
 		$username = $this->session->get('youtube_user');
@@ -34,31 +53,56 @@ class LoginManager extends GoogleProvider {
 		return ( $this->isLoggedIn() && $admin !== null && $username === $admin );
 	}
 
+	/**
+	 * Set the admin username
+	 * @param string $name admin username
+	 */
 	public function setAdmin($name){
 
 		$this->admin = $name;
 	}
 
+	/**
+	 * Get admin username
+	 * @return string admin username
+	 */
 	public function getAdmin(){
 
 		return $this->admin;
 	}
 
+	/**
+	 * Is the user authenticated with google
+	 * @return boolean
+	 */
 	public function isLoggedIn(){
 
 		return ( null !== $this->session->get('user_data') );
 	}
 
+	/**
+	 * Log the user out (invalidate current session)
+	 * @return void
+	 */
 	public function logOut(){
 
 		$this->session->invalidate();
 	}
 
+	/**
+	 * Get current username
+	 * @return string current user's username
+	 */
 	public function getUserName(){
 
 		return $this->session->get('username');
 	}
 
+	/**
+	 * Complete authentication based on access token
+	 * @param  AccessToken $token The access token object
+	 * @return void
+	 */
 	public function authenticate(AccessToken $token){
 
 		if ($token->getValue() === null || strlen($token->getValue()) === 0){
@@ -91,8 +135,8 @@ class LoginManager extends GoogleProvider {
 	/**
 	 * Get the URL to the provider's auth end-point.
 	 *
-	 * @param  string  $callbackUrl
-	 * @param  array   $options
+	 * @param  string  $callbackUrl Callback url for oauth process
+	 * @param  array   $options http request params
 	 * @return string
 	 */
 	public function getAuthUrl($callbackUrl, array $options = array()) {
@@ -109,6 +153,11 @@ class LoginManager extends GoogleProvider {
 		return parent::getAuthUrl($callbackUrl, $options);
 	}
 
+	/**
+	 * Get youtube user data
+	 * @param  AccessToken $token The access token object
+	 * @return array the user data
+	 */
 	public function getYoutubeData(AccessToken $token){
 
 		$gdata = $this->getHttpClient();
@@ -129,6 +178,10 @@ class LoginManager extends GoogleProvider {
 	    return $userdata;
 	}
 
+	/**
+	 * Get the admin token from database or cached
+	 * @return AccessToken the access token object for admin requests
+	 */
 	private function getAdminToken(){
 
 		if ($this->adminToken !== null) return $this->adminToken;
@@ -144,6 +197,10 @@ class LoginManager extends GoogleProvider {
 		return $this->adminToken;
 	}
 
+	/**
+	 * Get valid access token (refreshing token if necessary)
+	 * @return AccessToken the access token object for admin requests
+	 */
 	public function getValidAdminToken(){
 
 		$token = $this->getAdminToken();
@@ -157,6 +214,10 @@ class LoginManager extends GoogleProvider {
         return $token;
 	}
 
+	/**
+	 * Determine if admin token is available in database
+	 * @return boolean
+	 */
 	public function adminTokenAvailable(){
 
 		if ($this->getAdminToken() !== false){
@@ -167,6 +228,10 @@ class LoginManager extends GoogleProvider {
 		return false;
 	}
 
+	/**
+	 * Save access token in current session as admin token
+	 * @return void
+	 */
 	public function saveAdminToken(){
 
 		if (!$this->isAuthorized()) return;
@@ -189,6 +254,10 @@ class LoginManager extends GoogleProvider {
 		);
 	}
 
+	/**
+	 * Determine if admin access token has expired
+	 * @return boolean
+	 */
 	private function isAdminTokenExpired(){
 
 		$token = $this->getAdminToken();
@@ -201,6 +270,10 @@ class LoginManager extends GoogleProvider {
 		return ($now > $expires);
 	}
 
+	/**
+	 * Refresh the admin access token and store new one to database
+	 * @return AccessToken the admin access token
+	 */
 	private function refreshAdminToken(){
 
 		$token = $this->getAdminToken();
@@ -233,11 +306,19 @@ class LoginManager extends GoogleProvider {
 		return $this->adminToken = $token;
 	}
 
+	/**
+	 * Is current user allowing youtube access
+	 * @return boolean
+	 */
 	public function hasYoutubeAuth(){
 
 		return (null !== $this->session->get('youtube_data'));
 	}
 
+	/**
+	 * Authenticate through youtube for youtube data access
+	 * @return void
+	 */
 	public function doYoutubeAuth(){
 
 		$this->session->set('youtube_auth', true);

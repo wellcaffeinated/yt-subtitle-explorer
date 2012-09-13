@@ -1,4 +1,11 @@
 <?php
+/**
+ * YouTube Subtitle Explorer
+ * 
+ * @author  Jasper Palfree <jasper@wellcaffeinated.net>
+ * @copyright 2012 Jasper Palfree
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 
 namespace YTSE\Captions;
 
@@ -9,12 +16,22 @@ class CaptionManager {
 	private $base;
 	private static $acceptedExts = 'txt sub srt sbv';
 	private static $maxAcceptedSize = 1048576; // 1Mb
-	
+		
+	/**
+	 * Constructor
+	 * @param string $base absolute base directory for storing caption files
+	 */
 	public function __construct($base){
 
 		$this->base = $base;
 	}
 
+	/**
+	 * Get path to caption file
+	 * @param  string $videoId   the youtube video id
+	 * @param  string $lang_code the language code
+	 * @return string the absolute path
+	 */
 	public function getCaptionPath($videoId, $lang_code){
 
 		return implode('/', array(
@@ -24,6 +41,11 @@ class CaptionManager {
 		));
 	}
 
+	/**
+	 * Get contents of caption file
+	 * @param  string $path relative path to caption file
+	 * @return string|false
+	 */
 	public function getCaptionContents($path){
 
 		$filename = $this->base . '/' . $path;
@@ -39,6 +61,11 @@ class CaptionManager {
 		return false;
 	}
 
+	/**
+	 * Remove a caption file
+	 * @param  string $path relative path to caption file
+	 * @return boolean success value
+	 */
 	public function deleteCaption($path){
 
 		$filename = $this->base . '/' . $path;
@@ -53,11 +80,19 @@ class CaptionManager {
 		return true;
 	}
 
+	/**
+	 * Get caption submission list
+	 * @return array submission data
+	 */
 	public function getSubmissions(){
 
 		return $this->generateIndex();
 	}
 
+	/**
+	 * Generate index of caption submissions
+	 * @return array submission data
+	 */
 	protected function generateIndex(){
 
 		$ret = array();
@@ -89,6 +124,11 @@ class CaptionManager {
 		return $ret;
 	}
 
+	/**
+	 * Get caption record for specific video
+	 * @param  string $videoId youtube id for video
+	 * @return array caption data
+	 */
 	protected function generateCaptionsForVideo($videoId){
 
 		$dirname = $this->base . '/' . $videoId;
@@ -117,6 +157,11 @@ class CaptionManager {
 		return $langs;
 	}
 
+	/**
+	 * Get caption info based on caption path
+	 * @param  string $path relative path to caption file
+	 * @return array caption info
+	 */
 	public function extractCaptionInfo($path){
 
 		$path = preg_replace('/^\//', '', $path); // remove leading slash
@@ -140,6 +185,12 @@ class CaptionManager {
 		);
 	}
 
+	/**
+	 * Get caption submission data for specific video and language
+	 * @param  string $videoId   the youtube id for the video
+	 * @param  string $lang_code the language code of language
+	 * @return array caption data
+	 */
 	protected function generateCaptionsForVideoAndLang($videoId, $lang_code){
 
 		$dirname = $this->base . '/' . $videoId . '/' . $lang_code;
@@ -167,6 +218,14 @@ class CaptionManager {
 		return $caps;
 	}
 
+	/**
+	 * Save a caption submission from a form upload
+	 * @param  UploadedFile $file      the uploaded file
+	 * @param  string       $videoId   the youtube id of the video
+	 * @param  string       $lang_code the language code of the submission
+	 * @param  string       $username  the username of user who submitted it
+	 * @return void
+	 */
 	public function saveCaption(UploadedFile $file, $videoId, $lang_code, $username){
 
 		preg_match('/\.([a-zA-Z]*)$/', $file->getClientOriginalName(), $matches);
@@ -196,11 +255,22 @@ class CaptionManager {
 		$file->move($dir, $name);
 	}
 
+	/**
+	 * Determine if the extension of caption submission is acceptable
+	 * @param  string  $format extension to check
+	 * @return boolean true if safe/accepted extension
+	 */
 	protected function isSafeExtension($format){
 
 		return in_array($format, explode(' ', CaptionManager::$acceptedExts));
 	}
 
+	/**
+	 * Generate a caption filename
+	 * @param  string $username username of submitter
+	 * @param  string $format   the format of the caption
+	 * @return string the filename
+	 */
 	protected function getNewCaptionFilename($username, $format){
 
 		$ts = time();

@@ -1,3 +1,10 @@
+/**
+ * YouTube Subtitle Explorer
+ * 
+ * @author  Jasper Palfree <jasper@wellcaffeinated.net>
+ * @copyright 2012 Jasper Palfree
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 /*
  * Architecture: https://github.com/ryanfitzer/Example-RequireJS-jQuery-Project
  * All config options: https://github.com/jrburke/r.js/blob/master/build/example.build.js

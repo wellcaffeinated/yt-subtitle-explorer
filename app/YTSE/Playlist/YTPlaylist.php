@@ -1,4 +1,11 @@
 <?php
+/**
+ * YouTube Subtitle Explorer
+ * 
+ * @author  Jasper Palfree <jasper@wellcaffeinated.net>
+ * @copyright 2012 Jasper Palfree
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 
 namespace YTSE\Playlist;
 
@@ -14,8 +21,14 @@ class YTPlaylist {
 
 	private $noData = false;
 	
+	/**
+	 * Constructor
+	 * @param string $id  playlist youtube id
+	 * @param Application $app Silex application reference
+	 */
 	public function __construct( $id, $app ){
 		
+		//@TODO: this should not depend on $app
 		$this->app = $app;
 		$this->ytid = $id;
 		$this->videos = array();
@@ -26,19 +39,35 @@ class YTPlaylist {
 		$this->fetchLocal( $id );
 	}
 
+	/**
+	 * Get playlist id
+	 * @return string playlist id
+	 */
 	public function getId(){
 		return $this->ytid;
 	}
 
+	/**
+	 * Does playlist have data
+	 * @return boolean
+	 */
 	public function hasData(){
 		return !$this->noData;
 	}
 
+	/**
+	 * Get the playlist data
+	 * @return array playlist data
+	 */
 	public function getData(){
 		return $this->data;
 	}
 
-	public function setData( $arr ){
+	/**
+	 * Set the playlist data
+	 * @param array $arr The playlist data
+	 */
+	public function setData( array $arr ){
 
 		foreach ($this->data as $k=>$v){
 			if (array_key_exists($k, $arr)){
@@ -55,7 +84,11 @@ class YTPlaylist {
 		}
 	}
 
-	// fetch data from local db
+	/**
+	 * Fetch data from local db
+	 * @param  string $id playlist youtube id
+	 * @return void
+	 */
 	private function fetchLocal( $id ){
 
 		$this->sqlSelect->bindValue(1, $id);
@@ -85,7 +118,10 @@ class YTPlaylist {
 		}
 	}
 
-	// check to see if we need a refresh from remote
+	/**
+	 * Check to see if we need a refresh from remote
+	 * @return boolean
+	 */
 	public function isDirty(){
 
 		if (!$this->data) return true;
@@ -96,12 +132,18 @@ class YTPlaylist {
 		return ($now > $timeout);
 	}
 
+	/**
+	 * Update a particular video's data
+	 * @param  array  $data The video data
+	 * @return void
+	 */
 	public function updateVideo( array $data ){
 
 		if (!isset($data['ytid'])){
 			throw \Exception('Can not add video. "ytid" must be specified.');
 		}
 
+		// don't worry, array_unique is run later
 		$this->videos[] = $data['ytid'];
 		
 		// make sure $data only has valid video data
@@ -128,6 +170,11 @@ class YTPlaylist {
 		);
 	}
 
+	/**
+	 * Remove a video from the record
+	 * @param  string $ytid the video youtube id
+	 * @return void
+	 */
 	public function removeVideo( $ytid ){
 
 		$k = array_search($ytid);
@@ -144,11 +191,19 @@ class YTPlaylist {
 		}
 	}
 
+	/**
+	 * Get all video records
+	 * @return array
+	 */
 	private function fetchAllVideos(){
 		
 		return $this->app['db']->fetchAll("SELECT * FROM {$this->app['db.tables.videos']} WHERE playlist_id = ?", array($this->ytid));
 	}
 
+	/**
+	 * Get all video data for playlist
+	 * @return array video data
+	 */
 	public function getVideos(){
 
 		$vids = $this->fetchAllVideos();
@@ -160,6 +215,11 @@ class YTPlaylist {
 		return $vids;
 	}
 
+	/**
+	 * Get video data for a specific video
+	 * @param  string $id the video youtube id
+	 * @return array video data
+	 */
 	public function getVideoById($id){
 
 		$vid = $this->app['db']->fetchAssoc("SELECT * FROM {$this->app['db.tables.videos']} WHERE ytid = ?", array($id));
@@ -167,6 +227,11 @@ class YTPlaylist {
 		return $vid;
 	}
 
+	/**
+	 * Intermediate stage between database (unserializing etc...)
+	 * @param  array $vid video data
+	 * @return array video data
+	 */
 	private function filterVidData(&$vid){
 
 		$cmp = function($a, $b){
@@ -184,9 +249,12 @@ class YTPlaylist {
 		usort($vid['caption_links'], $cmp);
 	}
 
-	// get videos, filter by lang_codes.
-	// $filter['type'] => ('any'|'every') - includes any lang or every lang
-	// $filter['negate'] => (true|false) - exclude
+	/**
+	 * Get videos filtered by language code
+	 * @param  array  $lang_codes The array of language codes to filter
+	 * @param  array  $filter     The filter type. $filter['type'] => ('any'|'every') - includes any lang or every lang. $filter['negate'] => (true|false) - Search for languages not present (negative search)
+	 * @return array video data
+	 */
 	public function getVideosFilterLang( array $lang_codes, array $filter ){
 
 		$type = array_key_exists('type', $filter) && ($filter['type'] === 'every');
@@ -212,6 +280,10 @@ class YTPlaylist {
 		return $vids;
 	}
 
+	/**
+	 * Sync data to database
+	 * @return void
+	 */
 	public function syncLocal(){
 
 		$now = new \Datetime('now');
@@ -220,6 +292,11 @@ class YTPlaylist {
 		$this->app['db']->update($this->app['db.tables.playlists'], $this->data, array('ytid'=>$this->data['ytid']));
 	}
 
+	/**
+	 * Find languages by similar name (for autocomplete)
+	 * @param  string $str Language search string
+	 * @return array list of languages
+	 */
 	public function getAvailableLanguagesLike( $str = false ){
 
 		if (!$str || strlen($str) === 0){
@@ -237,6 +314,11 @@ class YTPlaylist {
 		);
 	}
 
+	/**
+	 * Get string representation of language data for insertion into db
+	 * @param  array  $langs language data
+	 * @return string
+	 */
 	private function getLangStr( array $langs ){
 
 		$ret = array();
@@ -248,6 +330,11 @@ class YTPlaylist {
 		return implode(':', $ret);
 	}
 
+	/**
+	 * Get array of language data from db string
+	 * @param  string $str language code list string
+	 * @return array language data for language list
+	 */
 	private function getLangData( $str ){
 
 		$ret = array();
@@ -261,6 +348,11 @@ class YTPlaylist {
 		return $st->fetchAll();
 	}
 
+	/**
+	 * Store language data to db
+	 * @param  array  $data language data
+	 * @return void
+	 */
 	private function storeLangData( array $data ){
 
 		$this->app['db']->executeQuery(

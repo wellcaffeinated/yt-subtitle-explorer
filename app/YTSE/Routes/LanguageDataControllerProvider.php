@@ -1,4 +1,11 @@
 <?php
+/**
+ * YouTube Subtitle Explorer
+ * 
+ * @author  Jasper Palfree <jasper@wellcaffeinated.net>
+ * @copyright 2012 Jasper Palfree
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 
 namespace YTSE\Routes;
 
@@ -27,7 +34,9 @@ class LanguageDataControllerProvider implements ControllerProviderInterface {
 
     	$controller = $app['controllers_factory'];
 
-		// meta data for languages (name, code, ...)
+		/**
+		 * meta data for languages (name, code, ...)
+		 */
 		$controller->get('/meta', function(Application $app, Request $request ) {
 
 			$data = $app['ytplaylist']->getAvailableLanguagesLike( $request->get('q') );
@@ -35,6 +44,9 @@ class LanguageDataControllerProvider implements ControllerProviderInterface {
 
 		})->bind('langmeta');
 
+		/**
+		 * All videos
+		 */
 		$controller->get('/languages', function(Application $app ) {
 			
 			return $app['twig']->render('videolist.twig', array(
@@ -44,7 +56,9 @@ class LanguageDataControllerProvider implements ControllerProviderInterface {
 
 		})->bind('langall');
 
-		// find videos filtered by languages provided
+		/**
+		 * find videos filtered by languages provided
+		 */
 		$controller->get('/languages/{withWithout}/{anyEvery}/{lang_list}', function( $withWithout, $anyEvery, array $lang_list, Application $app ) {
 			
 			return $app['twig']->render('videolist.twig', array(

@@ -1,9 +1,16 @@
 <?php
+/**
+ * YouTube Subtitle Explorer
+ * 
+ * @author  Jasper Palfree <jasper@wellcaffeinated.net>
+ * @copyright 2012 Jasper Palfree
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 
 require_once __DIR__.'/../vendor/autoload.php';
 
 define('YTSE_ROOT', __DIR__.'/..');
-require YTSE_ROOT.'/config.php';
+require_once YTSE_ROOT.'/config.php';
 
 $app = new Silex\Application();
 $app['debug'] = defined('DEBUG');
@@ -13,6 +20,7 @@ $app['db.tables.playlists'] = YTSE_DB_PFX.'playlists';
 $app['db.tables.languages'] = YTSE_DB_PFX.'languages';
 define('YTSE_DB_ADMIN_TABLE', YTSE_DB_PFX.'admin');
 
+// doctrine for db functions
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
     	'driver'   => 'pdo_sqlite',
@@ -30,7 +38,10 @@ $app->register(new Silex\Provider\SessionServiceProvider(), array(
 ));
 // register twig templating
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path' => YTSE_ROOT.'/app/views'
+    'twig.path' => YTSE_ROOT.'/app/views',
+    'twig.options' => array(
+    	'cache' => YTSE_ROOT.'/cache/',
+    ),
 ));
 
 // register api mediator provider
@@ -98,6 +109,29 @@ $app['refresh.data'] = $app->protect(function() use ($app) {
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+
+/**
+ * Error handling
+ */
+$app->error(function (\Exception $e, $code) use ($app) {
+
+    switch ($code) {
+        case 404:
+            $message = 'The requested page could not be found.';
+            break;
+        case 500:
+            $message = 'We are sorry, but something went terribly wrong. Try again later.';
+            break;
+        default:
+        	$message = $e->getMessage();
+    }
+
+    return $app['twig']->render('page-error-msg.twig', array(
+	
+		'msg' => $message,
+	));
+});
+
 /**
  * OAuth Authentication
  */
@@ -117,6 +151,9 @@ if (!dbDefOk($app['db']) || !$app['oauth']->adminTokenAvailable()){
 	exit;
 }
 
+/**
+ * Check if the user has admin authorization (the only kind)
+ */
 $checkAuthorization = function(Request $req, Silex\Application $app){
 
 	if ( !$app['oauth']->hasYoutubeAuth() ){
@@ -136,6 +173,9 @@ $checkAuthorization = function(Request $req, Silex\Application $app){
 	}
 };
 
+/**
+ * Check it the user has been authenticated with google
+ */
 $checkAuthentication = function(Request $req, Silex\Application $app){
 
 	if ( !$app['oauth']->isLoggedIn() ){
@@ -149,10 +189,14 @@ $checkAuthentication = function(Request $req, Silex\Application $app){
 	}
 };
 
+/**
+ * Enable app to access user's youtube data when authenticated
+ */
 $needYoutubeAuth = function(Request $req, Silex\Application $app){
 
 	$app['oauth']->doYoutubeAuth();
 };
+
 
 /**
  * Before routing
@@ -204,11 +248,6 @@ $admin->before($needYoutubeAuth);
 $admin->before($checkAuthentication);
 $admin->before($checkAuthorization);
 $app->mount('/admin', $admin);
-
-/**
- * OAuth test
- */
-//$app->mount('/admin', include YTSE_ROOT.'/app/Routes/oauth.php');
 
 /**
  * After response is sent

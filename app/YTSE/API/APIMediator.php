@@ -1,4 +1,11 @@
 <?php
+/**
+ * YouTube Subtitle Explorer
+ * 
+ * @author  Jasper Palfree <jasper@wellcaffeinated.net>
+ * @copyright 2012 Jasper Palfree
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 
 namespace YTSE\API;
 
@@ -45,6 +52,9 @@ class APIMediator {
 
     }
 
+    /**
+     * Convert xml string to php object
+     */
     private function parseXML( $body ){
         
         libxml_use_internal_errors(true);
@@ -73,6 +83,11 @@ class APIMediator {
         return $xml;
     }
 
+    /**
+     * Get all caption language data for list of youtube videos
+     * @param  array|string $ytids The youtube ids for videos
+     * @return array language data
+     */
     public function getYTLanguages($ytids){
 
         $ret = array();
@@ -137,6 +152,13 @@ class APIMediator {
         return $ret;
     }
 
+    /**
+     * Create a caption file
+     * @param  AccessToken $token   The access token object to authorize youtube access
+     * @param  array       $info    caption info array
+     * @param  string      $content Content of caption file
+     * @return array caption data of newly created caption
+     */
     public function createYTCaption(AccessToken $token, array $info, $content){
 
         $params = array(
@@ -148,6 +170,14 @@ class APIMediator {
         return $ret[0];
     }
 
+    /**
+     * Update a caption file
+     * @param  string      $url     The API url of caption file
+     * @param  AccessToken $token   The access token object to authorize youtube access
+     * @param  array       $info    caption info array
+     * @param  string      $content content of caption file
+     * @return array caption data of updated caption
+     */
     public function updateYTCaption($url, AccessToken $token, array $info, $content){
 
         $params = array(
@@ -159,6 +189,12 @@ class APIMediator {
         return $ret[0];
     }
 
+    /**
+     * create and/or update a batch of caption files
+     * @param  array       $batch The array containing caption file info
+     * @param  AccessToken $token The access token object to authorize youtube access
+     * @return array caption data of batch files
+     */
     public function batchSaveCaptions(array $batch, AccessToken $token){
 
         $params = array(
@@ -183,6 +219,16 @@ class APIMediator {
         return $this->execCaptionRequests( $requests );
     }
 
+    /**
+     * Create a Guzzle request object for caption request
+     * @param  string      $method  http method
+     * @param  string      $url     url of request
+     * @param  array       $params  http parameters
+     * @param  string      $content body content
+     * @param  array       $info    caption info array
+     * @param  AccessToken $token   The access token object to authorize youtube access
+     * @return Request the Guzzle request
+     */
     private function createCaptionRequest($method, $url, array $params, $content, array $info, AccessToken $token){
 
         return $this->gdataAPI->createRequest(
@@ -201,6 +247,11 @@ class APIMediator {
         );
     }
 
+    /**
+     * Execute a batch of Guzzle requests (for captions) in parallel
+     * @param  array  $requests Array of Guzzle requests
+     * @return array data of caption responses
+     */
     private function execCaptionRequests( array $requests ){
 
         $errorResponses = array();
@@ -276,6 +327,13 @@ class APIMediator {
         return $ret;
     }
 
+    /**
+     * Get contents of a caption file from youtube
+     * @param  string      $url    the API url to get caption content
+     * @param  AccessToken $token  the access token object to authorize youtube access
+     * @param  string      $format extension of the subtitle format (srt or sbv)
+     * @return string caption body string
+     */
     public function getYTCaptionContent($url, AccessToken $token, $format = 'srt'){
 
         $req = $this->gdataAPI->get(
@@ -294,6 +352,12 @@ class APIMediator {
         return $req->send()->getBody(true);
     }
 
+    /**
+     * Get list of captions available for a video
+     * @param  array|string      $ytids array of youtube ids for videos
+     * @param  AccessToken $token the access token object to authorize youtube access
+     * @return array caption data
+     */
     public function getYTCaptions($ytids, AccessToken $token){
 
         $ret = array();
@@ -366,11 +430,23 @@ class APIMediator {
         return $ret;
     }
 
+    /**
+     * Get playlist data for a playlist
+     * @param  string $ytid the playlist id
+     * @return array playlist data
+     */
     public function getYTPlaylist($ytid){
 
         return $this->getPlaylistData($ytid);
     }
 
+    /**
+     * Get playlist data for a playlist
+     * @param  string  $ytid  the playlist id
+     * @param  integer $start video index to start at
+     * @param  array   $data  recursive helper for playlist data
+     * @return array playlist data
+     */
     private function getPlaylistData($ytid, $start = 1, &$data = array()){
 
         try {

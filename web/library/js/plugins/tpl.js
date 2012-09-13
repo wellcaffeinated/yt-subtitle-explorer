@@ -1,4 +1,11 @@
 /**
+ * YouTube Subtitle Explorer
+ * 
+ * @author  Jasper Palfree <jasper@wellcaffeinated.net>
+ * @copyright 2012 Jasper Palfree
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
+/**
  * Templating plugin that uses mustache.
  *
  * will return an api that provides raw text and render method.

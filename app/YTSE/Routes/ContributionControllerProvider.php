@@ -1,4 +1,11 @@
 <?php
+/**
+ * YouTube Subtitle Explorer
+ * 
+ * @author  Jasper Palfree <jasper@wellcaffeinated.net>
+ * @copyright 2012 Jasper Palfree
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 
 namespace YTSE\Routes;
 
@@ -14,6 +21,9 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
 		$controller = $app['controllers_factory'];
 
+		/**
+		 * Show contribution page for video
+		 */
 		$controller->get('/{videoId}', function(Request $request, Application $app, $videoId){
 
 			$video = $app['ytplaylist']->getVideoById($videoId);
@@ -45,6 +55,9 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 			));
 		})->bind('contribute');
 
+		/**
+		 * Download caption file 
+		 */
 		$controller->get('/{videoId}/caption', function(Request $request, Application $app, $videoId){
 
 			$video = $app['ytplaylist']->getVideoById($videoId);
@@ -83,6 +96,9 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
 		})->bind('contribute_cap');
 
+		/**
+		 * Upload a caption file
+		 */
 		$controller->post('/{videoId}/upload', function(Request $request, Application $app, $videoId){
 
 			$video = $app['ytplaylist']->getVideoById($videoId);

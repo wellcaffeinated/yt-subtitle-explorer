@@ -1,4 +1,11 @@
 <?php
+/**
+ * YouTube Subtitle Explorer
+ * 
+ * @author  Jasper Palfree <jasper@wellcaffeinated.net>
+ * @copyright 2012 Jasper Palfree
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
 
 namespace YTSE\Routes;
 
@@ -14,11 +21,17 @@ class InstallationControllerProvider implements ControllerProviderInterface {
 
         $controller = $app['controllers_factory'];
 
+        /**
+         * Show installation message on main page
+         */
         $controller->get('/', function() use ($app){
 
             $app->abort(412, 'Please complete installation by visiting: ' . $app['url_generator']->generate('install'));
         })->bind('search_page');
 
+        /**
+         * Begin install
+         */
         $controller->get('/install', function(Request $req) use ($app){
 
             if ( !$app['oauth']->isLoggedIn() ){
@@ -41,6 +54,9 @@ class InstallationControllerProvider implements ControllerProviderInterface {
 
         })->bind('install');
 
+        /**
+         * Actually do install
+         */
         $controller->get('/install/complete', function() use ($app) {
 
             if ( !$app['oauth']->isAuthorized() ){
