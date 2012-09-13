@@ -9,6 +9,8 @@
 
 namespace YTSE\Playlist;
 
+use Doctrine\DBAL\Connection;
+
 class YTPlaylist {
 
 	static $RefreshInterval = 'PT12H'; // 12 hours
@@ -20,23 +22,113 @@ class YTPlaylist {
 	private $ytid;
 
 	private $noData = false;
+	private $language_file_path;
+	private $default_lang;
+
+	private $tables = array(
+		'playlists' => 'ytse_playlists',
+		'videos' => 'ytse_videos',
+		'languages' => 'ytse_languages',
+	);
 	
 	/**
 	 * Constructor
 	 * @param string $id  playlist youtube id
-	 * @param Application $app Silex application reference
+	 * @param Connection $conn DBAL connection
 	 */
-	public function __construct( $id, $app ){
+	public function __construct( $id, Connection $conn, $language_file_path, $default_lang = 'en' ){
 		
-		//@TODO: this should not depend on $app
-		$this->app = $app;
+		$this->conn = $conn;
 		$this->ytid = $id;
 		$this->videos = array();
+		$this->language_file_path = $language_file_path;
+		$this->default_lang = $default_lang;
 		$this->videoKeys = array('ytid','title','playlist_id','url','thumbnail','updated','published','position','caption_links','languages');
 		
-		$this->sqlSelect = $app['db']->prepare("SELECT * FROM {$app['db.tables.playlists']} WHERE ytid = ?");
+		$this->sqlSelect = $this->conn->prepare("SELECT * FROM {$this->tables['playlists']} WHERE ytid = ?");
 
 		$this->fetchLocal( $id );
+	}
+
+	/**
+	 * Determine if db has proper tables setup
+	 * @return boolean
+	 */
+	public function isDbSetup(){
+		
+		$schema = $this->conn->getSchemaManager();
+
+		foreach ($this->tables as $table){
+
+			if ( !$schema->tablesExist($table) )
+				return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Setup tables
+	 * @param  boolean $force If true, drop pre-existing tables
+	 * @return void
+	 */
+	public function initDb($force = false){
+
+		if ($force){
+			foreach ($this->tables as $table) {
+				$this->conn->query("DROP TABLE IF EXISTS {$table}");
+			}
+		}
+
+		$this->conn->query("CREATE TABLE {$this->tables['videos']} (
+            ytid TEXT UNIQUE,
+            title TEXT,
+            playlist_id TEXT,
+            url TEXT,
+            thumbnail TEXT,
+            updated TEXT,
+            published TEXT,
+            position INTEGER,
+            caption_links TEXT,
+            languages TEXT
+            )"
+        );
+
+        $this->conn->query("CREATE TABLE {$this->tables['playlists']} (
+            ytid TEXT UNIQUE,
+            title TEXT,
+            updated TEXT,
+            video_list TEXT,
+            last_refresh TEXT
+            )"
+        );
+
+        $this->conn->query("CREATE TABLE {$this->tables['languages']} (
+            lang_code TEXT UNIQUE,
+            lang_translated TEXT,
+            lang_original TEXT
+            )"
+        );
+
+        if (($handle = fopen($this->language_file_path, "r")) !== FALSE) {
+
+        	$langs = $this->tables['languages'];
+
+            while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
+
+                $this->conn->insert($langs, array(
+                    'lang_code' => $row[0],
+                    'lang_translated' => $row[1],
+                    'lang_original' => $row[2]
+                ));
+            }
+
+            fclose($handle);
+
+        } else {
+
+            throw new \Exception('Can not find language file at '.$this->language_file_path);
+        }
 	}
 
 	/**
@@ -105,7 +197,7 @@ class YTPlaylist {
 			);
 
 			// init
-			$this->app['db']->insert($this->app['db.tables.playlists'], $this->data);
+			$this->conn->insert($this->tables['playlists'], $this->data);
 
 		} else {
 
@@ -163,8 +255,8 @@ class YTPlaylist {
 		}
 
 		// this replace command loses any not-specified data... not the best solution
-		$this->app['db']->executeQuery(
-			"REPLACE INTO {$this->app['db.tables.videos']} (".implode(',',array_keys($data)).") VALUES (?)",
+		$this->conn->executeQuery(
+			"REPLACE INTO {$this->tables['videos']} (".implode(',',array_keys($data)).") VALUES (?)",
 			array(array_values($data)),
 			array(\Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
 		);
@@ -183,8 +275,8 @@ class YTPlaylist {
 			array_splice($this->videos, $k, 1);
 
 			// remove playlist association in video record
-			$this->app['db']->update(
-				$this->app['db.tables.videos'], 
+			$this->conn->update(
+				$this->tables['videos'], 
 				array('playlist_id' => null),
 				array('ytid' => $ytid)
 			);
@@ -197,7 +289,7 @@ class YTPlaylist {
 	 */
 	private function fetchAllVideos(){
 		
-		return $this->app['db']->fetchAll("SELECT * FROM {$this->app['db.tables.videos']} WHERE playlist_id = ?", array($this->ytid));
+		return $this->conn->fetchAll("SELECT * FROM {$this->tables['videos']} WHERE playlist_id = ?", array($this->ytid));
 	}
 
 	/**
@@ -222,7 +314,7 @@ class YTPlaylist {
 	 */
 	public function getVideoById($id){
 
-		$vid = $this->app['db']->fetchAssoc("SELECT * FROM {$this->app['db.tables.videos']} WHERE ytid = ?", array($id));
+		$vid = $this->conn->fetchAssoc("SELECT * FROM {$this->tables['videos']} WHERE ytid = ?", array($id));
 		$this->filterVidData($vid);
 		return $vid;
 	}
@@ -234,10 +326,12 @@ class YTPlaylist {
 	 */
 	private function filterVidData(&$vid){
 
-		$cmp = function($a, $b){
+		$default_lang = $this->default_lang;
 
-			if ($a['lang_code'] === YT_PLAYLIST_DEFAULT_LANG) return -1;
-			if ($b['lang_code'] === YT_PLAYLIST_DEFAULT_LANG) return 1;
+		$cmp = function($a, $b) use ($default_lang) {
+
+			if ($a['lang_code'] === $default_lang) return -1;
+			if ($b['lang_code'] === $default_lang) return 1;
 
 			return 0;
 		};
@@ -289,7 +383,7 @@ class YTPlaylist {
 		$now = new \Datetime('now');
 		$this->data['last_refresh'] = $now->format('c');
 		$this->data['video_list'] = serialize(array_unique($this->videos));
-		$this->app['db']->update($this->app['db.tables.playlists'], $this->data, array('ytid'=>$this->data['ytid']));
+		$this->conn->update($this->tables['playlists'], $this->data, array('ytid'=>$this->data['ytid']));
 	}
 
 	/**
@@ -301,15 +395,15 @@ class YTPlaylist {
 
 		if (!$str || strlen($str) === 0){
 			
-			return $this->app['db']->fetchAll(
-				"SELECT * FROM {$this->app['db.tables.languages']}"
+			return $this->conn->fetchAll(
+				"SELECT * FROM {$this->tables['languages']}"
 			);
 		}
 
 		$str .= '%';
 
-		return $this->app['db']->fetchAll(
-			"SELECT * FROM {$this->app['db.tables.languages']} WHERE lang_original LIKE ? OR lang_translated LIKE ?",
+		return $this->conn->fetchAll(
+			"SELECT * FROM {$this->tables['languages']} WHERE lang_original LIKE ? OR lang_translated LIKE ?",
 			array($str, $str)
 		);
 	}
@@ -339,8 +433,8 @@ class YTPlaylist {
 
 		$ret = array();
 		$codes = explode(':', $str);
-		$st = $this->app['db']->executeQuery(
-			"SELECT * FROM {$this->app['db.tables.languages']} WHERE lang_code in (?)",
+		$st = $this->conn->executeQuery(
+			"SELECT * FROM {$this->tables['languages']} WHERE lang_code in (?)",
 			array(array_values($codes)),
 			array(\Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
 		);
@@ -355,8 +449,8 @@ class YTPlaylist {
 	 */
 	private function storeLangData( array $data ){
 
-		$this->app['db']->executeQuery(
-			"INSERT OR IGNORE INTO {$this->app['db.tables.languages']} (lang_code, lang_original, lang_translated) VALUES (?,?,?)",
+		$this->conn->executeQuery(
+			"INSERT OR IGNORE INTO {$this->tables['languages']} (lang_code, lang_original, lang_translated) VALUES (?,?,?)",
 			array($data['lang_code'],$data['lang_original'],$data['lang_translated'])
 		);
 	}

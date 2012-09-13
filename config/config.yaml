@@ -1,0 +1,34 @@
+# YouTube Subtitle Explorer
+# 
+# @author  Jasper Palfree <jasper@wellcaffeinated.net>
+# @copyright 2012 Jasper Palfree
+# @license http:#opensource.org/licenses/mit-license.php MIT License
+
+# uncomment to activate debug mode
+# debug: true
+
+ytse.config:
+    # path to create sqlite database
+    db.path: %ytse.root%/app/db/ytse.db
+
+# YouTube API Key
+api.config:
+    yt.api.key: "AI39si5ay6Qrl18RfxMT5UAkKtJgPBcdTJrwLtH6_w9tgwkpNa-IJL584LgZLABjRnR51-pIa7C4N9B0ogCZxjTizUPVVOqRxA"
+
+# Youtube Playlist to use
+ytplaylist.config:
+    playlist: PLB4B992CFA7A233BC #908547EAA7E4AE74
+    lang_file: %ytse.root%/app/db/languages.csv
+    # the default language code to highlight
+    default_lang: en
+
+# Google App OAuth consumer key and secret and admin youtube username
+oauth.config:
+    provider: google
+    key: 800287186226.apps.googleusercontent.com
+    secret: adOMrJ-Kika6t7onDCARC7GB
+    admin: caffeinatedphysicist
+
+# location of caption uploads
+captions.config:
+    caption_dir: %ytse.root%/app/uploads

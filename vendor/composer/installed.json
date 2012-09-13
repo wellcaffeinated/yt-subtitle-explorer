@@ -275,18 +275,87 @@
         }
     },
     {
+        "name": "symfony/yaml",
+        "version": "2.1.x-dev",
+        "version_normalized": "2.1.9999999.9999999-dev",
+        "target-dir": "Symfony/Component/Yaml",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/Yaml",
+            "reference": "v2.1.0-RC2"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/symfony/Yaml/zipball/v2.1.0-RC2",
+            "reference": "v2.1.0-RC2",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.1-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\Yaml": ""
+            }
+        }
+    },
+    {
+        "name": "igorw/config-service-provider",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/igorw/ConfigServiceProvider",
+            "reference": "ca8b3710cc3a6a397ec42d8163766920e90c920a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/igorw/ConfigServiceProvider/zipball/ca8b3710cc3a6a397ec42d8163766920e90c920a",
+            "reference": "ca8b3710cc3a6a397ec42d8163766920e90c920a",
+            "shasum": ""
+        },
+        "require": {
+            "silex/silex": "1.0.*"
+        },
+        "require-dev": {
+            "symfony/yaml": "2.1.*"
+        },
+        "suggest": {
+            "symfony/yaml": "2.1.*"
+        },
+        "type": "library",
+        "extra": {
+            "branch-alias": [
+
+    ]
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Igorw\\Silex": "src"
+            }
+        }
+    },
+    {
         "name": "monolog/monolog",
         "version": "dev-master",
         "version_normalized": "9999999-dev",
         "source": {
             "type": "git",
             "url": "https://github.com/Seldaek/monolog",
-            "reference": "e5bf7ba5d1df622b68d004b3c0277bc94286e1b7"
+            "reference": "0f3dc95c4a0ed7d17bec237d07af3da6c0c1071a"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/Seldaek/monolog/zipball/e5bf7ba5d1df622b68d004b3c0277bc94286e1b7",
-            "reference": "e5bf7ba5d1df622b68d004b3c0277bc94286e1b7",
+            "url": "https://github.com/Seldaek/monolog/zipball/0f3dc95c4a0ed7d17bec237d07af3da6c0c1071a",
+            "reference": "0f3dc95c4a0ed7d17bec237d07af3da6c0c1071a",
             "shasum": ""
         },
         "require": {
@@ -320,12 +389,12 @@
         "source": {
             "type": "git",
             "url": "git://github.com/fabpot/Twig.git",
-            "reference": "68b8c4619c5bbe82bd345fe56070dec8c356610a"
+            "reference": "956a66e6da304ead2aa2632acc01118b360d19d3"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/fabpot/Twig/zipball/68b8c4619c5bbe82bd345fe56070dec8c356610a",
-            "reference": "68b8c4619c5bbe82bd345fe56070dec8c356610a",
+            "url": "https://github.com/fabpot/Twig/zipball/956a66e6da304ead2aa2632acc01118b360d19d3",
+            "reference": "956a66e6da304ead2aa2632acc01118b360d19d3",
             "shasum": ""
         },
         "require": {
@@ -352,12 +421,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/HttpFoundation",
-            "reference": "v2.1.0"
+            "reference": "v2.1.1"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/symfony/HttpFoundation/zipball/v2.1.0",
-            "reference": "v2.1.0",
+            "url": "https://github.com/symfony/HttpFoundation/zipball/v2.1.1",
+            "reference": "v2.1.1",
             "shasum": ""
         },
         "require": {
@@ -385,12 +454,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/EventDispatcher",
-            "reference": "6e9726a4e82fe95fcb243e7c4021f7fb2de19b70"
+            "reference": "v2.1.1"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/symfony/EventDispatcher/zipball/6e9726a4e82fe95fcb243e7c4021f7fb2de19b70",
-            "reference": "6e9726a4e82fe95fcb243e7c4021f7fb2de19b70",
+            "url": "https://github.com/symfony/EventDispatcher/zipball/v2.1.1",
+            "reference": "v2.1.1",
             "shasum": ""
         },
         "require": {
@@ -424,12 +493,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/HttpKernel",
-            "reference": "cb91ebb2c104f3c24b20ef34b785f8ab75f1ea2d"
+            "reference": "584499e64026f41c4be938ed35d8f0a9a9eebd38"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/symfony/HttpKernel/zipball/cb91ebb2c104f3c24b20ef34b785f8ab75f1ea2d",
-            "reference": "cb91ebb2c104f3c24b20ef34b785f8ab75f1ea2d",
+            "url": "https://github.com/symfony/HttpKernel/zipball/584499e64026f41c4be938ed35d8f0a9a9eebd38",
+            "reference": "584499e64026f41c4be938ed35d8f0a9a9eebd38",
             "shasum": ""
         },
         "require": {
@@ -476,12 +545,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/Routing",
-            "reference": "5069cbd8bf02ed33cfd640b227bb43e816d55f14"
+            "reference": "v2.1.1"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/symfony/Routing/zipball/5069cbd8bf02ed33cfd640b227bb43e816d55f14",
-            "reference": "5069cbd8bf02ed33cfd640b227bb43e816d55f14",
+            "url": "https://github.com/symfony/Routing/zipball/v2.1.1",
+            "reference": "v2.1.1",
             "shasum": ""
         },
         "require": {

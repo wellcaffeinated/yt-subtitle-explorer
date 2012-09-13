@@ -18,13 +18,9 @@ class YTPlaylistProvider implements ServiceProviderInterface {
 
         $app['ytplaylist'] = $app->share(function($app){
 
-            $id = $app['ytplaylist.id'];
+            $config = $app['ytplaylist.config'];
 
-            if (!$id){
-                throw new Exception('Playlist ID undefined');
-            }
-
-            return new YTPlaylist( $id, $app );
+            return new YTPlaylist( $config['playlist'], $app['db'], $config['lang_file'], $config['default_lang'] );
         });
     }
 

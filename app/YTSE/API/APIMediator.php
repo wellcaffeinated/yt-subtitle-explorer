@@ -18,15 +18,11 @@ class APIMediator {
     private $ytAPI;
     private $unisubAPI;
 
-    public function __construct(){
-
-        if(!defined('UNISUB_USERNAME') || count(UNISUB_USERNAME) === 0){
-            throw new Exception('You MUST specify your Universal Subtitles username in config.php');
-        }
-
-        if(!defined('UNISUB_KEY') || count(UNISUB_KEY) === 0){
-            throw new Exception('You MUST specify your Universal Subtitles API Key in config.php');
-        }
+    /**
+     * Contstructor
+     * @param string $youtubeKey Youtube api key
+     */
+    public function __construct($youtubeKey){
 
         $this->ytAPI = new Client('http://www.youtube.com/api', array(
             // 'curl.CURLOPT_SSL_VERIFYHOST' => false,
@@ -38,11 +34,9 @@ class APIMediator {
             // 'curl.CURLOPT_SSL_VERIFYPEER' => false,
         ));
 
-        if(defined('YOUTUBE_KEY') && count(YOUTUBE_KEY) !== 0){
-            $this->gdataAPI->setDefaultHeaders(array(
-                'X-GData-Key' => 'key='.YOUTUBE_KEY
-            ));
-        }
+        $this->gdataAPI->setDefaultHeaders(array(
+            'X-GData-Key' => 'key='.$youtubeKey
+        ));
 
         // $this->unisubAPI = new Client('https://www.universalsubtitles.org/api2/partners');
         // $this->unisubAPI->setDefaultHeaders(array(
