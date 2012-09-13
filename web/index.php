@@ -204,7 +204,7 @@ $app->before(function(Request $request) use ($app) {
  * Main Site
  */
 $app->get('/', function(Silex\Application $app) {
-	
+
 	return $app['twig']->render('page-video-search.twig', array(
 		'playlist' => $app['ytplaylist']->getData(),
 		'videos' => $app['ytplaylist']->getVideos(),
