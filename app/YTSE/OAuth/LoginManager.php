@@ -79,7 +79,7 @@ class LoginManager extends GoogleProvider {
 	 */
 	public function isAuthorized(){
 
-		$username = $this->session->get('youtube_user');
+		$username = $this->getYTUserName();
 		$admin = $this->getAdmin();
 
 		return ( $this->isLoggedIn() && $admin !== null && $username === $admin );
@@ -128,6 +128,11 @@ class LoginManager extends GoogleProvider {
 	public function getUserName(){
 
 		return $this->session->get('username');
+	}
+
+	public function getYTUserName(){
+
+		return $this->session->get('youtube_user');
 	}
 
 	/**

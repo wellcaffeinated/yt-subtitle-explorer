@@ -45,9 +45,11 @@ class YTPlaylist {
 		$this->default_lang = $default_lang;
 		$this->videoKeys = array('ytid','title','playlist_id','url','thumbnail','updated','published','position','caption_links','languages');
 		
-		$this->sqlSelect = $this->conn->prepare("SELECT * FROM {$this->tables['playlists']} WHERE ytid = ?");
+		if($this->isDbSetup()){
 
-		$this->fetchLocal( $id );
+			$this->sqlSelect = $this->conn->prepare("SELECT * FROM {$this->tables['playlists']} WHERE ytid = ?");
+			$this->fetchLocal( $id );
+		}
 	}
 
 	/**
@@ -129,6 +131,9 @@ class YTPlaylist {
 
             throw new \Exception('Can not find language file at '.$this->language_file_path);
         }
+
+        $this->sqlSelect = $this->conn->prepare("SELECT * FROM {$this->tables['playlists']} WHERE ytid = ?");
+		$this->fetchLocal( $this->ytid );
 	}
 
 	/**
@@ -339,8 +344,13 @@ class YTPlaylist {
 		$vid['languages'] = $this->getLangData($vid['languages']);
 		$vid['caption_links'] = unserialize($vid['caption_links']);
 
-		usort($vid['languages'], $cmp);
-		usort($vid['caption_links'], $cmp);
+		if ($vid['languages']){
+			usort($vid['languages'], $cmp);
+		}
+
+		if ($vid['caption_links']){
+			usort($vid['caption_links'], $cmp);
+		}
 	}
 
 	/**

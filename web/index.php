@@ -10,13 +10,18 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 define('YTSE_ROOT', __DIR__.'/..');
-require_once YTSE_ROOT.'/config.php';
+//require_once YTSE_ROOT.'/config.php';
+define('YTSE_CONFIG_FILE', YTSE_ROOT.'/config/config.yaml');
 
 $app = new Silex\Application();
 
-$app->register(new Igorw\Silex\ConfigServiceProvider(YTSE_ROOT.'/config/config.yaml', array(
+$app->register(new Igorw\Silex\ConfigServiceProvider(YTSE_CONFIG_FILE, array(
     'ytse.root' => YTSE_ROOT,
 )));
+
+$app->register(new Silex\Provider\MonologServiceProvider(), array(
+    'monolog.logfile' => YTSE_ROOT.'/ytse.log',
+));
 
 // doctrine for db functions
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
@@ -201,8 +206,8 @@ $app->before(function(Request $request) use ($app) {
 $app->get('/', function(Silex\Application $app) {
 	
 	return $app['twig']->render('page-video-search.twig', array(
-	
-		'videos' => $app['ytplaylist']->getVideos()
+		'playlist' => $app['ytplaylist']->getData(),
+		'videos' => $app['ytplaylist']->getVideos(),
 	));
 })->bind('search_page');
 

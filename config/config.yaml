@@ -13,11 +13,11 @@ ytse.config:
 
 # YouTube API Key
 api.config:
-    yt.api.key: "AI39si5ay6Qrl18RfxMT5UAkKtJgPBcdTJrwLtH6_w9tgwkpNa-IJL584LgZLABjRnR51-pIa7C4N9B0ogCZxjTizUPVVOqRxA"
+    yt.api.key: YOUR_DEVELOPER_KEY
 
 # Youtube Playlist to use
 ytplaylist.config:
-    playlist: PLB4B992CFA7A233BC #908547EAA7E4AE74
+    playlist: YOUR_PLAYLIST_ID
     lang_file: %ytse.root%/app/db/languages.csv
     # the default language code to highlight
     default_lang: en
@@ -25,9 +25,9 @@ ytplaylist.config:
 # Google App OAuth consumer key and secret and admin youtube username
 oauth.config:
     provider: google
-    key: 800287186226.apps.googleusercontent.com
-    secret: adOMrJ-Kika6t7onDCARC7GB
-    admin: caffeinatedphysicist
+    key: YOUR_CLIENT_ID
+    secret: YOUR_CLIENT_SECRET
+    admin: YOUR_YOUTUBE_USERNAME
 
 # location of caption uploads
 captions.config:
