@@ -39,6 +39,8 @@ class InstallationControllerProvider implements ControllerProviderInterface {
 
         $yaml = Yaml::dump($config);
 
+        $yaml = str_replace($app['ytse.root'], '%ytse.root%', $yaml);
+
         file_put_contents(YTSE_CONFIG_FILE, $yaml);
     }
 
