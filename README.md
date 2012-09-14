@@ -22,6 +22,17 @@ The **YouTube Subtitle Explorer** is a tool you can install on your website to d
 4. If the folder isn't the root directory, edit the `.htaccess` file contents to point it to the subfolder.
 5. Visit the directory in a browser and follow the instructions (it will tell you to visit `/install`)
 
+## Contributing
+
+Please feel free to send pull requests my way. Dependencies are entirely managed by [composer](http://getcomposer.org/).
+
+To build the javascript, use the [RequireJS optimiser](http://requirejs.org/docs/optimization.html) and run:
+
+```bash
+	cd library/js
+	r.js -o require-profile.js
+```
+
 ## Credit
 
 This was created by Jasper Palfree (http://wellcaffeinated.net).
