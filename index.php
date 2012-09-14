@@ -20,7 +20,7 @@ $app->register(new Igorw\Silex\ConfigServiceProvider(YTSE_CONFIG_FILE, array(
 )));
 
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
-    'monolog.logfile' => YTSE_ROOT.'/ytse.log',
+    'monolog.logfile' => YTSE_ROOT.'/logs/ytse.log',
 ));
 
 // doctrine for db functions
