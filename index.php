@@ -10,7 +10,6 @@
 require_once __DIR__.'/vendor/autoload.php';
 
 define('YTSE_ROOT', __DIR__);
-//require_once YTSE_ROOT.'/config.php';
 define('YTSE_CONFIG_FILE', YTSE_ROOT.'/config/config.yaml');
 
 $app = new Silex\Application();
@@ -18,6 +17,8 @@ $app = new Silex\Application();
 $app->register(new Igorw\Silex\ConfigServiceProvider(YTSE_CONFIG_FILE, array(
     'ytse.root' => YTSE_ROOT,
 )));
+
+$app['ytse.root'] = YTSE_ROOT;
 
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile' => YTSE_ROOT.'/logs/ytse.log',
