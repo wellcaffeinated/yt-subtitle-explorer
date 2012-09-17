@@ -21,7 +21,7 @@
 
   <div class="container">
   	<div id="language-search-wrap" class="well" data-all-langs="{{app.url_generator.generate("langall")}}">
-  		<h2>MinutePhysics Translations</h2>
+  		<h2>Translations for {{playlist.title}}</h2>
 
       <div>
 
@@ -45,10 +45,15 @@
       <div id="lang-search">
   		  <input type="text" name="lang-search" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
       </div>
+
+      <p style="text-align: right; margin: 1em 0 0; font-size: 12px;">
+        {% include 'credit.twig' %}
+      </p>
   	</div>
     
     {% include 'videolist.twig' %}
     
+    {% include 'footer.twig' %}
   </div>
 
 </body>

@@ -2,7 +2,8 @@
     Options -MultiViews
 
     RewriteEngine On
-    RewriteBase /dev/translate/web
+    ## You only need to set the RewriteBase if this is in a subdirectory
+    #RewriteBase /path/to/this/dir
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>

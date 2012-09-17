@@ -7,24 +7,28 @@
  * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__.'/vendor/autoload.php';
 
-define('YTSE_ROOT', __DIR__.'/..');
-require_once YTSE_ROOT.'/config.php';
+define('YTSE_ROOT', __DIR__);
+define('YTSE_CONFIG_FILE', YTSE_ROOT.'/config/config.yaml');
 
 $app = new Silex\Application();
-$app['debug'] = defined('DEBUG');
 
-$app['db.tables.videos'] = YTSE_DB_PFX.'videos';
-$app['db.tables.playlists'] = YTSE_DB_PFX.'playlists';
-$app['db.tables.languages'] = YTSE_DB_PFX.'languages';
-define('YTSE_DB_ADMIN_TABLE', YTSE_DB_PFX.'admin');
+$app->register(new Igorw\Silex\ConfigServiceProvider(YTSE_CONFIG_FILE, array(
+    'ytse.root' => YTSE_ROOT,
+)));
+
+$app['ytse.root'] = YTSE_ROOT;
+
+$app->register(new Silex\Provider\MonologServiceProvider(), array(
+    'monolog.logfile' => YTSE_ROOT.'/logs/ytse.log',
+));
 
 // doctrine for db functions
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
     	'driver'   => 'pdo_sqlite',
-        'path'     => YTSE_DB_PATH,
+        'path'     => $app['ytse.config']['db.path'],
     ),
 ));
 
@@ -47,23 +51,11 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 // register api mediator provider
 $app->register(new YTSE\API\APIMediatorProvider());
 // register playlist provider
-$app->register(new YTSE\Playlist\YTPlaylistProvider(), array(
-    'ytplaylist.id' => YT_PLAYLIST
-));
-$app->register(new YTSE\OAuth\OAuthProvider(), array(
-	'oauth.config' => array(
-		'provider' => 'google',
-		'key' => G_OAUTH_KEY,
-		'secret' => G_OAUTH_SECRET,
-		'admin' => ADMIN_YT_USERNAME,
-	)
-));
+$app->register(new YTSE\Playlist\YTPlaylistProvider());
+// register oauth login manager
+$app->register(new YTSE\OAuth\OAuthProvider());
 // caption manager
-$app->register(new YTSE\Captions\CaptionManagerProvider(), array(
-    'captions.config' => array(
-    	'caption_dir' => CAPTION_DIR,
-    )
-));
+$app->register(new YTSE\Captions\CaptionManagerProvider());
 
 
 $app['refresh.data'] = $app->protect(function() use ($app) {
@@ -138,12 +130,7 @@ $app->error(function (\Exception $e, $code) use ($app) {
 
 $app->mount('/', new YTSE\Routes\AuthenticationControllerProvider( $app['oauth'] ));
 
-function dbDefOk($conn){
-	$schema = $conn->getSchemaManager();
-	return $schema->tablesExist(YTSE_DB_ADMIN_TABLE);
-}
-
-if (!dbDefOk($app['db']) || !$app['oauth']->adminTokenAvailable()){
+if (!$app['oauth']->isDbSetup() || !$app['oauth']->adminTokenAvailable()){
 
 	// do installation
 	$app->mount('/', new YTSE\Routes\InstallationControllerProvider());
@@ -218,10 +205,10 @@ $app->before(function(Request $request) use ($app) {
  * Main Site
  */
 $app->get('/', function(Silex\Application $app) {
-	
+
 	return $app['twig']->render('page-video-search.twig', array(
-	
-		'videos' => $app['ytplaylist']->getVideos()
+		'playlist' => $app['ytplaylist']->getData(),
+		'videos' => $app['ytplaylist']->getVideos(),
 	));
 })->bind('search_page');
 

@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'YTSE' => $baseDir . '/app/',
     'Twig_' => $vendorDir . '/twig/twig/lib/',
+    'Symfony\\Component\\Yaml' => $vendorDir . '/symfony/yaml/',
     'Symfony\\Component\\Routing' => $vendorDir . '/symfony/routing/',
     'Symfony\\Component\\HttpKernel' => $vendorDir . '/symfony/http-kernel/',
     'Symfony\\Component\\HttpFoundation' => $vendorDir . '/symfony/http-foundation/',
@@ -17,6 +18,7 @@ return array(
     'Pimple' => $vendorDir . '/pimple/pimple/lib/',
     'Monolog' => $vendorDir . '/monolog/monolog/src/',
     'Illuminate\\Socialite' => $vendorDir . '/illuminate/socialite/src/',
+    'Igorw\\Silex' => $vendorDir . '/igorw/config-service-provider/src',
     'Guzzle\\Tests' => $vendorDir . '/guzzle/guzzle/tests/',
     'Guzzle' => $vendorDir . '/guzzle/guzzle/src/',
     'Doctrine\\DBAL' => $vendorDir . '/doctrine/dbal/lib/',

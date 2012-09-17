@@ -6,7 +6,9 @@
         "monolog/monolog": ">=1.0.0",
         "swiftmailer/swiftmailer": ">=4.1.2,<4.2-dev",
         "illuminate/socialite": "*",
-        "guzzle/guzzle": "*"
+        "guzzle/guzzle": "*",
+        "symfony/yaml": "2.1.*",
+        "igorw/config-service-provider": "*"
     },
     "minimum-stability": "dev",
     "autoload": {

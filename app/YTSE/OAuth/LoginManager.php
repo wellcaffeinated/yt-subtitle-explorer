@@ -24,6 +24,9 @@ class LoginManager extends GoogleProvider {
 	private $admin;
 	private $ytdataScope = 'https://gdata.youtube.com';
 	private $adminToken;
+	private $tables = array(
+		'admin' => 'ytse_admin'
+	);
 
 	/**
 	 * Constructor
@@ -42,12 +45,41 @@ class LoginManager extends GoogleProvider {
 	}
 	
 	/**
+	 * Determine if db has proper tables setup
+	 * @return boolean
+	 */
+	public function isDbSetup(){
+		$schema = $this->conn->getSchemaManager();
+		return $schema->tablesExist($this->tables['admin']);
+	}
+
+	/**
+	 * Setup tables
+	 * @param  boolean $force If true, drop pre-existing tables
+	 * @return void
+	 */
+	public function initDb($force = false){
+
+		if ($force){
+			$this->conn->query("DROP TABLE IF EXISTS {$this->tables['admin']}");
+		}
+
+		$this->conn->query("CREATE TABLE {$this->tables['admin']} (
+            username TEXT UNIQUE,
+            access_token TEXT,
+            refresh_token TEXT,
+            expires TEXT
+            )"
+        );
+	}
+
+	/**
 	 * Is user the admin?
 	 * @return boolean
 	 */
 	public function isAuthorized(){
 
-		$username = $this->session->get('youtube_user');
+		$username = $this->getYTUserName();
 		$admin = $this->getAdmin();
 
 		return ( $this->isLoggedIn() && $admin !== null && $username === $admin );
@@ -96,6 +128,11 @@ class LoginManager extends GoogleProvider {
 	public function getUserName(){
 
 		return $this->session->get('username');
+	}
+
+	public function getYTUserName(){
+
+		return $this->session->get('youtube_user');
 	}
 
 	/**
@@ -186,7 +223,7 @@ class LoginManager extends GoogleProvider {
 
 		if ($this->adminToken !== null) return $this->adminToken;
 
-		$data = $this->conn->fetchAssoc("SELECT access_token, refresh_token, expires FROM ".YTSE_DB_ADMIN_TABLE." WHERE username = ?", array($this->getAdmin()));
+		$data = $this->conn->fetchAssoc("SELECT access_token, refresh_token, expires FROM {$this->tables['admin']} WHERE username = ?", array($this->getAdmin()));
 
 		if ($data){
 
@@ -244,7 +281,7 @@ class LoginManager extends GoogleProvider {
 		$expires->add( \DateInterval::createFromDateString($token->get('expires_in') . ' seconds') );
 
 		$this->conn->executeQuery(
-			"INSERT OR REPLACE INTO ".YTSE_DB_ADMIN_TABLE." (username, access_token, refresh_token, expires) VALUES (?,?,?,?)",
+			"INSERT OR REPLACE INTO {$this->tables['admin']} (username, access_token, refresh_token, expires) VALUES (?,?,?,?)",
 			array(
 				$this->session->get('youtube_user'),
 				$token->getValue(),
@@ -295,7 +332,7 @@ class LoginManager extends GoogleProvider {
 		$expires->add( \DateInterval::createFromDateString($token->get('expires_in') . ' seconds') );
 
 		$this->conn->update(
-			YTSE_DB_ADMIN_TABLE, 
+			$this->tables['admin'], 
 			array(
 				'access_token' => $token->getValue(),
 				'expires' => $expires->format('c'),

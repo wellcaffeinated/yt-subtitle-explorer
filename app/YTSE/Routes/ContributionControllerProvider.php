@@ -35,11 +35,14 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
 			$video['caption_details'] = array();
 
-			foreach ( $video['caption_links'] as $cap ){
-			
-				foreach ( $video['languages'] as &$lang ){
-					if ($lang['lang_code'] === $cap['lang_code'])
-						$video['caption_details'][] = $lang;
+			if ($video['caption_links']){
+
+				foreach ( $video['caption_links'] as $cap ){
+				
+					foreach ( $video['languages'] as &$lang ){
+						if ($lang['lang_code'] === $cap['lang_code'])
+							$video['caption_details'][] = $lang;
+					}
 				}
 			}
 
