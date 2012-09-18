@@ -139,3 +139,10 @@ Modals
     box-sizing: border-box;
 }
 
+/*
+Footer
+ */
+
+.footer {
+    margin: 2em 0;
+}

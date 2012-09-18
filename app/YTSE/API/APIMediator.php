@@ -331,7 +331,7 @@ class APIMediator {
     public function getYTCaptionContent($url, AccessToken $token, $format = 'srt'){
 
         $req = $this->gdataAPI->get(
-            array($url . '{?params}',
+            array($url . '{?params*}',
                 array(
                     'params' => array(
                         'fmt' => $format === 'srt' ? 'srt' : 'sbv',
@@ -410,10 +410,12 @@ class APIMediator {
 
                     foreach ($json['entry'] as $caption){
 
-                        $caps[] = array(
-                            'lang_code' => $caption['content']['xml$lang'],
-                            'src' => $caption['content']['src'],
-                        );
+                        if (!array_key_exists('yt$derived', $caption) || $caption['yt$derived']['$t'] !== 'speechRecognition'){
+                            $caps[] = array(
+                                'lang_code' => $caption['content']['xml$lang'],
+                                'src' => $caption['content']['src'],
+                            );
+                        }
                     }
 
                     $ret[ $ytids[$key] ] = $caps;

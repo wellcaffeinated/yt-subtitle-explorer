@@ -86,15 +86,15 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 				$app->abort(404, 'Caption not found.');	
 			}
 
-			$format = $request->get('format');
-			$format = $request->get('format') ?: 'srt';
+			$format = $request->get('fmt');
+			$format = $request->get('fmt') ?: 'srt';
 			$content = $app['api']->getYTCaptionContent($caption['src'], $app['oauth']->getValidAdminToken(), $format);
 			$filename = str_replace(' ', '_', 'captions_'.$capId.'_'.$video['title']. '.' .$format);
 
 			return new Response($content, 200, array(
 
 				'Content-type' => 'application/octet-stream',
-				'Content-disposition' => "attachment;filename=$filename",
+				'Content-disposition' => "attachment; filename=\"$filename\"",
 			));
 
 		})->bind('contribute_cap');

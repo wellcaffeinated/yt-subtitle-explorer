@@ -28,7 +28,7 @@
           <a class="btn btn-danger" href="{{app.url_generator.generate("logout", { redirect: 'login' })}}">Log Out</a>
         {% else %}
           <p>You need YouTube authentication to access this area. Please Sign In.</p>
-          <a class="btn btn-primary" href="{{app.url_generator.generate("authenticate")}}">Login with YouTube</a>
+          <a class="btn btn-primary" href="{{app.url_generator.generate("authenticate")}}">Login with Google</a>
           <a class="btn" href="{{app.url_generator.generate("search_page")}}">Cancel</a>
         {% endif %}
       </div>

@@ -1,5 +1,7 @@
 # YouTube Subtitle Explorer
 
+	Currently in beta. Not yet considered fully stable.
+
 The **YouTube Subtitle Explorer** is a tool you can install on your website to display a videos from one of your playlists. Users can then search by languages to find videos that contain or don't contain subtitles for a particular language. Users can also easily submit caption files that can be then uploaded directly to youtube.
 
 ## Features
@@ -43,6 +45,21 @@ For YouTube:
 3. Enter a name like "YTSE"
 4. Click save
 
+## Security
+
+There are `.htaccess` files with "deny from all" rules in certain sensitive directories. These include:
+
+* config/
+* app/
+* logs/
+
+Whatever you do, ensure that these directories are not accessible by the public and are only accessible by the php application code. (as long as the htaccess files are working that should be taken care of already).
+
+Also, please remember that you shouldn't share the API keys. If your system ever becomes compromized you can always invalidate the keys through google, and paste any newly created keys into the `config/config.yaml` file.
+
+If you ever suspect that your system has been compromized (and someone could have downloaded your database), then immediately unauthorize this app from your [google authorized applications and websites page](https://www.google.com/settings/security).
+
+*Note: no contributor user information is stored permanently by the app. Only administrator information is stored.**
 
 ## Contributing
 
@@ -57,7 +74,7 @@ To build the javascript, use the [RequireJS optimiser](http://requirejs.org/docs
 
 ## Credit
 
-This was created by Jasper Palfree (http://wellcaffeinated.net).
+This was created and developed by Jasper Palfree of *Well Caffeinated* (http://wellcaffeinated.net) with creative direction from Henry Reich of *Minute Physics* (http://minutephysics.com).
 
 Copyright 2012 Jasper Palfree
 

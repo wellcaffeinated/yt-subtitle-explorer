@@ -183,7 +183,7 @@ class LoginManager extends GoogleProvider {
 			$this->addScope($this->ytdataScope);
 			if ( !isset($options['access_type']) ){
 				$options['access_type'] = 'offline';
-				$options['approval_prompt'] = 'force';
+				//$options['approval_prompt'] = 'force';
 			}
 		}
 		
