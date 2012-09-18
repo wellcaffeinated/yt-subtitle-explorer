@@ -94,7 +94,7 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 			return new Response($content, 200, array(
 
 				'Content-type' => 'application/octet-stream',
-				'Content-disposition' => "attachment;filename=$filename",
+				'Content-disposition' => "attachment; filename=\"$filename\"",
 			));
 
 		})->bind('contribute_cap');
