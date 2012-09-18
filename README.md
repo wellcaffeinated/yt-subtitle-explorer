@@ -1,5 +1,7 @@
 # YouTube Subtitle Explorer
 
+	Currently in beta. Not yet considered fully stable.
+
 The **YouTube Subtitle Explorer** is a tool you can install on your website to display a videos from one of your playlists. Users can then search by languages to find videos that contain or don't contain subtitles for a particular language. Users can also easily submit caption files that can be then uploaded directly to youtube.
 
 ## Features
