@@ -24,6 +24,8 @@ swiftmailer.options:
 # YouTube API Key
 api.config:
     yt.api.key: YOUR_DEVELOPER_KEY
+    # type of thumbnail image to use
+    thumbnail: mqdefault
 
 # Youtube Playlist to use
 ytplaylist.config:
