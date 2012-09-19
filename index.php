@@ -24,6 +24,9 @@ $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile' => YTSE_ROOT.'/logs/ytse.log',
 ));
 
+// email service provider
+$app->register(new Silex\Provider\SwiftmailerServiceProvider());
+
 // doctrine for db functions
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
