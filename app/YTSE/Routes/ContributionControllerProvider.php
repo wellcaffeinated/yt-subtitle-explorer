@@ -17,141 +17,174 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ContributionControllerProvider implements ControllerProviderInterface {
 
-	public function connect(Application $app){
+    public function connect(Application $app){
 
-		$controller = $app['controllers_factory'];
+        $self = $this;
+        $this->app = $app;
 
-		/**
-		 * Show contribution page for video
-		 */
-		$controller->get('/{videoId}', function(Request $request, Application $app, $videoId){
+        $controller = $app['controllers_factory'];
 
-			$video = $app['ytplaylist']->getVideoById($videoId);
+        /**
+         * Show contribution page for video
+         */
+        $controller->get('/{videoId}', function(Request $request, Application $app, $videoId){
 
-			if (!$video){
+            $video = $app['ytplaylist']->getVideoById($videoId);
 
-				$app->abort(404, 'Video not found.');
-			}
+            if (!$video){
 
-			$video['caption_details'] = array();
+                $app->abort(404, 'Video not found.');
+            }
 
-			if ($video['caption_links']){
+            $video['caption_details'] = array();
 
-				foreach ( $video['caption_links'] as $cap ){
-				
-					foreach ( $video['languages'] as &$lang ){
-						if ($lang['lang_code'] === $cap['lang_code'])
-							$video['caption_details'][] = $lang;
-					}
-				}
-			}
+            if ($video['caption_links']){
 
-			return $app['twig']->render('page-contribute.twig', array(
+                foreach ( $video['caption_links'] as $cap ){
+                
+                    foreach ( $video['languages'] as &$lang ){
+                        if ($lang['lang_code'] === $cap['lang_code'])
+                            $video['caption_details'][] = $lang;
+                    }
+                }
+            }
 
-				'video' => $video,
-				'errors' => array(
-					'file' => $request->get('error_file'),
-					'lang' => $request->get('error_lang'),
-				),
-				'success_msg' => $request->get('success_msg'),
+            return $app['twig']->render('page-contribute.twig', array(
 
-			));
-		})->bind('contribute');
+                'video' => $video,
+                'errors' => array(
+                    'file' => $request->get('error_file'),
+                    'lang' => $request->get('error_lang'),
+                ),
+                'success_msg' => $request->get('success_msg'),
 
-		/**
-		 * Download caption file 
-		 */
-		$controller->get('/{videoId}/caption', function(Request $request, Application $app, $videoId){
+            ));
+        })->bind('contribute');
 
-			$video = $app['ytplaylist']->getVideoById($videoId);
+        /**
+         * Download caption file 
+         */
+        $controller->get('/{videoId}/caption', function(Request $request, Application $app, $videoId){
 
-			if (!$video){
+            $video = $app['ytplaylist']->getVideoById($videoId);
 
-				$app->abort(404, 'Video not found.');
-			}
+            if (!$video){
 
-			$capId = $request->get('capId');
-			$caption = false;
+                $app->abort(404, 'Video not found.');
+            }
 
-			foreach( $video['caption_links'] as $cap ){
+            $capId = $request->get('capId');
+            $caption = false;
 
-				if ($cap['lang_code'] === $capId){
-					$caption = $cap;
-					break;
-				}
-			}
+            foreach( $video['caption_links'] as $cap ){
 
-			if (!$caption){
+                if ($cap['lang_code'] === $capId){
+                    $caption = $cap;
+                    break;
+                }
+            }
 
-				$app->abort(404, 'Caption not found.');	
-			}
+            if (!$caption){
 
-			$format = $request->get('fmt');
-			$format = $request->get('fmt') ?: 'srt';
-			$content = $app['api']->getYTCaptionContent($caption['src'], $app['oauth']->getValidAdminToken(), $format);
-			$filename = str_replace(' ', '_', 'captions_'.$capId.'_'.$video['title']. '.' .$format);
+                $app->abort(404, 'Caption not found.'); 
+            }
 
-			return new Response($content, 200, array(
+            $format = $request->get('fmt');
+            $format = $request->get('fmt') ?: 'srt';
+            $content = $app['api']->getYTCaptionContent($caption['src'], $app['oauth']->getValidAdminToken(), $format);
+            $filename = str_replace(' ', '_', 'captions_'.$capId.'_'.$video['title']. '.' .$format);
 
-				'Content-type' => 'application/octet-stream',
-				'Content-disposition' => "attachment; filename=\"$filename\"",
-			));
+            return new Response($content, 200, array(
 
-		})->bind('contribute_cap');
+                'Content-type' => 'application/octet-stream',
+                'Content-disposition' => "attachment; filename=\"$filename\"",
+            ));
 
-		/**
-		 * Upload a caption file
-		 */
-		$controller->post('/{videoId}/upload', function(Request $request, Application $app, $videoId){
+        })->bind('contribute_cap');
 
-			$video = $app['ytplaylist']->getVideoById($videoId);
+        /**
+         * Upload a caption file
+         */
+        $controller->post('/{videoId}/upload', function(Request $request, Application $app, $videoId) use ($self) {
 
-			if (!$video){
+            $video = $app['ytplaylist']->getVideoById($videoId);
 
-				$app->abort(404, 'Video not found.');
-			}
+            if (!$video){
 
-			$file = $request->files->get('cap_file');
-			$lang = $request->get('lang_code');
+                $app->abort(404, 'Video not found.');
+            }
 
-			// if form data invalid, redirect with error messages
-			if (empty($file) || empty($lang)){
+            $file = $request->files->get('cap_file');
+            $lang = $request->get('lang_code');
 
-				return $app->redirect(
-					$app['url_generator']->generate('contribute',
-						array(
-							'videoId' => $videoId,
-							'error_file' => empty($file),
-							'error_lang' => empty($lang),
-						)
-					)
-				);
-			}
+            // if form data invalid, redirect with error messages
+            if (empty($file) || empty($lang)){
 
-			try {
+                return $app->redirect(
+                    $app['url_generator']->generate('contribute',
+                        array(
+                            'videoId' => $videoId,
+                            'error_file' => empty($file),
+                            'error_lang' => empty($lang),
+                        )
+                    )
+                );
+            }
 
-				$app['captions']->saveCaption($file, $videoId, $lang, $app['oauth']->getUserName(), $format);
+            try {
 
-			} catch (\YTSE\Captions\InvalidFileFormatException $e){
+                $app['captions']->saveCaption($file, $videoId, $lang, $app['oauth']->getUserName(), $format);
 
-				$app->abort(403, 'Invalid caption file format.');
+            } catch (\YTSE\Captions\InvalidFileFormatException $e){
 
-			} catch (\Exception $e){
+                $app->abort(403, 'Invalid caption file format.');
 
-				$app->abort(500, 'Problem uploading file.');
-			}
+            } catch (\Exception $e){
 
-			return $app->redirect(
-				$app['url_generator']->generate('contribute',
-					array(
-						'videoId' => $videoId,
-						'success_msg' => true,
-					)
-				)
-			);
+                $app->abort(500, 'Problem uploading file.');
+            }
 
-		})->bind('contribute_upload');
+            $self->emailNotification($request, $lang, $videoId);
 
-		return $controller;
-	}
+            return $app->redirect(
+                $app['url_generator']->generate('contribute',
+                    array(
+                        'videoId' => $videoId,
+                        'success_msg' => true,
+                    )
+                )
+            );
+
+        })->bind('contribute_upload');
+
+        return $controller;
+    }
+
+    public function emailNotification(Request $req, $lang, $videoId){
+
+        $app = $this->app;
+
+        $config = $app['ytse.config'];
+
+        if (!isset($config['email_notify']) || empty($config['email_notify'])) return;
+
+        $host = $req->getHost();
+        $video = $app['ytplaylist']->getVideoById($videoId);
+
+        $msg = 'You have received a new translation from ' .
+            $app['oauth']->getUserName() .
+            ' in '. $lang .' for the video called "' .
+            $video['title'] .
+            '"' . PHP_EOL . PHP_EOL .
+            'View it on your admin panel: ' . $app['url_generator']->generate('admin_main', array(), true).
+            PHP_EOL;  
+
+        $email = \Swift_Message::newInstance()
+            ->setSubject('New Translation on '.$host)
+            ->setFrom(array('noreply@'.$host))
+            ->setTo($config['email_notify'])
+            ->setBody($msg);
+
+        $app['mailer']->send($email);
+    }
 }
