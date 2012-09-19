@@ -1,6 +1,6 @@
 # YouTube Subtitle Explorer
 
-    Currently in beta. Not yet considered fully stable.
+	Currently in beta. Not yet considered fully stable.
 
 The **YouTube Subtitle Explorer** is a tool you can install on your website to display a videos from one of your playlists. Users can then search by languages to find videos that contain or don't contain subtitles for a particular language. Users can also easily submit caption files that can be then uploaded directly to youtube.
 
@@ -50,18 +50,18 @@ For YouTube:
 After you have finished installing the app, you can set up email notifications to be sent when you get a new submission. To do this, edit the file `config/config.yaml`. Change the following options as needed
 
 ```yaml
-    # in config/config.yaml
+# in config/config.yaml ...
 
-    ytse.config:
-        email_notify: null # array of email addresses to notify. Eg: [ 'example@example.com', 'ex2@...' ]
-        email_from: no-reply@example.com #likely must be same as username
+ytse.config:
+    email_notify: null # array of email addresses to notify. Eg: [ 'example@example.com', 'ex2@...' ]
+    email_from: no-reply@example.com #likely must be same as username
 
-    swiftmailer.options:
-        host: localhost #probably fine
-        port: 25 #probably fine
-        username: '' # username for smtp auth, likely same as email_from
-        password: '' # password for smtp auth
-        auth_mode: false # true if your host needs smtp auth
+swiftmailer.options:
+    host: localhost #probably fine
+    port: 25 #probably fine
+    username: '' # username for smtp auth, likely same as email_from
+    password: '' # password for smtp auth
+    auth_mode: false # true if your host needs smtp auth
 ```
 
 ## Security
@@ -87,8 +87,8 @@ Please feel free to send pull requests my way. Dependencies are entirely managed
 To build the javascript, use the [RequireJS optimiser](http://requirejs.org/docs/optimization.html) and run:
 
 ```bash
-    cd library/js
-    r.js -o require-profile.js
+	cd library/js
+	r.js -o require-profile.js
 ```
 
 ## Credit
