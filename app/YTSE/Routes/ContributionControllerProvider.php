@@ -171,20 +171,27 @@ class ContributionControllerProvider implements ControllerProviderInterface {
         $host = $req->getHost();
         $video = $app['ytplaylist']->getVideoById($videoId);
 
-        $msg = 'You have received a new translation from ' .
-            $app['oauth']->getUserName() .
-            ' in '. $lang .' for the video called "' .
-            $video['title'] .
-            '"' . PHP_EOL . PHP_EOL .
-            'View it on your admin panel: ' . $app['url_generator']->generate('admin_main', array(), true).
-            PHP_EOL;  
+        $msg = $app['twig']->render('email-notify-submission.twig', array(
+            'username' => $app['oauth']->getUserName(),
+            'lang_code' => $lang,
+            'video' => $video,
+            'hostname' => $host,
+        ));
+
+        $app['monolog']->addInfo( 'emailing: ' . 
+            (is_array($config['email_notify']) ? implode(',', $config['email_notify']) : $config['email_notify']) . 
+            ' from: ' . 
+            (is_array($config['email_from']) ? implode(',', $config['email_from']) : $config['email_from'])
+        );
 
         $email = \Swift_Message::newInstance()
             ->setSubject('New Translation on '.$host)
-            ->setFrom(array('noreply@'.$host))
+            ->setFrom($config['email_from'])
             ->setTo($config['email_notify'])
             ->setBody($msg);
 
-        $app['mailer']->send($email);
+        $count = $app['mailer']->send($email);
+        
+        $app['monolog']->addInfo( 'emailed ' . $count . ' recipients');
     }
 }

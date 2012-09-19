@@ -12,6 +12,14 @@ ytse.config:
     db.path: %ytse.root%/app/db/ytse.db
     # list of email addresses to notify about new submissions
     email_notify: # [ 'example@example.com', 'ex2@...' ]
+    email_from: no-reply@example.com
+
+swiftmailer.options:
+    host: localhost
+    port: 25
+    username: ''
+    password: ''
+    auth_mode: false
 
 # YouTube API Key
 api.config:

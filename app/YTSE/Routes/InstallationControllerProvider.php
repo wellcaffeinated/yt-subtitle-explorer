@@ -27,6 +27,7 @@ class InstallationControllerProvider implements ControllerProviderInterface {
             'ytplaylist.config' => array(),
             'oauth.config' => array(),
             'captions.config' => array(),
+            'swiftmailer.options' => array(),
         );
 
         foreach ($config as $key => $val) {
