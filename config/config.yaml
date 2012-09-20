@@ -2,7 +2,7 @@
 # 
 # @author  Jasper Palfree <jasper@wellcaffeinated.net>
 # @copyright 2012 Jasper Palfree
-# @license http:#opensource.org/licenses/mit-license.php MIT License
+# @license http://opensource.org/licenses/mit-license.php MIT License
 
 # uncomment to activate debug mode
 # debug: true
@@ -10,10 +10,22 @@
 ytse.config:
     # path to create sqlite database
     db.path: %ytse.root%/app/db/ytse.db
+    # list of email addresses to notify about new submissions
+    email_notify: # [ 'example@example.com', 'ex2@...' ]
+    email_from: no-reply@example.com
+
+swiftmailer.options:
+    host: localhost
+    port: 25
+    username: ''
+    password: ''
+    auth_mode: false
 
 # YouTube API Key
 api.config:
     yt.api.key: YOUR_DEVELOPER_KEY
+    # type of thumbnail image to use
+    thumbnail: mqdefault
 
 # Youtube Playlist to use
 ytplaylist.config:

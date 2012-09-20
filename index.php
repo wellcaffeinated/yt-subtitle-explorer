@@ -20,9 +20,16 @@ $app->register(new Igorw\Silex\ConfigServiceProvider(YTSE_CONFIG_FILE, array(
 
 $app['ytse.root'] = YTSE_ROOT;
 
+if (!$app['debug']){
+	error_reporting(0);
+}
+
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile' => YTSE_ROOT.'/logs/ytse.log',
 ));
+
+// email service provider
+$app->register(new Silex\Provider\SwiftmailerServiceProvider());
 
 // doctrine for db functions
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
@@ -42,7 +49,11 @@ $app->register(new Silex\Provider\SessionServiceProvider(), array(
 ));
 // register twig templating
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path' => YTSE_ROOT.'/app/views',
+    'twig.path' => array(
+    	YTSE_ROOT.'/user/views',
+    	YTSE_ROOT.'/app/views',
+    	YTSE_ROOT.'/app', // for user override inheritence
+    ),
     'twig.options' => array(
     	'cache' => YTSE_ROOT.'/cache/',
     ),
@@ -62,7 +73,15 @@ $app['refresh.data'] = $app->protect(function() use ($app) {
 
 	$pl = $app['ytplaylist'];
 
-	$data = $app['api']->getYTPlaylist($pl->getId());
+	try {
+
+		$data = $app['api']->getYTPlaylist($pl->getId());
+
+	} catch (\Exception $e){
+
+		$app['monolog']->addError('Failed to refresh: ' . $e->getMessage());
+		return false;
+	}
 
 	if (!$data){
 
@@ -76,8 +95,16 @@ $app['refresh.data'] = $app->protect(function() use ($app) {
 		$ids[] = $video['ytid'];
 	}
 
-	$allLangs = $app['api']->getYTLanguages($ids);
-	$capData = $app['api']->getYTCaptions($ids, $app['oauth']->getValidAdminToken());
+	try {
+
+		$allLangs = $app['api']->getYTLanguages($ids);
+		$capData = $app['api']->getYTCaptions($ids, $app['oauth']->getValidAdminToken());
+
+	} catch (\Exception $e){
+
+		$app['monolog']->addError('Failed to refresh: ' . $e->getMessage());
+		return false;
+	}
 
 	foreach ($data['videos'] as &$video){
 
@@ -94,7 +121,9 @@ $app['refresh.data'] = $app->protect(function() use ($app) {
 		$pl->syncLocal();
 		
 	} catch (\Exception $e){
-		// don't care for now
+		
+		$app['monolog']->addError('Failed to refresh: ' . $e->getMessage());
+		return false;
 	}
 });
 
@@ -131,7 +160,6 @@ $app->error(function (\Exception $e, $code) use ($app) {
 $app->mount('/', new YTSE\Routes\AuthenticationControllerProvider( $app['oauth'] ));
 
 if (!$app['oauth']->isDbSetup() || !$app['oauth']->adminTokenAvailable()){
-
 	// do installation
 	$app->mount('/', new YTSE\Routes\InstallationControllerProvider());
 	$app->run();

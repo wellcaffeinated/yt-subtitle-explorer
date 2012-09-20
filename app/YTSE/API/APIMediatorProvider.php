@@ -18,7 +18,9 @@ class APIMediatorProvider implements ServiceProviderInterface {
 
         $app['api'] = $app->share(function($app){
 
-            return new APIMediator($app['api.config']['yt.api.key']);
+        	$config = $app['api.config'];
+
+            return new APIMediator($config['yt.api.key'], $config['thumbnail']);
         });
     }
 

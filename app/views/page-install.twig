@@ -1,70 +1,49 @@
-<!doctype html>
-<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
-<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
+{% extends 'page-skeleton.twig' %}
 
-  <!-- Use the .htaccess and remove these lines to avoid edge case issues.
-       More info: h5bp.com/i/378 -->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-
-  <title>Translate</title>
-  <meta name="description" content="">
-
-  {% include 'meta.twig' %}
+{% block title %}Installation{% endblock %}
+{% block description %}{% endblock %}
   
-</head>
-<body>
-
-  <div class="container">
-  	
-    <div class="row-fluid">
-      <div class="col12">
-        <h1 class="page-header">Installation Step 1: API Keys</h1>
-        
-        <p>Please see the instructions regarding obtaining API keys in <a href="https://github.com/wellcaffeinated/yt-subtitle-explorer" target="_blank">the README.</p>
-        
-        <p>Also, please remember that you shouldn't share these keys. If your system ever becomes compromized you can always invalidate the keys through google, and paste any newly created keys into the <em>config/config.yaml</em> file.</p>
-
-        <p>If you ever suspect that your system has been compromized (and someone could have downloaded your database), then immediately unauthorize this app from your <a href="https://www.google.com/settings/security" target="_blank">google authorized applications and websites page</a>.</p>
-
-        <form action="{{app.url_generator.generate('install_post')}}" method="POST" class="form-horizontal">
-
-          <div class="control-group">
-            <label class="control-label" for="youtubekey">YouTube Developer Key: (<a href="https://code.google.com/apis/youtube/dashboard" target="_blank">get one here</a>)</label>
-            <div class="controls">
-              <input type="text" id="youtubekey" name="ytkey" required="required"/>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label" for="googlekey">Google API Client Id: (<a href="https://code.google.com/apis/console" target="_blank">get one here</a>)</label>
-            <div class="controls">
-              <input type="text" id="googlekey" name="gkey" required="required"/>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label" for="googlesecret">Google API Client Secret:</label>
-            <div class="controls">
-              <input type="text" id="googlesecret" name="gsecret" required="required"/>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <div class="controls">
-              <button type="submit" class="btn btn-success">Continue</button>
-            </div>
-          </div>
-
-        </form>
-      </div>
-    </div>
+{% block content %}
+<div class="row-fluid">
+  <div class="col12">
+    <h1 class="page-header">Installation Step 1: API Keys</h1>
     
-  </div>
+    <p>Please see the instructions regarding obtaining API keys in <a href="https://github.com/wellcaffeinated/yt-subtitle-explorer" target="_blank">the README</a>.</p>
+    
+    <p>Also, please remember that you shouldn't share these keys. If your system ever becomes compromized you can always invalidate the keys through google, and paste any newly created keys into the <em>config/config.yaml</em> file.</p>
 
-</body>
-</html>
+    <p>If you ever suspect that your system has been compromized (and someone could have downloaded your database), then immediately unauthorize this app from your <a href="https://www.google.com/settings/security" target="_blank">google authorized applications and websites page</a>.</p>
+
+    <form action="{{app.url_generator.generate('install_post')}}" method="POST" class="form-horizontal">
+
+      <div class="control-group">
+        <label class="control-label" for="youtubekey">YouTube Developer Key: (<a href="https://code.google.com/apis/youtube/dashboard" target="_blank">get one here</a>)</label>
+        <div class="controls">
+          <input type="text" id="youtubekey" name="ytkey" required="required"/>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="googlekey">Google API Client Id: (<a href="https://code.google.com/apis/console" target="_blank">get one here</a>)</label>
+        <div class="controls">
+          <input type="text" id="googlekey" name="gkey" required="required"/>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="googlesecret">Google API Client Secret:</label>
+        <div class="controls">
+          <input type="text" id="googlesecret" name="gsecret" required="required"/>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="controls">
+          <button type="submit" class="btn btn-success">Continue</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

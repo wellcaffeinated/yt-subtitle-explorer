@@ -45,6 +45,25 @@ For YouTube:
 3. Enter a name like "YTSE"
 4. Click save
 
+### Email Notifications
+
+After you have finished installing the app, you can set up email notifications to be sent when you get a new submission. To do this, edit the file `config/config.yaml`. Change the following options as needed
+
+```yaml
+# in config/config.yaml ...
+
+ytse.config:
+    email_notify: null # array of email addresses to notify. Eg: [ 'example@example.com', 'ex2@...' ]
+    email_from: no-reply@example.com #likely must be same as username
+
+swiftmailer.options:
+    host: localhost #probably fine
+    port: 25 #probably fine
+    username: '' # username for smtp auth, likely same as email_from
+    password: '' # password for smtp auth
+    auth_mode: false # true if your host needs smtp auth
+```
+
 ## Security
 
 There are `.htaccess` files with "deny from all" rules in certain sensitive directories. These include:
@@ -52,6 +71,7 @@ There are `.htaccess` files with "deny from all" rules in certain sensitive dire
 * config/
 * app/
 * logs/
+* user/
 
 Whatever you do, ensure that these directories are not accessible by the public and are only accessible by the php application code. (as long as the htaccess files are working that should be taken care of already).
 

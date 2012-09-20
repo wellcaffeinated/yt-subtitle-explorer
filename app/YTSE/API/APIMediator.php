@@ -17,12 +17,16 @@ class APIMediator {
     private $gdataAPI;
     private $ytAPI;
     private $unisubAPI;
+    private $thumbType;
 
     /**
      * Contstructor
      * @param string $youtubeKey Youtube api key
+     * @param string $thumbType The type of youtube thumb to use as thumbnail image @see https://developers.google.com/youtube/2.0/reference#youtube_data_api_tag_media:thumbnail
      */
-    public function __construct($youtubeKey){
+    public function __construct($youtubeKey, $thumbType = 'default'){
+
+        $this->thumbType = $thumbType;
 
         $this->ytAPI = new Client('http://www.youtube.com/api', array(
             // 'curl.CURLOPT_SSL_VERIFYHOST' => false,
@@ -491,7 +495,7 @@ class APIMediator {
 
             $thumb;
             foreach($entry->{'media$group'}->{'media$thumbnail'} as $val){
-                if ($val->{'yt$name'} === 'default'){
+                if ($val->{'yt$name'} === $this->thumbType){
                     $thumb = $val->url;
                     break;
                 }
