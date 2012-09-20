@@ -4,11 +4,15 @@
 {% block description %}Search for caption translations in videos from {{playlist.title}}{% endblock %}
   
 {% block content %}
+<div class="page-header">
+  <h1>Translations for {{playlist.title}}</h1>
+  <p style="text-align: right; margin: 1em 0 0; font-size: 12px;">
+    {% include 'credit.twig' %}
+  </p>
+</div>
+
 <div id="language-search-wrap" class="well" data-all-langs="{{app.url_generator.generate("langall")}}">
-	<h2>Translations for {{playlist.title}}</h2>
-
-  <div>
-
+	<div>
     <span>Search for videos that </span>
 
     <span class="btn-group toggle-group" id="negate-ctrl">
@@ -29,10 +33,6 @@
   <div id="lang-search">
 	  <input type="text" name="lang-search" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
   </div>
-
-  <p style="text-align: right; margin: 1em 0 0; font-size: 12px;">
-    {% include 'credit.twig' %}
-  </p>
 </div>
 
 {% include 'videolist.twig' %}

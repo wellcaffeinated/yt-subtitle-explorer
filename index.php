@@ -49,7 +49,11 @@ $app->register(new Silex\Provider\SessionServiceProvider(), array(
 ));
 // register twig templating
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path' => YTSE_ROOT.'/app/views',
+    'twig.path' => array(
+    	YTSE_ROOT.'/user/views',
+    	YTSE_ROOT.'/app/views',
+    	YTSE_ROOT.'/app', // for user override inheritence
+    ),
     'twig.options' => array(
     	'cache' => YTSE_ROOT.'/cache/',
     ),

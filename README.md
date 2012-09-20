@@ -71,6 +71,7 @@ There are `.htaccess` files with "deny from all" rules in certain sensitive dire
 * config/
 * app/
 * logs/
+* user/
 
 Whatever you do, ensure that these directories are not accessible by the public and are only accessible by the php application code. (as long as the htaccess files are working that should be taken care of already).
 
