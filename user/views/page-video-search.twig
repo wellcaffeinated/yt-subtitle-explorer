@@ -1,0 +1,15 @@
+{% extends 'views/page-video-search.twig' %}
+
+{% block css %}
+{{ parent() }}
+<link rel="stylesheet" href="{{root}}/user/css/mp-styles.css" />
+{% endblock %}
+
+{% block header %}
+<div class="page-header">
+  <h1>Minute Physics Translate</h1>
+  <p style="text-align: right; margin: 1em 0 0; font-size: 12px;">
+    {% include 'credit.twig' %}
+  </p>
+</div>
+{% endblock %}
