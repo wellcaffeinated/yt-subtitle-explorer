@@ -10,6 +10,12 @@
 {% block content %}
 <h1 class="page-header">Administration {% include 'right-nav.twig' %}</h1>
 
+<div class="ctrl-admin-main btn-toolbar">
+  <div class="btn-group">
+    <a href="{{app.url_generator.generate('admin_refresh_data')}}" class="btn btn-primary">Refresh Video Data</a>
+  </div>
+</div>
+
 {% if error is defined and error is not empty %}
 <div class="alert alert-error">
   <p><strong>Error</strong></p>

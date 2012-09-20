@@ -207,6 +207,16 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 		->method('GET|POST')
 		->bind('admin_main');
 
+		/**
+		 * Main admin route
+		 */
+		$controller->match('/refresh', function(Request $req, Application $app){
+
+			$app['refresh.data']();
+
+			return $app->redirect($app['url_generator']->generate('admin_main'));
+		})->bind('admin_refresh_data');
+
 		return $controller;
 	}
 }
