@@ -221,7 +221,7 @@ $app->before(function(Request $request) use ($app) {
 	$pl = $app['ytplaylist'];
 
 	// check to see if we need an update from remote
-	if (!$pl->hasData() || $request->get('refresh') === 'true'){
+	if (!$pl->hasData()){ // || $request->get('refresh') === 'true'){
 
 		// start update process
 		$app['refresh.data']();
