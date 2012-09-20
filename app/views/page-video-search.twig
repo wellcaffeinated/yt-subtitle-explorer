@@ -4,12 +4,14 @@
 {% block description %}Search for caption translations in videos from {{playlist.title}}{% endblock %}
   
 {% block content %}
+{% block header %}
 <div class="page-header">
   <h1>Translations for {{playlist.title}}</h1>
   <p style="text-align: right; margin: 1em 0 0; font-size: 12px;">
     {% include 'credit.twig' %}
   </p>
 </div>
+{% endblock %}
 
 <div id="language-search-wrap" class="well" data-all-langs="{{app.url_generator.generate("langall")}}">
 	<div>
