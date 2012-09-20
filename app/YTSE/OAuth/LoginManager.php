@@ -178,9 +178,12 @@ class LoginManager extends GoogleProvider {
 	 */
 	public function getAuthUrl($callbackUrl, array $options = array()) {
 
-		if ($this->session->get('youtube_auth') && !in_array($this->ytdataScope, $this->getScope())){
+		if ($this->session->get('youtube_auth')){
 
-			$this->addScope($this->ytdataScope);
+			if ( !in_array($this->ytdataScope, $this->getScope()) ){
+				$this->addScope($this->ytdataScope);
+			}
+			
 			if ( !isset($options['access_type']) ){
 				$options['access_type'] = 'offline';
 				//$options['approval_prompt'] = 'force';
