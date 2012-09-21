@@ -1,0 +1,14 @@
+Dear Excellent Translator,
+
+Unfortunately your translation in {{lang.lang_translated}} ({{lang.lang_original}}) for the video "{{video.title}}" has been rejected.
+
+The following reason was provided.
+Reason: "{{reason}}"
+
+You can download the caption you submitted by visiting: {{app.url_generator.generate('user_profile_caption', { ctx: 'rejected', l: lang.lang_code, v: video.ytid, f: info.filename }, true) | raw}}
+
+Once you make corrections, you can re-upload at: {{app.url_generator.generate('contribute', { videoId: video.ytid }, true) | raw}}
+
+Thank you for your support!
+
+Note: If you wish to change your email notification settings, visit your profile at: {{app.url_generator.generate('user_profile_settings', {}, true) | raw}}

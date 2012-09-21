@@ -63,20 +63,29 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 			}
 
 			/**
-			 * Delete caption file
+			 * Reject caption file
 			 */
-			if (preg_match('/^delete/', $action)){
+			if ($action === 'reject'){
 
-				$path = $req->get('path')? $req->get('path') : str_replace('delete:', '', $action);
+				$path = $req->get('path');
 
 				try {
 
-					$success = $app['captions']->deleteCaption($path);
+					$reason = $req->get('reason');
 
-					if (!$success){
+					if ($reason === 'other'){
 
-						$error = 'Problem deleting caption.';
+						$reason = $req->get('other_reason');
 					}
+
+					$info = $app['captions']->extractCaptionInfo($path);
+					$abspath = $app['captions']->getBaseDir() . '/' . $path;
+					$app['captions_rejected']->manageCaptionFile($abspath, $info);
+
+					$self->sendRejectionEmail(array(
+						'info' => $info,
+						'video' => $app['ytplaylist']->getVideoById($info['videoId']),
+					), $reason);
 
 				} catch (\Exception $e){
 
@@ -140,12 +149,9 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 						));
 					}
 
-					$success = $app['captions']->deleteCaption($path);
-
-					if (!$success){
-
-						$error .= 'Problem deleting caption.';
-					}
+					$info = $app['captions']->extractCaptionInfo($path);
+					$abspath = $app['captions']->getBaseDir() . '/' . $path;
+					$app['captions_approved']->manageCaptionFile($abspath, $info);
 
 				} catch (\Exception $e){
 
@@ -208,12 +214,10 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 							$self->sendApprovalEmail($item);
 
 							$path = $item['info']['path'];
-							$success = $app['captions']->deleteCaption($path);
-
-							if (!$success){
-
-								$error .= "Problem removing caption file: $filename <br/>";
-							}
+							
+							$info = $app['captions']->extractCaptionInfo($path);
+							$abspath = $app['captions']->getBaseDir() . '/' . $path;
+							$app['captions_approved']->manageCaptionFile($abspath, $info);
 						}
 					}
 
@@ -235,7 +239,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 		->bind('admin_main');
 
 		/**
-		 * Main admin route
+		 * Refresh video data
 		 */
 		$controller->match('/refresh', function(Request $req, Application $app){
 
@@ -243,6 +247,113 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 
 			return $app->redirect($app['url_generator']->generate('admin_main'));
 		})->bind('admin_refresh_data');
+
+		/**
+		 * Main admin route
+		 */
+		$controller->match('/trash', function(Request $req, Application $app) use ($self) {
+
+			$action = $req->get('action');
+			$error = '';
+			$msg = '';
+
+			if (!$req->get('context')){
+
+				$action = '';
+
+			} else {
+
+				$ctx = $app['captions_' . $req->get('context')];
+			}
+
+			/**
+			 * View caption file
+			 */
+			if ($action === 'view'){
+
+				$path = $req->get('path');
+				$content = $ctx->getCaptionContents($path);
+
+				if (!$content) $app->abort(404, 'Caption file not found.');
+
+				return new Response($content, 200, array(
+
+					'Content-type' => 'text/plain',
+				));
+			}
+
+			/**
+			 * Delete caption file
+			 */
+			if (preg_match('/^delete/', $action)){
+
+				$path = $req->get('path')? $req->get('path') : str_replace('delete:', '', $action);
+
+				try {
+
+					$success = $ctx->deleteCaption($path);
+
+					if (!$success){
+
+						$error .= 'Problem deleting caption.';
+
+					}
+
+				} catch (\Exception $e){
+
+					$success = false;
+					$error = $e->getMessage();
+
+				}				
+			}
+
+			/**
+			 * Batch delete
+			 */
+			if ($action === 'batch_delete' && $req->get('selected')) {
+
+				foreach ($req->get('selected') as $path) {
+
+					$success = $ctx->deleteCaption($path);
+
+					if (!$success){
+
+						$error .= 'Problem deleting caption: '.$path;
+
+					}
+				}
+			}
+
+			/**
+			 * Retrieve caption
+			 */
+			if (preg_match('/^retrieve/', $action)){
+
+				$path = $req->get('path')? $req->get('path') : str_replace('retrieve:', '', $action);
+
+				try {
+				
+					$info = $ctx->extractCaptionInfo($path);
+					$abspath = $ctx->getBaseDir() . '/' . $path;
+					$app['captions']->manageCaptionFile($abspath, $info);
+
+				} catch (\Exception $e){
+
+					$error = $e->getMessage();
+				}
+			}
+
+			return $app['twig']->render('page-admin-trash.twig', array(
+
+				'rejected' => $app['captions_rejected']->getSubmissions(),
+				'approved' => $app['captions_approved']->getSubmissions(),
+				'error' => $error,
+				'msg' => $msg,
+
+			));
+		})
+		->method('GET|POST')
+		->bind('admin_trash');
 
 		return $controller;
 	}
@@ -267,6 +378,33 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 				'video' => $item['video'],
 				'lang' => $lang,
 				'user' => $user,
+				'info' => $item['info'],
+			)
+		);
+	}
+
+	public function sendRejectionEmail(array $item, $reason){
+
+		$name = $item['info']['user'];
+		$user = $this->app['users']->getUser($name);
+		$settings = $user->getUserSettings();
+
+		if (!$settings['email_notifications']) return; // don't spam if they don't want it
+
+		$to = $user->getEmail();
+		$lang_code = $item['info']['lang_code'];
+		$lang = $this->app['ytplaylist']->getLanguageDataByLangCode($lang_code);
+
+		$this->sendEmail(
+			$to, 
+			'Your translation was rejected', 
+			'email-notify-rejection.twig',
+			array(
+				'video' => $item['video'],
+				'lang' => $lang,
+				'user' => $user,
+				'info' => $item['info'],
+				'reason' => $reason,
 			)
 		);
 	}

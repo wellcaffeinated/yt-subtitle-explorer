@@ -16,6 +16,7 @@
   <div class="btn-group">
     <a href="{{app.url_generator.generate('admin_refresh_data')}}" class="btn btn-primary">Refresh Video Data</a>
     <button type="submit" name="action" value="maintenance" class="btn {{mm_on ? 'btn-danger' : 'btn-success' }}">{{mm_on ? 'Disable' : 'Enable'}} Maintenance Mode</button>
+    <a href="{{app.url_generator.generate('admin_trash')}}" class="btn btn-inverse">View Trash</a>
   </div>
 </form>
 
@@ -70,7 +71,7 @@
             <td class="btn-group">
               <a class="btn ctrl-view" title="view" href="{{app.url_generator.generate('admin_main', { path: cap.path, action: 'view' })}}"><i class="icon-search"></i></a>
               <button class="btn btn-success ctrl-approve" title="approve" type="submit" name="action" value="approve:{{cap.path}}"><i class="icon-ok"></i></button>
-              <button class="btn btn-danger ctrl-delete" title="delete" type="submit" name="action" value="delete:{{cap.path}}"><i class="icon-remove"></i></button>
+              <a href="{{app.url_generator.generate('admin_main')}}" data-path="{{cap.path}}" class="btn btn-danger ctrl-reject" title="reject"><i class="icon-remove"></i></a>
             </td>
           </tr>
           {% endfor %}

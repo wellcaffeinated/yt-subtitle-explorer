@@ -30,15 +30,26 @@ class CaptionManager {
 	 * Get path to caption file
 	 * @param  string $videoId   the youtube video id
 	 * @param  string $lang_code the language code
+	 * @param  boolean $rel Flag for absolute vs relative. True for relative
 	 * @return string the absolute path
 	 */
-	public function getCaptionPath($videoId, $lang_code){
+	public function getCaptionPath($videoId, $lang_code, $rel = false){
 
-		return implode('/', array(
-			$this->base,
+		$part = implode('/', array(
 			$videoId,
 			$lang_code,
 		));
+
+		return $rel ? $part : $this->base . '/' . $part;
+	}
+
+	/**
+	 * Get base directory
+	 * @return string the absolute path
+	 */
+	public function getBaseDir(){
+
+		return $this->base;
 	}
 
 	/**
@@ -253,6 +264,26 @@ class CaptionManager {
 		}
 
 		$file->move($dir, $name);
+	}
+
+	public function manageCaptionFile($absPath, array $info){
+
+		if (!is_file($absPath)){
+			throw new \Exception('No file found at path: '.$absPath);
+		}
+
+		$dir = $this->getCaptionPath($info['videoId'], $info['lang_code']);
+
+		if (!is_dir($dir)){
+
+			mkdir($dir, 0777, true);
+		}
+
+		$ret = @rename($absPath, $dir . '/' . $info['filename']);
+
+		if (!$ret){
+			throw new \Exception('Problem moving caption file');
+		}
 	}
 
 	/**
