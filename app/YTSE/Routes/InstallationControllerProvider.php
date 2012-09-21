@@ -102,6 +102,17 @@ class InstallationControllerProvider implements ControllerProviderInterface {
 
             }
 
+            $token = $app['session']->get('admin_token');
+            if ( empty($token) || empty($token->get('refresh_token')) ){
+
+                $app['oauth']->logOut();
+
+                return $app['twig']->render('page-error.twig', array(
+                    'ok_action' => $app['url_generator']->generate('install_authenticate'),
+                    'msg' => 'Something went wrong with authentication. Please try authenticating again.',
+                ));
+            }
+
             return $app->redirect($app['url_generator']->generate('install_config'));
 
         })->bind('install_authenticate');
