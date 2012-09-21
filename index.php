@@ -136,8 +136,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 $app->error(function (\Exception $e, $code) use ($app) {
 
+	$page = 'page-error-msg.twig';
+
     switch ($code) {
         case 404:
+        	$page = '404.twig';
             $message = 'The requested page could not be found.';
             break;
         case 500:

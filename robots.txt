@@ -1,0 +1,9 @@
+# robotstxt.org/
+
+User-agent: *
+Disallow: /app/
+Disallow: /cache/
+Disallow: /config/
+Disallow: /logs/
+Disallow: /admin/
+Disallow: /contribute/
