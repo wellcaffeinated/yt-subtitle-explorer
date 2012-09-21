@@ -67,6 +67,8 @@ $app->register(new YTSE\Playlist\YTPlaylistProvider());
 $app->register(new YTSE\OAuth\OAuthProvider());
 // caption manager
 $app->register(new YTSE\Captions\CaptionManagerProvider());
+// user manager
+$app->register(new YTSE\Users\UserManagerProvider());
 // maintenance mode provider
 $app->register(new YTSE\Util\MaintenanceModeProvider(), array(
     'maintenance_mode.options' => array(
@@ -272,6 +274,14 @@ $contrib = new YTSE\Routes\ContributionControllerProvider();
 $contrib = $contrib->connect($app);
 $contrib->before($checkAuthentication);
 $app->mount('/contribute', $contrib);
+
+/**
+ * User Profile settings
+ */
+$userProfile = new YTSE\Routes\UserProfileControllerProvider();
+$userProfile = $userProfile->connect($app);
+$userProfile->before($checkAuthentication);
+$app->mount('/profile', $userProfile);
 
 /**
  * Administration
