@@ -16,16 +16,28 @@ class CaptionManagerProvider implements ServiceProviderInterface {
     
     public function register(Application $app){
 
-        $app['captions'] = $app->share(function($app){
+        $config = $app['captions.config'];
 
-            $config = $app['captions.config'];
+        if ( empty($config['caption_dir']) ){
 
-            if ( empty($config['caption_dir']) ){
+            throw "You must define a directory to hold caption uploads.";
+        }
 
-                throw "You must define a directory to hold caption uploads.";
-            }
+        $basedir = preg_replace('/\/$/', '', $config['caption_dir']);
 
-            return new CaptionManager($config['caption_dir']);
+        $app['captions'] = $app->share(function($app) use ($basedir) {
+
+            return new CaptionManager($basedir . '/submissions');
+        });
+
+        $app['captions_rejected'] = $app->share(function($app) use ($basedir) {
+
+            return new CaptionManager($basedir . '/rejected');
+        });
+
+        $app['captions_approved'] = $app->share(function($app) use ($basedir) {
+
+            return new CaptionManager($basedir . '/approved');
         });
     }
 

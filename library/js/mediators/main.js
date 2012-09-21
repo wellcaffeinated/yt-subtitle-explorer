@@ -13,6 +13,7 @@ define(
         'modules/toggle-ctrl',
         'plugins/tpl!templates/video-modal.tpl',
         'plugins/tpl!templates/caption-modal.tpl',
+        'plugins/tpl!templates/modal-caption-reject.tpl',
         'bootstrap'
     ],
     function(
@@ -21,7 +22,8 @@ define(
         languageSearch,
         toggleCtrl,
         tplVideoModal,
-        tplCaptionModal
+        tplCaptionModal,
+        tplModalCaptionReject
     ){
         'use strict';
 
@@ -117,31 +119,51 @@ define(
                 /**
                  * Admin controls
                  */
-                $(document).on('click', '.admin .captions .ctrl-view', function(e){
+                $(document)
+                    .on('click', '.admin .captions .ctrl-view', function(e){
 
-                    e.preventDefault();
-                    var href = $(this).attr('href');
-                    self.showRemoteModal(href, 'Caption');
+                        e.preventDefault();
+                        var href = $(this).attr('href');
+                        self.showRemoteModal(href, 'Caption');
 
-                }).on('change', '.ctrl-select-all', function(e){
+                    })
+                    .on('change', '.ctrl-select-all', function(e){
 
-                    var $this = $(this)
-                        ,checked = $this.is(':checked')
-                        ,checkboxes = $this.parents('.select-root').find('.ctrl-select')
-                        ;
+                        var $this = $(this)
+                            ,checked = $this.is(':checked')
+                            ,checkboxes = $this.parents('.select-root').find('.ctrl-select')
+                            ;
 
-                    e.preventDefault();
+                        e.preventDefault();
 
-                    if (checked){
+                        if (checked){
 
-                        checkboxes.attr('checked', 'checked');
+                            checkboxes.attr('checked', 'checked');
 
-                    } else {
+                        } else {
 
-                        checkboxes.removeAttr('checked');
-                    }
+                            checkboxes.removeAttr('checked');
+                        }
 
-                })
+                    })
+                    .on('click', '.admin .captions .ctrl-reject', function(e){
+
+                        e.preventDefault();
+                        var $this = $(this);
+
+                        $(tplModalCaptionReject.render({
+
+                            action: $this.attr('href'),
+                            path: $this.data('path')
+
+                        })).modal().on('hidden', function () {
+                            
+                            // destroy it when closed so video stops
+                            $(this).remove();
+                        });
+
+                    })
+                    ;
             },
 
             filterVids: function(){

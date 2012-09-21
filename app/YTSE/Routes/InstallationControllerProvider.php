@@ -103,7 +103,7 @@ class InstallationControllerProvider implements ControllerProviderInterface {
             }
 
             $token = $app['session']->get('admin_token');
-            if ( empty($token) || empty($token->get('refresh_token')) ){
+            if ( !$token || !$token->get('refresh_token') ){
 
                 $app['oauth']->logOut();
 

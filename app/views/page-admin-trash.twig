@@ -1,0 +1,134 @@
+{% extends 'page-skeleton.twig' %}
+
+{% import "videolist.twig" as videoList %}
+
+{% block title %}Trash | Administration{% endblock %}
+{% block description %}Trash page{% endblock %}
+
+{% set containerClasses = 'admin' %}
+
+{% set mm_on = app.maintenance_mode.isEnabled() %}
+
+{% block content %}
+<h1 class="page-header">Trash <small>(Archive)</small>{% include 'right-nav.twig' %}</h1>
+
+<a href="{{app.url_generator.generate('admin_main')}}" class="btn">Back to Admin Page</a>
+
+{% if error is defined and error is not empty %}
+<div class="alert alert-error">
+  <p><strong>Error</strong></p>
+  <p>{{error}}</p>
+</div>
+{% endif %}
+
+{% if msg is defined and msg is not empty %}
+<div class="alert alert-warning">
+  <p><strong>Attention</strong></p>
+  <p>{{msg}}</p>
+</div>
+{% endif %}
+
+<h2 class="page-header">Approved Captions</h2>
+
+{% if approved is empty %}
+  <p>Approved caption archive is empty.</p>
+{% endif %}
+
+{% for sub in approved %}
+{% set video = app.ytplaylist.getVideoById(sub.videoId) %}
+
+<div class="row-fluid">
+  
+  {{ videoList.video(video, 4, true) }}
+
+  <div class="span8">
+
+    <form action="{{app.url_generator.generate('admin_trash')}}" method="POST">
+      <input type="hidden" name="context" value="approved"/>
+
+      <table class="table captions select-root">
+        <thead>
+          <tr>
+            <th><input type="checkbox" class="ctrl-select-all"/></th>
+            <th>Language</th>
+            <th>Submitted By</th>
+            <th>Date</th>
+            <th><button class="btn btn-danger ctrl-trash-batch-delete" type="submit" name="action" value="batch_delete">Destroy Selected</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lang in sub.captions %}
+          {% for cap in lang %}
+          <tr>
+            <td><input type="checkbox" class="ctrl-select" name="selected[]" value="{{cap.path}}"/></td>
+            <td>{{cap.lang_code}}</td>
+            <td>{{cap.user}}</td>
+            <td>{{cap.timestamp | date('m/d/Y')}}</td>
+            <td class="btn-group">
+              <a class="btn ctrl-view" title="view" href="{{app.url_generator.generate('admin_trash', { path: cap.path, action: 'view', context: 'approved' })}}"><i class="icon-search"></i></a>
+              <button class="btn btn-success ctrl-retrieve" title="retrieve" type="submit" name="action" value="retrieve:{{cap.path}}"><i class="icon-repeat"></i></button>
+              <button class="btn btn-danger ctrl-delete" title="destroy" type="submit" name="action" value="delete:{{cap.path}}"><i class="icon-remove"></i></button>
+            </td>
+          </tr>
+          {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+</div>
+{% endfor %}
+
+
+<h2 class="page-header">Rejected Captions</h2>
+
+{% if rejected is empty %}
+  <p>Rejected caption archive is empty.</p>
+{% endif %}
+
+{% for sub in rejected %}
+{% set video = app.ytplaylist.getVideoById(sub.videoId) %}
+
+<div class="row-fluid">
+  
+  {{ videoList.video(video, 4, true) }}
+
+  <div class="span8">
+
+    <form action="{{app.url_generator.generate('admin_trash')}}" method="POST">
+      <input type="hidden" name="context" value="rejected"/>
+
+      <table class="table captions select-root">
+        <thead>
+          <tr>
+            <th><input type="checkbox" class="ctrl-select-all"/></th>
+            <th>Language</th>
+            <th>Submitted By</th>
+            <th>Date</th>
+            <th><button class="btn btn-danger ctrl-trash-batch-delete" type="submit" name="action" value="batch_delete">Destroy Selected</button></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lang in sub.captions %}
+          {% for cap in lang %}
+          <tr>
+            <td><input type="checkbox" class="ctrl-select" name="selected[]" value="{{cap.path}}"/></td>
+            <td>{{cap.lang_code}}</td>
+            <td>{{cap.user}}</td>
+            <td>{{cap.timestamp | date('m/d/Y')}}</td>
+            <td class="btn-group">
+              <a class="btn ctrl-view" title="view" href="{{app.url_generator.generate('admin_trash', { path: cap.path, action: 'view', context: 'rejected' })}}"><i class="icon-search"></i></a>
+              <button class="btn btn-success ctrl-retrieve" title="retrieve" type="submit" name="action" value="retrieve:{{cap.path}}"><i class="icon-repeat"></i></button>
+              <button class="btn btn-danger ctrl-delete" title="destroy" type="submit" name="action" value="delete:{{cap.path}}"><i class="icon-remove"></i></button>
+            </td>
+          </tr>
+          {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </form>
+  </div>
+</div>
+{% endfor %}
+    
+{% endblock %}
