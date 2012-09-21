@@ -37,3 +37,16 @@
         padding-left: 20px;
     }
 }
+
+/*
+404 page
+ */
+
+.page-404 {
+    text-align: center;
+}
+
+.page-404 .msg {
+    font-size: 1.5em;
+    margin: 2em 0;
+}
