@@ -150,7 +150,7 @@ $app->error(function (\Exception $e, $code) use ($app) {
         	$message = $e->getMessage();
     }
 
-    return $app['twig']->render('page-error-msg.twig', array(
+    return $app['twig']->render($page, array(
 	
 		'msg' => $message,
 	));
