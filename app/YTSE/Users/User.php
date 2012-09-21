@@ -27,6 +27,11 @@ class User {
 		return $this->username;
 	}
 
+	public function getEmail(){
+
+		return $this->username;
+	}
+
 	public function getUserSettings(){
 
 		return $this->settings;

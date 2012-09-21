@@ -419,6 +419,19 @@ class YTPlaylist {
 	}
 
 	/**
+	 * Get language data for one language code
+	 * @param  string $lang_code The language code
+	 * @return array            language data
+	 */
+	public function getLanguageDataByLangCode( $lang_code ){
+
+		return $this->conn->fetchAssoc(
+			"SELECT * FROM {$this->tables['languages']} WHERE lang_code = ?",
+			array($lang_code)
+		);
+	}
+
+	/**
 	 * Get string representation of language data for insertion into db
 	 * @param  array  $langs language data
 	 * @return string

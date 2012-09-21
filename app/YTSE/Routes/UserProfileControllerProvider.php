@@ -36,7 +36,7 @@ class UserProfileControllerProvider implements ControllerProviderInterface {
 
                 $app['users']->saveUser($user);
             }
-var_dump($settings);
+
             return $app['twig']->render('page-user-settings.twig', array(
 
                 'user_settings' => $settings,

@@ -19,12 +19,15 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 
 	public function connect(Application $app){
 
+		$this->app = $app;
+		$self = $this;
+
 		$controller = $app['controllers_factory'];
 
 		/**
 		 * Main admin route
 		 */
-		$controller->match('/', function(Request $req, Application $app){
+		$controller->match('/', function(Request $req, Application $app) use ($self) {
 
 			$action = $req->get('action');
 			$error = '';
@@ -128,6 +131,13 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 						foreach ($data['errors'] as $err) {
 							$error .= $err['msg'] . '<br/>';
 						}
+
+					} else if (!$data['draft']) {
+
+						$self->sendApprovalEmail(array(
+							'info' => $info,
+							'video' => $video,
+						));
 					}
 
 					$success = $app['captions']->deleteCaption($path);
@@ -172,6 +182,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 						'url' => $caption? $caption['src'] : false,
 						'info' => $info,
 						'content' => $content,
+						'video' => $video,
 					);
 				}
 
@@ -181,7 +192,8 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 
 					foreach ($ret as $key => $data) {
 
-						$filename = $batch[$key]['info']['filename'];
+						$item = $batch[$key];
+						$filename = $item['info']['filename'];
 						
 						if (array_key_exists('errors', $data)){
 
@@ -193,7 +205,9 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 
 						} else {
 
-							$path = $batch[$key]['info']['path'];
+							$self->sendApprovalEmail($item);
+
+							$path = $item['info']['path'];
 							$success = $app['captions']->deleteCaption($path);
 
 							if (!$success){
@@ -231,5 +245,55 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 		})->bind('admin_refresh_data');
 
 		return $controller;
+	}
+
+	public function sendApprovalEmail(array $item){
+
+		$name = $item['info']['user'];
+		$user = $this->app['users']->getUser($name);
+		$settings = $user->getUserSettings();
+
+		if (!$settings['email_notifications']) return; // don't spam if they don't want it
+
+		$to = $user->getEmail();
+		$lang_code = $item['info']['lang_code'];
+		$lang = $this->app['ytplaylist']->getLanguageDataByLangCode($lang_code);
+
+		$this->sendEmail(
+			$to, 
+			'Your translation has been approved!', 
+			'email-notify-approval.twig',
+			array(
+				'video' => $item['video'],
+				'lang' => $lang,
+				'user' => $user,
+			)
+		);
+	}
+
+	public function sendEmail($to, $subject, $tpl, $params){
+
+		$app = $this->app;
+		$config = $app['ytse.config'];
+
+        $msg = $app['twig']->render($tpl, $params);
+
+        $app['monolog']->addInfo( 'emailing: ' . 
+            (is_array($to) ? implode(',', $to) : $to) . 
+            ' from: ' . 
+            (is_array($config['email_from']) ? implode(',', $config['email_from']) : $config['email_from'])
+        );
+
+        $email = \Swift_Message::newInstance()
+            ->setSubject($subject)
+            ->setFrom($config['email_from'])
+            ->setTo($to)
+            ->setBody($msg);
+
+        $count = $app['mailer']->send($email);
+        
+        $app['monolog']->addInfo( 'emailed ' . $count . ' recipients');
+
+        return $count;
 	}
 }

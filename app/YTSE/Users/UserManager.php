@@ -75,14 +75,14 @@ class UserManager {
 			return false;
 		}
 
-		$userdata = $this->conn->fetchArray("SELECT * FROM {$this->tables['users']} WHERE username = ?", array($username));
+		$userdata = $this->conn->fetchAssoc("SELECT * FROM {$this->tables['users']} WHERE username = ?", array($username));
 
 		if (!isset($userdata['settings'])){
 
 			return new User($username);	
 		}
 
-		return new User($username, $userdata['settings']);
+		return new User($username, unserialize($userdata['settings']));
 	}
 
 	public function saveUser(User $user){
@@ -91,7 +91,7 @@ class UserManager {
 			"INSERT OR REPLACE INTO {$this->tables['users']} (username, settings) VALUES (?, ?)",
 			array(
 				$user->getUserName(),
-				$user->getUserSettings(),
+				serialize($user->getUserSettings()),
 			)
 		);
 	}
