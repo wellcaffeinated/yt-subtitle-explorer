@@ -7,6 +7,7 @@
 <head>
   
   {% set root = app.url_generator.getContext().getBaseUrl() %}
+  {% set cache_query = '?v=' ~ app['ytse.config'].version %}
 
   <title>{% block title %}Translate{% endblock %}</title>
   <meta name="description" content="{% block description %}{% endblock %}">

@@ -8,8 +8,9 @@
 # debug: true
 
 ytse.config:
+    version: 1.0b
     # path to create sqlite database
-    db.path: %ytse.root%/app/db/ytse.db
+    db.path: %ytse.root%/user/db/ytse.db
     # list of email addresses to notify about new submissions
     email_notify: # [ 'example@example.com', 'ex2@...' ]
     email_from: no-reply@example.com
@@ -30,7 +31,7 @@ api.config:
 # Youtube Playlist to use
 ytplaylist.config:
     playlist: YOUR_PLAYLIST_ID
-    lang_file: %ytse.root%/app/db/languages.csv
+    lang_file: %ytse.root%/app/data/languages.csv
     # the default language code to highlight
     default_lang: en
 
@@ -43,4 +44,4 @@ oauth.config:
 
 # location of caption uploads
 captions.config:
-    caption_dir: %ytse.root%/app/uploads
+    caption_dir: %ytse.root%/user/uploads
