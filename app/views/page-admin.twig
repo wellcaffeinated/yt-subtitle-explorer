@@ -7,14 +7,17 @@
 
 {% set containerClasses = 'admin' %}
 
+{% set mm_on = app.maintenance_mode.isEnabled() %}
+
 {% block content %}
 <h1 class="page-header">Administration {% include 'right-nav.twig' %}</h1>
 
-<div class="ctrl-admin-main btn-toolbar">
+<form action="{{app.url_generator.generate('admin_main')}}" method="POST" class="ctrl-admin-main btn-toolbar">
   <div class="btn-group">
     <a href="{{app.url_generator.generate('admin_refresh_data')}}" class="btn btn-primary">Refresh Video Data</a>
+    <button type="submit" name="action" value="maintenance" class="btn {{mm_on ? 'btn-danger' : 'btn-success' }}">{{mm_on ? 'Disable' : 'Enable'}} Maintenance Mode</button>
   </div>
-</div>
+</form>
 
 {% if error is defined and error is not empty %}
 <div class="alert alert-error">

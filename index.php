@@ -21,7 +21,7 @@ $app->register(new Igorw\Silex\ConfigServiceProvider(YTSE_CONFIG_FILE, array(
 $app['ytse.root'] = YTSE_ROOT;
 
 if (!$app['debug']){
-	error_reporting(0);
+    error_reporting(0);
 }
 
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
@@ -34,7 +34,7 @@ $app->register(new Silex\Provider\SwiftmailerServiceProvider());
 // doctrine for db functions
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
-    	'driver'   => 'pdo_sqlite',
+        'driver'   => 'pdo_sqlite',
         'path'     => $app['ytse.config']['db.path'],
     ),
 ));
@@ -43,19 +43,19 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
 $app->register(new Silex\Provider\UrlGeneratorServiceProvider());
 // register the session extension
 $app->register(new Silex\Provider\SessionServiceProvider(), array(
-	'session.storage.options' => array(
-		'secure' => true
-	)
+    'session.storage.options' => array(
+        'secure' => true
+    )
 ));
 // register twig templating
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => array(
-    	YTSE_ROOT.'/user/views',
-    	YTSE_ROOT.'/app/views',
-    	YTSE_ROOT.'/app', // for user override inheritence
+        YTSE_ROOT.'/user/views',
+        YTSE_ROOT.'/app/views',
+        YTSE_ROOT.'/app', // for user override inheritence
     ),
     'twig.options' => array(
-    	'cache' => YTSE_ROOT.'/cache/',
+        'cache' => YTSE_ROOT.'/cache/',
     ),
 ));
 
@@ -67,64 +67,70 @@ $app->register(new YTSE\Playlist\YTPlaylistProvider());
 $app->register(new YTSE\OAuth\OAuthProvider());
 // caption manager
 $app->register(new YTSE\Captions\CaptionManagerProvider());
+// maintenance mode provider
+$app->register(new YTSE\Util\MaintenanceModeProvider(), array(
+    'maintenance_mode.options' => array(
+        'base_dir' => YTSE_ROOT.'/config',
+    ),
+));
 
 
 $app['refresh.data'] = $app->protect(function() use ($app) {
 
-	$pl = $app['ytplaylist'];
+    $pl = $app['ytplaylist'];
 
-	try {
+    try {
 
-		$data = $app['api']->getYTPlaylist($pl->getId());
+        $data = $app['api']->getYTPlaylist($pl->getId());
 
-	} catch (\Exception $e){
+    } catch (\Exception $e){
 
-		$app['monolog']->addError('Failed to refresh: ' . $e->getMessage());
-		return false;
-	}
+        $app['monolog']->addError('Failed to refresh: ' . $e->getMessage());
+        return false;
+    }
 
-	if (!$data){
+    if (!$data){
 
-		return false;
-	}
+        return false;
+    }
 
-	$ids = array();
+    $ids = array();
 
-	foreach ($data['videos'] as &$video){
+    foreach ($data['videos'] as &$video){
 
-		$ids[] = $video['ytid'];
-	}
+        $ids[] = $video['ytid'];
+    }
 
-	try {
+    try {
 
-		$allLangs = $app['api']->getYTLanguages($ids);
-		$capData = $app['api']->getYTCaptions($ids, $app['oauth']->getValidAdminToken());
+        $allLangs = $app['api']->getYTLanguages($ids);
+        $capData = $app['api']->getYTCaptions($ids, $app['oauth']->getValidAdminToken());
 
-	} catch (\Exception $e){
+    } catch (\Exception $e){
 
-		$app['monolog']->addError('Failed to refresh: ' . $e->getMessage());
-		return false;
-	}
+        $app['monolog']->addError('Failed to refresh: ' . $e->getMessage());
+        return false;
+    }
 
-	foreach ($data['videos'] as &$video){
+    foreach ($data['videos'] as &$video){
 
-		if (array_key_exists($video['ytid'], $allLangs))
-			$video['languages'] = $allLangs[ $video['ytid'] ];
+        if (array_key_exists($video['ytid'], $allLangs))
+            $video['languages'] = $allLangs[ $video['ytid'] ];
 
-		if (array_key_exists($video['ytid'], $capData))
-			$video['caption_links'] = $capData[ $video['ytid'] ];
-	}
+        if (array_key_exists($video['ytid'], $capData))
+            $video['caption_links'] = $capData[ $video['ytid'] ];
+    }
 
-	try {
+    try {
 
-		$pl->setData($data);
-		$pl->syncLocal();
-		
-	} catch (\Exception $e){
-		
-		$app['monolog']->addError('Failed to refresh: ' . $e->getMessage());
-		return false;
-	}
+        $pl->setData($data);
+        $pl->syncLocal();
+        
+    } catch (\Exception $e){
+        
+        $app['monolog']->addError('Failed to refresh: ' . $e->getMessage());
+        return false;
+    }
 });
 
 use Symfony\Component\HttpFoundation\Request;
@@ -136,24 +142,28 @@ use Symfony\Component\HttpFoundation\Response;
  */
 $app->error(function (\Exception $e, $code) use ($app) {
 
-	$page = 'page-error-msg.twig';
+    $page = 'page-error-msg.twig';
 
     switch ($code) {
         case 404:
-        	$page = '404.twig';
+            $page = '404.twig';
             $message = 'The requested page could not be found.';
+            break;
+        case 503:
+            $page = 'page-info-msg.twig';
+            $message = $e->getMessage();
             break;
         case 500:
             $message = 'We are sorry, but something went terribly wrong. Try again later.';
             break;
         default:
-        	$message = $e->getMessage();
+            $message = $e->getMessage();
     }
 
     return $app['twig']->render($page, array(
-	
-		'msg' => $message,
-	));
+    
+        'msg' => $message,
+    ));
 });
 
 /**
@@ -163,10 +173,10 @@ $app->error(function (\Exception $e, $code) use ($app) {
 $app->mount('/', new YTSE\Routes\AuthenticationControllerProvider( $app['oauth'] ));
 
 if (!$app['oauth']->isDbSetup() || !$app['oauth']->adminTokenAvailable()){
-	// do installation
-	$app->mount('/', new YTSE\Routes\InstallationControllerProvider());
-	$app->run();
-	exit;
+    // do installation
+    $app->mount('/', new YTSE\Routes\InstallationControllerProvider());
+    $app->run();
+    exit;
 }
 
 /**
@@ -174,21 +184,21 @@ if (!$app['oauth']->isDbSetup() || !$app['oauth']->adminTokenAvailable()){
  */
 $checkAuthorization = function(Request $req, Silex\Application $app){
 
-	if ( !$app['oauth']->hasYoutubeAuth() ){
+    if ( !$app['oauth']->hasYoutubeAuth() ){
 
-		$app['oauth']->doYoutubeAuth();
-		$app['session']->set('login_referrer', $req->getRequestUri());
+        $app['oauth']->doYoutubeAuth();
+        $app['session']->set('login_referrer', $req->getRequestUri());
 
-		return new \Symfony\Component\HttpFoundation\RedirectResponse(
-			$app['url_generator']->generate('authenticate')
-		);
-	}
+        return new \Symfony\Component\HttpFoundation\RedirectResponse(
+            $app['url_generator']->generate('authenticate')
+        );
+    }
 
-	// if you are not the administrator, get lost
-	if ( !$app['oauth']->isAuthorized() ){
-		
-		return $app->abort(401, "You are not authorized. Please log out and try again.");
-	}
+    // if you are not the administrator, get lost
+    if ( !$app['oauth']->isAuthorized() ){
+        
+        return $app->abort(401, "You are not authorized. Please log out and try again.");
+    }
 };
 
 /**
@@ -196,15 +206,15 @@ $checkAuthorization = function(Request $req, Silex\Application $app){
  */
 $checkAuthentication = function(Request $req, Silex\Application $app){
 
-	if ( !$app['oauth']->isLoggedIn() ){
+    if ( !$app['oauth']->isLoggedIn() ){
 
-		$app['session']->set('login_referrer', $req->getRequestUri());
+        $app['session']->set('login_referrer', $req->getRequestUri());
 
-		// redirect to login page
-		return new \Symfony\Component\HttpFoundation\RedirectResponse(
-			$app['url_generator']->generate('login')
-		);
-	}
+        // redirect to login page
+        return new \Symfony\Component\HttpFoundation\RedirectResponse(
+            $app['url_generator']->generate('login')
+        );
+    }
 };
 
 /**
@@ -212,7 +222,7 @@ $checkAuthentication = function(Request $req, Silex\Application $app){
  */
 $needYoutubeAuth = function(Request $req, Silex\Application $app){
 
-	$app['oauth']->doYoutubeAuth();
+    $app['oauth']->doYoutubeAuth();
 };
 
 
@@ -221,15 +231,22 @@ $needYoutubeAuth = function(Request $req, Silex\Application $app){
  */
 $app->before(function(Request $request) use ($app) {
 
-	$pl = $app['ytplaylist'];
+    $path = $request->getPathInfo();
 
-	// check to see if we need an update from remote
-	if (!$pl->hasData()){ // || $request->get('refresh') === 'true'){
+    if ($app['maintenance_mode']->isEnabled() && !preg_match('/\/(admin|login|logout)/', $path) ){
 
-		// start update process
-		$app['refresh.data']();
-	}
-	
+        $app->abort(503, 'Site is down for maintenance. Check back soon.');
+    }
+
+    $pl = $app['ytplaylist'];
+
+    // check to see if we need an update from remote
+    if (!$pl->hasData()){ // || $request->get('refresh') === 'true'){
+
+        // start update process
+        $app['refresh.data']();
+    }
+    
 });
 
 /**
@@ -237,10 +254,10 @@ $app->before(function(Request $request) use ($app) {
  */
 $app->get('/', function(Silex\Application $app) {
 
-	return $app['twig']->render('page-video-search.twig', array(
-		'playlist' => $app['ytplaylist']->getData(),
-		'videos' => $app['ytplaylist']->getVideos(),
-	));
+    return $app['twig']->render('page-video-search.twig', array(
+        'playlist' => $app['ytplaylist']->getData(),
+        'videos' => $app['ytplaylist']->getVideos(),
+    ));
 })->bind('search_page');
 
 /**
@@ -272,14 +289,14 @@ $app->mount('/admin', $admin);
  */
 $app->finish(function(Request $request, Response $response) use ($app) {
 
-	$pl = $app['ytplaylist'];
+    $pl = $app['ytplaylist'];
 
-	// check to see if we need an update from remote
-	if ($pl->isDirty()){
+    // check to see if we need an update from remote
+    if ($pl->isDirty()){
 
-		// start update process
-		$app['refresh.data']();
-	}
+        // start update process
+        $app['refresh.data']();
+    }
 
 });
 

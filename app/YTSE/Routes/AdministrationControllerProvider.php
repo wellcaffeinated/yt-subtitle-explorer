@@ -47,6 +47,19 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 			}
 
 			/**
+			 * Maintenance Mode Toggle
+			 */
+			
+			if ($action === 'maintenance'){
+
+				if ($app['maintenance_mode']->isEnabled()){
+					$app['maintenance_mode']->disable();
+				} else {
+					$app['maintenance_mode']->enable();
+				}
+			}
+
+			/**
 			 * Delete caption file
 			 */
 			if (preg_match('/^delete/', $action)){
