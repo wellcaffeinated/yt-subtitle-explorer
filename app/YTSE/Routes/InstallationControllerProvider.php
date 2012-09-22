@@ -107,7 +107,7 @@ class InstallationControllerProvider implements ControllerProviderInterface {
 
                 $app['oauth']->logOut();
 
-                return $app['twig']->render('page-error.twig', array(
+                return $app['twig']->render('page-error-msg.twig', array(
                     'ok_action' => $app['url_generator']->generate('install_authenticate'),
                     'msg' => 'Something went wrong with authentication. Please try authenticating again.',
                 ));
