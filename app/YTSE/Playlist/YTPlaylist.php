@@ -413,8 +413,8 @@ class YTPlaylist {
 		$str .= '%';
 
 		return $this->conn->fetchAll(
-			"SELECT * FROM {$this->tables['languages']} WHERE lang_original LIKE ? OR lang_translated LIKE ?",
-			array($str, $str)
+			"SELECT * FROM {$this->tables['languages']} WHERE lang_original LIKE ? OR lang_translated LIKE ? OR lang_original LIKE ? OR lang_translated LIKE ?",
+			array($str, $str, '% '.$str, '% '.$str)
 		);
 	}
 
