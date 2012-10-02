@@ -370,7 +370,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 		$lang_code = $item['info']['lang_code'];
 		$lang = $this->app['ytplaylist']->getLanguageDataByLangCode($lang_code);
 
-		$this->sendEmail(
+		$app['email_notification'](
 			$to, 
 			'Your translation has been approved!', 
 			'email-notify-approval.twig',
@@ -395,7 +395,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 		$lang_code = $item['info']['lang_code'];
 		$lang = $this->app['ytplaylist']->getLanguageDataByLangCode($lang_code);
 
-		$this->sendEmail(
+		$app['email_notification'](
 			$to, 
 			'Your translation was rejected', 
 			'email-notify-rejection.twig',
@@ -407,31 +407,5 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 				'reason' => $reason,
 			)
 		);
-	}
-
-	public function sendEmail($to, $subject, $tpl, $params){
-
-		$app = $this->app;
-		$config = $app['ytse.config'];
-
-        $msg = $app['twig']->render($tpl, $params);
-
-        $app['monolog']->addInfo( 'emailing: ' . 
-            (is_array($to) ? implode(',', $to) : $to) . 
-            ' from: ' . 
-            (is_array($config['email_from']) ? implode(',', $config['email_from']) : $config['email_from'])
-        );
-
-        $email = \Swift_Message::newInstance()
-            ->setSubject($subject)
-            ->setFrom($config['email_from'])
-            ->setTo($to)
-            ->setBody($msg);
-
-        $count = $app['mailer']->send($email);
-        
-        $app['monolog']->addInfo( 'emailed ' . $count . ' recipients');
-
-        return $count;
 	}
 }
