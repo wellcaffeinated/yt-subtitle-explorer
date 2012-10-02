@@ -55,6 +55,7 @@ class ContributionControllerProvider implements ControllerProviderInterface {
                 'errors' => array(
                     'file' => $request->get('error_file'),
                     'lang' => $request->get('error_lang'),
+                    'token' => $request->get('error_token'),
                 ),
                 'success_msg' => $request->get('success_msg'),
 
@@ -89,9 +90,23 @@ class ContributionControllerProvider implements ControllerProviderInterface {
                 $app->abort(404, 'Caption not found.'); 
             }
 
+            $token = $app['oauth']->getValidAdminToken();
+
+            if ($token === null){
+
+                return $app->redirect(
+                    $app['url_generator']->generate('contribute',
+                        array(
+                            'videoId' => $videoId,
+                            'error_token' => true,
+                        )
+                    )
+                );
+            }
+
             $format = $request->get('fmt');
             $format = $request->get('fmt') ?: 'srt';
-            $content = $app['api']->getYTCaptionContent($caption['src'], $app['oauth']->getValidAdminToken(), $format);
+            $content = $app['api']->getYTCaptionContent($caption['src'], $token, $format);
             $filename = str_replace(' ', '_', 'captions_'.$capId.'_'.$video['title']. '.' .$format);
 
             return new Response($content, 200, array(
@@ -171,27 +186,16 @@ class ContributionControllerProvider implements ControllerProviderInterface {
         $host = $req->getHost();
         $video = $app['ytplaylist']->getVideoById($videoId);
 
-        $msg = $app['twig']->render('email-notify-submission.twig', array(
-            'username' => $app['oauth']->getUserName(),
-            'lang_code' => $lang,
-            'video' => $video,
-            'hostname' => $host,
-        ));
-
-        $app['monolog']->addInfo( 'emailing: ' . 
-            (is_array($config['email_notify']) ? implode(',', $config['email_notify']) : $config['email_notify']) . 
-            ' from: ' . 
-            (is_array($config['email_from']) ? implode(',', $config['email_from']) : $config['email_from'])
+        $app['email_notification'](
+            $config['email_notify'],
+            'New Translation on '.$host,
+            'email-notify-submission.twig',
+            array(
+                'username' => $app['oauth']->getUserName(),
+                'lang_code' => $lang,
+                'video' => $video,
+                'hostname' => $host,
+            )
         );
-
-        $email = \Swift_Message::newInstance()
-            ->setSubject('New Translation on '.$host)
-            ->setFrom($config['email_from'])
-            ->setTo($config['email_notify'])
-            ->setBody($msg);
-
-        $count = $app['mailer']->send($email);
-        
-        $app['monolog']->addInfo( 'emailed ' . $count . ' recipients');
     }
 }

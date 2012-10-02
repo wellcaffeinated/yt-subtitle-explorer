@@ -24,6 +24,12 @@
         <p>Thank you!</p>
       </div>
     {% endif %}
+
+    {% if errors is defined and errors.token %}
+      <div class="alert alert-error">
+        Woops. Something went wrong while trying to fetch the caption. Please try again later.
+      </div>
+    {% endif %}
     
     <h2>Thank you for deciding to help!</h2>
     <p>Let's step through the process...</p>

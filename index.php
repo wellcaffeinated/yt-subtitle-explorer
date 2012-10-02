@@ -59,6 +59,10 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
     ),
 ));
 
+// state manager
+$app->register(new YTSE\Util\StateManagerProvider());
+// email notifications
+$app->register(new YTSE\Util\EmailNotificationProvider());
 // register api mediator provider
 $app->register(new YTSE\API\APIMediatorProvider());
 // register playlist provider
@@ -75,7 +79,6 @@ $app->register(new YTSE\Util\MaintenanceModeProvider(), array(
         'base_dir' => YTSE_ROOT.'/config',
     ),
 ));
-
 
 $app['refresh.data'] = $app->protect(function() use ($app) {
 
@@ -174,11 +177,43 @@ $app->error(function (\Exception $e, $code) use ($app) {
 
 $app->mount('/', new YTSE\Routes\AuthenticationControllerProvider( $app['oauth'] ));
 
-if (!$app['oauth']->isDbSetup() || !$app['oauth']->adminTokenAvailable()){
+if (!$app['oauth']->isDbSetup()){
     // do installation
     $app->mount('/', new YTSE\Routes\InstallationControllerProvider());
     $app->run();
     exit;
+}
+
+function sendTokenEmailWarning(){
+
+    global $app;
+
+    $last = $app['state']->get('last_admin_token_warning');
+
+    $now = new DateTime('now');
+
+    if ($last){
+
+        $timeout = new DateTime();
+        $timeout->setTimestamp((int)$last);
+        // two hour gap
+        $timeout->add( new DateInterval('PT2H') );
+    }
+
+    if (!$last || $now > $timeout){
+
+        $config = $app['ytse.config'];
+
+        if (!isset($config['email_notify']) || empty($config['email_notify'])) return;
+
+        $app['email_notification'](
+            $config['email_notify'],
+            'WARNING: Authentication failed',
+            'email-notify-authentication-failed.twig'
+        );
+
+        $app['state']->set('last_admin_token_warning', $now->getTimestamp());
+    }
 }
 
 /**
@@ -232,6 +267,11 @@ $needYoutubeAuth = function(Request $req, Silex\Application $app){
  * Before routing
  */
 $app->before(function(Request $request) use ($app) {
+
+    if (!$app['oauth']->getValidAdminToken()){
+
+        sendTokenEmailWarning();
+    }
 
     $path = $request->getPathInfo();
 
@@ -292,6 +332,14 @@ $admin = $admin->connect($app);
 $admin->before($needYoutubeAuth);
 $admin->before($checkAuthentication);
 $admin->before($checkAuthorization);
+$admin->before(function() use ($app) {
+
+    // re-save auth token if unavailable
+    if (!$app['oauth']->adminTokenAvailable()){
+
+        $app['oauth']->saveAdminToken();
+    }
+});
 $app->mount('/admin', $admin);
 
 /**
