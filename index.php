@@ -55,7 +55,7 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
         YTSE_ROOT.'/app', // for user override inheritence
     ),
     'twig.options' => array(
-        //'cache' => YTSE_ROOT.'/cache/',
+        'cache' => YTSE_ROOT.'/cache/',
     ),
 ));
 
