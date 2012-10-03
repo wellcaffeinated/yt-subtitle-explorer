@@ -370,7 +370,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 		$lang_code = $item['info']['lang_code'];
 		$lang = $this->app['ytplaylist']->getLanguageDataByLangCode($lang_code);
 
-		$app['email_notification'](
+		$this->app['email_notification'](
 			$to, 
 			'Your translation has been approved!', 
 			'email-notify-approval.twig',
@@ -395,7 +395,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 		$lang_code = $item['info']['lang_code'];
 		$lang = $this->app['ytplaylist']->getLanguageDataByLangCode($lang_code);
 
-		$app['email_notification'](
+		$this->app['email_notification'](
 			$to, 
 			'Your translation was rejected', 
 			'email-notify-rejection.twig',
