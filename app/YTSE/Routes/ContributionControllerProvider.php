@@ -49,6 +49,9 @@ class ContributionControllerProvider implements ControllerProviderInterface {
                 }
             }
 
+            $error = $app['session']->get('last_error');
+            $app['session']->remove('last_error');
+
             return $app['twig']->render('page-contribute.twig', array(
 
                 'video' => $video,
@@ -57,6 +60,7 @@ class ContributionControllerProvider implements ControllerProviderInterface {
                     'lang' => $request->get('error_lang'),
                     'token' => $request->get('error_token'),
                 ),
+                'error_msg' => $error,
                 'success_msg' => $request->get('success_msg'),
 
             ));
@@ -146,26 +150,35 @@ class ContributionControllerProvider implements ControllerProviderInterface {
                 );
             }
 
+            $error = false;
+
             try {
 
                 $app['captions']->saveCaption($file, $videoId, $lang, $app['oauth']->getUserName(), $format);
 
             } catch (\YTSE\Captions\InvalidFileFormatException $e){
 
-                $app->abort(403, 'Invalid caption file format.');
+                $error = $e->getMessage();
 
             } catch (\Exception $e){
 
-                $app->abort(500, 'Problem uploading file.');
+                $error = 'Problem uploading file.';
             }
 
-            $self->emailNotification($request, $lang, $videoId);
+            if (!$error){
+
+                $self->emailNotification($request, $lang, $videoId);
+
+            } else {
+
+                $app['session']->set('last_error', $error);
+            }
 
             return $app->redirect(
                 $app['url_generator']->generate('contribute',
                     array(
                         'videoId' => $videoId,
-                        'success_msg' => true,
+                        'success_msg' => !$error,
                     )
                 )
             );

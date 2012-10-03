@@ -229,6 +229,12 @@ class APIMediator {
      */
     private function createCaptionRequest($method, $url, array $params, $content, array $info, AccessToken $token){
 
+        $enc = mb_detect_encoding($content);
+
+        if ($enc === false){
+            $enc = 'UTF-8';
+        }
+
         return $this->gdataAPI->createRequest(
             $method,
             array($url . '{?params*}',
@@ -238,7 +244,7 @@ class APIMediator {
             ),
             array(
                 'Authorization' => 'Bearer ' . $token->getValue(),
-                'Content-Type' => 'application/vnd.youtube.timedtext; charset=UTF-8',
+                'Content-Type' => 'application/vnd.youtube.timedtext; charset=' . $enc,
                 'Content-Language' => $info['lang_code'],
             ),
             $content

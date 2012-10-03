@@ -30,6 +30,10 @@
         Woops. Something went wrong while trying to fetch the caption. Please try again later.
       </div>
     {% endif %}
+
+    {% if error_msg is defined and error_msg is not empty %}
+      <div class="alert alert-error">{{error_msg}}</div>
+    {% endif %}
     
     <h2>Thank you for deciding to help!</h2>
     <p>Let's step through the process...</p>

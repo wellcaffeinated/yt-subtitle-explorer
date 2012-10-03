@@ -10,11 +10,13 @@
 namespace YTSE\Captions;
 
 use \Symfony\Component\HttpFoundation\File\UploadedFile;
+use \Symfony\Component\HttpFoundation\File\File;
 
 class CaptionManager {
 
 	private $base;
 	private static $acceptedExts = 'txt sub srt sbv';
+	//private static $acceptedEncodings = 'UTF-8 ASCII';
 	private static $maxAcceptedSize = 1048576; // 1Mb
 		
 	/**
@@ -248,14 +250,17 @@ class CaptionManager {
 		if ( !$this->isSafeExtension($format) ){
 
 			// if someone tries to upload a .php file, for example... stop them.
-			throw new InvalidFileFormatException("Invalid File Format");
-			return;
+			throw new InvalidFileFormatException("Invalid File Type. Will not accept files of type: .$format");
+		}
+
+		if ( !$this->isValidEncoding($file) ){
+
+			throw new InvalidFileFormatException("File contains invalid characters. Please use UTF-8 encoding.");
 		}
 
 		if ( $file->getSize() > CaptionManager::$maxAcceptedSize ){
 
 			throw new \Exception("File too big.");
-			return;
 		}
 
 		if (!is_dir($dir)){
@@ -264,6 +269,11 @@ class CaptionManager {
 		}
 
 		$file->move($dir, $name);
+
+		// convert to utf-8
+		$path = $dir . '/' . $name;
+		$content = mb_convert_encoding(file_get_contents($path), 'UTF-8', 'auto');
+		file_put_contents($path, $content);
 	}
 
 	public function manageCaptionFile($absPath, array $info){
@@ -294,6 +304,13 @@ class CaptionManager {
 	protected function isSafeExtension($format){
 
 		return in_array($format, explode(' ', CaptionManager::$acceptedExts));
+	}
+
+	protected function isValidEncoding(File $file){
+
+		$enc = mb_detect_encoding(file_get_contents($file->getRealPath()));
+
+		return $enc !== false; //in_array($enc, explode(' ', CaptionManager::$acceptedEncodings));
 	}
 
 	/**
