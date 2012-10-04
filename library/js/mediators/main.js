@@ -123,8 +123,18 @@ define(
                     .on('click', '.admin .captions .ctrl-view', function(e){
 
                         e.preventDefault();
-                        var href = $(this).attr('href');
-                        self.showRemoteModal(href, 'Caption');
+                        
+                        var $this = $(this)
+                            ,href = $this.attr('href')
+                            ,btnApprove = $this.siblings('.ctrl-approve')
+                            ,approveHref = btnApprove.length? $this.parents('form').attr('action') + '?' + btnApprove.attr('name') + '=' + encodeURIComponent(btnApprove.attr('value')) : false
+                            ;
+
+                        self.showRemoteModal(href, {
+
+                            title: 'Caption',
+                            approveHref: approveHref
+                        });
 
                     })
                     .on('change', '.ctrl-select-all', function(e){
@@ -187,7 +197,7 @@ define(
                 })
             },
 
-            showRemoteModal: function(url, title){
+            showRemoteModal: function(url, params){
 
                 $.ajax({
 
@@ -195,12 +205,13 @@ define(
 
                 }).done(function( content ){
 
-                    $(tplCaptionModal.render({
+                    $(tplCaptionModal.render(
+                        $.extend({
+                        
+                            content: content
 
-                        title: title,
-                        content: content
-
-                    })).modal().on('hidden', function () {
+                        }, params)
+                    )).modal().on('hidden', function () {
                         
                         // destroy it when closed so video stops
                         $(this).remove();

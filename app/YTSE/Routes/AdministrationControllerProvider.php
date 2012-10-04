@@ -30,6 +30,8 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 		$controller->match('/', function(Request $req, Application $app) use ($self) {
 
 			$action = $req->get('action');
+			$selfUrl = $app['url_generator']->generate('admin_main');
+			$isGet = $req->getMethod() === 'GET';
 			$error = '';
 			$msg = '';
 
@@ -92,7 +94,12 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 					$success = false;
 					$error = $e->getMessage();
 
-				}				
+				}
+
+				if ($isGet){
+
+					return $app->redirect($selfUrl);
+				}
 			}
 
 			/**
@@ -158,6 +165,10 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 					$error = $e->getMessage();
 				}
 				
+				if ($isGet){
+
+					return $app->redirect($selfUrl);
+				}
 			}
 
 			/**

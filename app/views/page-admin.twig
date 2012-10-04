@@ -69,9 +69,13 @@
             <td>{{cap.user}}</td>
             <td>{{cap.timestamp | date('m/d/Y')}}</td>
             <td class="btn-group">
+
               <a class="btn ctrl-view" title="view" href="{{app.url_generator.generate('admin_main', { path: cap.path, action: 'view' })}}"><i class="icon-search"></i></a>
+
               <button class="btn btn-success ctrl-approve" title="approve" type="submit" name="action" value="approve:{{cap.path}}"><i class="icon-ok"></i></button>
+
               <a href="{{app.url_generator.generate('admin_main')}}" data-path="{{cap.path}}" class="btn btn-danger ctrl-reject" title="reject"><i class="icon-remove"></i></a>
+
             </td>
           </tr>
           {% endfor %}
