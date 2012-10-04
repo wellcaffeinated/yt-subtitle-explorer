@@ -336,16 +336,24 @@ class APIMediator {
      * @param  string      $url    the API url to get caption content
      * @param  AccessToken $token  the access token object to authorize youtube access
      * @param  string      $format extension of the subtitle format (srt or sbv)
+     * @param  string      $lang (optional) the iso639 language code to translate caption to
      * @return string caption body string
      */
-    public function getYTCaptionContent($url, AccessToken $token, $format = 'srt'){
+    public function getYTCaptionContent($url, AccessToken $token, $format = 'srt', $lang = false){
+
+        $params = array(
+            'fmt' => $format === 'srt' ? 'srt' : 'sbv',
+        );
+
+        if ($lang){
+
+            $params['lang'] = $lang;
+        }
 
         $req = $this->gdataAPI->get(
             array($url . '{?params*}',
                 array(
-                    'params' => array(
-                        'fmt' => $format === 'srt' ? 'srt' : 'sbv',
-                    )
+                    'params' => $params,
                 )
             ),
             array(
