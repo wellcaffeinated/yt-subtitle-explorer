@@ -21,7 +21,7 @@
       
       {{#approveHref}}
       <div class="btn-group">
-        <a href="{{approveHref}}" class="btn btn-success ctrl-approve"><i class="icon-ok"></i> Approve</a>
+        <a href="{{approveHref}}" class="btn btn-success ctrl-approve">Approve</a>
       </div>
       {{/approveHref}}
 
