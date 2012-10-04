@@ -41,7 +41,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 			if ($action === 'view'){
 
 				$path = $req->get('path');
-				$content = $app['captions']->getCaptionContents($path);
+				$content = $app['captions']->getCaptionContents($path, 'UTF-8');
 
 				if (!$content) $app->abort(404, 'Caption file not found.');
 
@@ -108,7 +108,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 			if (preg_match('/^approve/', $action)){
 
 				$path = $req->get('path')? $req->get('path') : str_replace('approve:', '', $action);
-				$content = $app['captions']->getCaptionContents($path);
+				$content = $app['captions']->getCaptionContents($path, 'UTF-8');
 
 				if (!$content) $app->abort(404, 'Caption file not found.');
 
@@ -178,7 +178,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 
 				foreach ($req->get('selected') as $path) {
 
-					$content = $app['captions']->getCaptionContents($path);	
+					$content = $app['captions']->getCaptionContents($path, 'UTF-8');	
 
 					if (!$content) continue;
 
@@ -283,7 +283,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 			if ($action === 'view'){
 
 				$path = $req->get('path');
-				$content = $ctx->getCaptionContents($path);
+				$content = $ctx->getCaptionContents($path, 'UTF-8');
 
 				if (!$content) $app->abort(404, 'Caption file not found.');
 

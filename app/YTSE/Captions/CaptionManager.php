@@ -14,315 +14,322 @@ use \Symfony\Component\HttpFoundation\File\File;
 
 class CaptionManager {
 
-	private $base;
-	private static $acceptedExts = 'txt sub srt sbv';
-	//private static $acceptedEncodings = 'UTF-8 ASCII';
-	private static $maxAcceptedSize = 1048576; // 1Mb
-		
-	/**
-	 * Constructor
-	 * @param string $base absolute base directory for storing caption files
-	 */
-	public function __construct($base){
+    private $base;
+    private static $acceptedExts = 'txt sub srt sbv';
+    //private static $acceptedEncodings = 'UTF-8 ASCII';
+    private static $maxAcceptedSize = 1048576; // 1Mb
+        
+    /**
+     * Constructor
+     * @param string $base absolute base directory for storing caption files
+     */
+    public function __construct($base){
+
+        $this->base = $base;
+    }
+
+    /**
+     * Get path to caption file
+     * @param  string $videoId   the youtube video id
+     * @param  string $lang_code the language code
+     * @param  boolean $rel Flag for absolute vs relative. True for relative
+     * @return string the absolute path
+     */
+    public function getCaptionPath($videoId, $lang_code, $rel = false){
 
-		$this->base = $base;
-	}
+        $part = implode('/', array(
+            $videoId,
+            $lang_code,
+        ));
 
-	/**
-	 * Get path to caption file
-	 * @param  string $videoId   the youtube video id
-	 * @param  string $lang_code the language code
-	 * @param  boolean $rel Flag for absolute vs relative. True for relative
-	 * @return string the absolute path
-	 */
-	public function getCaptionPath($videoId, $lang_code, $rel = false){
+        return $rel ? $part : $this->base . '/' . $part;
+    }
 
-		$part = implode('/', array(
-			$videoId,
-			$lang_code,
-		));
+    /**
+     * Get base directory
+     * @return string the absolute path
+     */
+    public function getBaseDir(){
 
-		return $rel ? $part : $this->base . '/' . $part;
-	}
+        return $this->base;
+    }
 
-	/**
-	 * Get base directory
-	 * @return string the absolute path
-	 */
-	public function getBaseDir(){
+    /**
+     * Get contents of caption file
+     * @param  string $path relative path to caption file
+     * @param  string $encoding (optional) convert to specified encoding
+     * @return string|false
+     */
+    public function getCaptionContents($path, $encoding = false){
 
-		return $this->base;
-	}
+        $filename = $this->base . '/' . $path;
 
-	/**
-	 * Get contents of caption file
-	 * @param  string $path relative path to caption file
-	 * @return string|false
-	 */
-	public function getCaptionContents($path){
+        if (!is_file($filename)) return false;
 
-		$filename = $this->base . '/' . $path;
+        try{
 
-		if (!is_file($filename)) return false;
+            $content = file_get_contents($filename);
+            
+            if ($encoding){
+                $content = mb_convert_encoding($content, $encoding, 'auto'); // convert to utf-8
+            }
+            
+            return $content;
 
-		try{
+        } catch (\Exception $e) {}
 
-			return file_get_contents($filename);
+        return false;
+    }
 
-		} catch (\Exception $e) {}
+    /**
+     * Remove a caption file
+     * @param  string $path relative path to caption file
+     * @return boolean success value
+     */
+    public function deleteCaption($path){
 
-		return false;
-	}
+        $filename = $this->base . '/' . $path;
 
-	/**
-	 * Remove a caption file
-	 * @param  string $path relative path to caption file
-	 * @return boolean success value
-	 */
-	public function deleteCaption($path){
+        if (!is_file($filename)) return false;
 
-		$filename = $this->base . '/' . $path;
+        unlink($filename);
 
-		if (!is_file($filename)) return false;
+        $dir = dirname($filename);
+        @rmdir($dir); // remove if empty
 
-		unlink($filename);
+        return true;
+    }
 
-		$dir = dirname($filename);
-		@rmdir($dir); // remove if empty
+    /**
+     * Get caption submission list
+     * @return array submission data
+     */
+    public function getSubmissions(){
 
-		return true;
-	}
+        return $this->generateIndex();
+    }
 
-	/**
-	 * Get caption submission list
-	 * @return array submission data
-	 */
-	public function getSubmissions(){
+    /**
+     * Generate index of caption submissions
+     * @return array submission data
+     */
+    protected function generateIndex(){
 
-		return $this->generateIndex();
-	}
+        $ret = array();
 
-	/**
-	 * Generate index of caption submissions
-	 * @return array submission data
-	 */
-	protected function generateIndex(){
+        if (!is_dir($this->base)) {
 
-		$ret = array();
+            return $ret;
+        }
 
-		if (!is_dir($this->base)) {
+        $d = dir($this->base);
 
-			return $ret;
-		}
+        while (false !== ($entry = $d->read())) {
 
-		$d = dir($this->base);
+            if (preg_match('/^\./', $entry)) continue; // begins with .
 
-		while (false !== ($entry = $d->read())) {
+            $vid = array(
+                'videoId' => $entry,
+                'captions' => $this->generateCaptionsForVideo($entry),
+            );
 
-			if (preg_match('/^\./', $entry)) continue; // begins with .
+            if (!empty($vid['captions'])){
 
-			$vid = array(
-				'videoId' => $entry,
-				'captions' => $this->generateCaptionsForVideo($entry),
-			);
+                $ret[] = $vid;
+            }
+        }
 
-			if (!empty($vid['captions'])){
+        $d->close();
 
-				$ret[] = $vid;
-			}
-		}
+        return $ret;
+    }
 
-		$d->close();
+    /**
+     * Get caption record for specific video
+     * @param  string $videoId youtube id for video
+     * @return array caption data
+     */
+    protected function generateCaptionsForVideo($videoId){
 
-		return $ret;
-	}
+        $dirname = $this->base . '/' . $videoId;
+        $langs = array();
 
-	/**
-	 * Get caption record for specific video
-	 * @param  string $videoId youtube id for video
-	 * @return array caption data
-	 */
-	protected function generateCaptionsForVideo($videoId){
+        if (!is_dir($dirname)) {
+            return $langs;
+        }
 
-		$dirname = $this->base . '/' . $videoId;
-		$langs = array();
+        $d = dir($dirname);
 
-		if (!is_dir($dirname)) {
-			return $langs;
-		}
+        while (false !== ($lang_code = $d->read())) {
 
-		$d = dir($dirname);
+            if (preg_match('/^\./', $lang_code)) continue; // begins with .
 
-		while (false !== ($lang_code = $d->read())) {
+            $caps = $this->generateCaptionsForVideoAndLang($videoId, $lang_code);
 
-			if (preg_match('/^\./', $lang_code)) continue; // begins with .
+            if (!empty($caps)){
 
-			$caps = $this->generateCaptionsForVideoAndLang($videoId, $lang_code);
+                $langs[ $lang_code ] = $caps;
+            }
+        }
 
-			if (!empty($caps)){
+        $d->close();
 
-				$langs[ $lang_code ] = $caps;
-			}
-		}
+        return $langs;
+    }
 
-		$d->close();
+    /**
+     * Get caption info based on caption path
+     * @param  string $path relative path to caption file
+     * @return array caption info
+     */
+    public function extractCaptionInfo($path){
 
-		return $langs;
-	}
+        $path = preg_replace('/^\//', '', $path); // remove leading slash
+        $dirs = explode('/', $path);
 
-	/**
-	 * Get caption info based on caption path
-	 * @param  string $path relative path to caption file
-	 * @return array caption info
-	 */
-	public function extractCaptionInfo($path){
+        if (count($dirs) !== 3) return false;
 
-		$path = preg_replace('/^\//', '', $path); // remove leading slash
-		$dirs = explode('/', $path);
+        $filename = $dirs[2];
+        $count = preg_match('/^([^%]+)%([0-9]+)\.(\w+)$/', $filename, $matches);
 
-		if (count($dirs) !== 3) return false;
+        if (!$count) return false;
 
-		$filename = $dirs[2];
-		$count = preg_match('/^([^%]+)%([0-9]+)\.(\w+)$/', $filename, $matches);
+        return array(
+            'videoId' => $dirs[0],
+            'lang_code' => $dirs[1],
+            'path' => $path,
+            'filename' => $filename,
+            'user' => $matches[1],
+            'timestamp' => $matches[2],
+            'ext' => $matches[3],
+        );
+    }
 
-		if (!$count) return false;
+    /**
+     * Get caption submission data for specific video and language
+     * @param  string $videoId   the youtube id for the video
+     * @param  string $lang_code the language code of language
+     * @return array caption data
+     */
+    protected function generateCaptionsForVideoAndLang($videoId, $lang_code){
 
-		return array(
-			'videoId' => $dirs[0],
-			'lang_code' => $dirs[1],
-			'path' => $path,
-			'filename' => $filename,
-			'user' => $matches[1],
-			'timestamp' => $matches[2],
-			'ext' => $matches[3],
-		);
-	}
+        $dirname = $this->base . '/' . $videoId . '/' . $lang_code;
+        $caps = array();
 
-	/**
-	 * Get caption submission data for specific video and language
-	 * @param  string $videoId   the youtube id for the video
-	 * @param  string $lang_code the language code of language
-	 * @return array caption data
-	 */
-	protected function generateCaptionsForVideoAndLang($videoId, $lang_code){
+        if (!is_dir($dirname)) {
+            return $caps;
+        }
 
-		$dirname = $this->base . '/' . $videoId . '/' . $lang_code;
-		$caps = array();
+        $d = dir($dirname);
 
-		if (!is_dir($dirname)) {
-			return $caps;
-		}
+        while (false !== ($entry = $d->read())) {
 
-		$d = dir($dirname);
+            if (preg_match('/^\./', $entry)) continue; // begins with .
 
-		while (false !== ($entry = $d->read())) {
+            $info = $this->extractCaptionInfo(str_replace($this->base, '', $dirname) . '/' . $entry);
 
-			if (preg_match('/^\./', $entry)) continue; // begins with .
+            if (!$info) continue;
 
-			$info = $this->extractCaptionInfo(str_replace($this->base, '', $dirname) . '/' . $entry);
+            $caps[] = $info;
+        }
 
-			if (!$info) continue;
+        $d->close();
 
-			$caps[] = $info;
-		}
+        return $caps;
+    }
 
-		$d->close();
+    /**
+     * Save a caption submission from a form upload
+     * @param  UploadedFile $file      the uploaded file
+     * @param  string       $videoId   the youtube id of the video
+     * @param  string       $lang_code the language code of the submission
+     * @param  string       $username  the username of user who submitted it
+     * @return void
+     */
+    public function saveCaption(UploadedFile $file, $videoId, $lang_code, $username){
 
-		return $caps;
-	}
+        preg_match('/\.([a-zA-Z]*)$/', $file->getClientOriginalName(), $matches);
+        $format = isset($matches[1])? $matches[1] : 'txt';
+        
+        $dir = $this->getCaptionPath($videoId, $lang_code);
+        $name = $this->getNewCaptionFilename($username, $format);
 
-	/**
-	 * Save a caption submission from a form upload
-	 * @param  UploadedFile $file      the uploaded file
-	 * @param  string       $videoId   the youtube id of the video
-	 * @param  string       $lang_code the language code of the submission
-	 * @param  string       $username  the username of user who submitted it
-	 * @return void
-	 */
-	public function saveCaption(UploadedFile $file, $videoId, $lang_code, $username){
+        if ( !$this->isSafeExtension($format) ){
 
-		preg_match('/\.([a-zA-Z]*)$/', $file->getClientOriginalName(), $matches);
-		$format = isset($matches[1])? $matches[1] : 'txt';
-		
-		$dir = $this->getCaptionPath($videoId, $lang_code);
-		$name = $this->getNewCaptionFilename($username, $format);
+            // if someone tries to upload a .php file, for example... stop them.
+            throw new InvalidFileFormatException("Invalid File Type. Will not accept files of type: .$format");
+        }
 
-		if ( !$this->isSafeExtension($format) ){
+        if ( !$this->isValidEncoding($file) ){
 
-			// if someone tries to upload a .php file, for example... stop them.
-			throw new InvalidFileFormatException("Invalid File Type. Will not accept files of type: .$format");
-		}
+            throw new InvalidFileFormatException("File contains invalid characters. Please use UTF-8 encoding.");
+        }
 
-		if ( !$this->isValidEncoding($file) ){
+        if ( $file->getSize() > CaptionManager::$maxAcceptedSize ){
 
-			throw new InvalidFileFormatException("File contains invalid characters. Please use UTF-8 encoding.");
-		}
+            throw new \Exception("File too big.");
+        }
 
-		if ( $file->getSize() > CaptionManager::$maxAcceptedSize ){
+        if (!is_dir($dir)){
 
-			throw new \Exception("File too big.");
-		}
+            mkdir($dir, 0777, true);
+        }
 
-		if (!is_dir($dir)){
+        $file->move($dir, $name);
 
-			mkdir($dir, 0777, true);
-		}
+        // convert to utf-8
+        // $path = $dir . '/' . $name;
+        // $content = mb_convert_encoding(file_get_contents($path), 'UTF-8', 'auto');
+        // file_put_contents($path, $content);
+    }
 
-		$file->move($dir, $name);
+    public function manageCaptionFile($absPath, array $info){
 
-		// convert to utf-8
-		$path = $dir . '/' . $name;
-		$content = mb_convert_encoding(file_get_contents($path), 'UTF-8', 'auto');
-		file_put_contents($path, $content);
-	}
+        if (!is_file($absPath)){
+            throw new \Exception('No file found at path: '.$absPath);
+        }
 
-	public function manageCaptionFile($absPath, array $info){
+        $dir = $this->getCaptionPath($info['videoId'], $info['lang_code']);
 
-		if (!is_file($absPath)){
-			throw new \Exception('No file found at path: '.$absPath);
-		}
+        if (!is_dir($dir)){
 
-		$dir = $this->getCaptionPath($info['videoId'], $info['lang_code']);
+            mkdir($dir, 0777, true);
+        }
 
-		if (!is_dir($dir)){
+        $ret = @rename($absPath, $dir . '/' . $info['filename']);
 
-			mkdir($dir, 0777, true);
-		}
+        if (!$ret){
+            throw new \Exception('Problem moving caption file');
+        }
+    }
 
-		$ret = @rename($absPath, $dir . '/' . $info['filename']);
+    /**
+     * Determine if the extension of caption submission is acceptable
+     * @param  string  $format extension to check
+     * @return boolean true if safe/accepted extension
+     */
+    protected function isSafeExtension($format){
 
-		if (!$ret){
-			throw new \Exception('Problem moving caption file');
-		}
-	}
+        return in_array($format, explode(' ', CaptionManager::$acceptedExts));
+    }
 
-	/**
-	 * Determine if the extension of caption submission is acceptable
-	 * @param  string  $format extension to check
-	 * @return boolean true if safe/accepted extension
-	 */
-	protected function isSafeExtension($format){
+    protected function isValidEncoding(File $file){
 
-		return in_array($format, explode(' ', CaptionManager::$acceptedExts));
-	}
+        $enc = mb_detect_encoding(file_get_contents($file->getRealPath()));
 
-	protected function isValidEncoding(File $file){
+        return $enc !== false; //in_array($enc, explode(' ', CaptionManager::$acceptedEncodings));
+    }
 
-		$enc = mb_detect_encoding(file_get_contents($file->getRealPath()));
+    /**
+     * Generate a caption filename
+     * @param  string $username username of submitter
+     * @param  string $format   the format of the caption
+     * @return string the filename
+     */
+    protected function getNewCaptionFilename($username, $format){
 
-		return $enc !== false; //in_array($enc, explode(' ', CaptionManager::$acceptedEncodings));
-	}
+        $ts = time();
 
-	/**
-	 * Generate a caption filename
-	 * @param  string $username username of submitter
-	 * @param  string $format   the format of the caption
-	 * @return string the filename
-	 */
-	protected function getNewCaptionFilename($username, $format){
-
-		$ts = time();
-
-		return "{$username}%{$ts}.{$format}";
-	}
+        return "{$username}%{$ts}.{$format}";
+    }
 }
