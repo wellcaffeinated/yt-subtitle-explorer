@@ -14,409 +14,533 @@ use Silex\ControllerProviderInterface;
 use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Yaml\Yaml;
+use Guzzle\Service\Client;
 
 class AdministrationControllerProvider implements ControllerProviderInterface {
 
-	public function connect(Application $app){
+    public function connect(Application $app){
 
-		$this->app = $app;
-		$self = $this;
+        $this->app = $app;
+        $self = $this;
 
-		$controller = $app['controllers_factory'];
+        $controller = $app['controllers_factory'];
 
-		/**
-		 * Main admin route
-		 */
-		$controller->match('/', function(Request $req, Application $app) use ($self) {
+        /**
+         * Main admin route
+         */
+        $controller->match('/', function(Request $req, Application $app) use ($self) {
 
-			$action = $req->get('action');
-			$selfUrl = $app['url_generator']->generate('admin_main');
-			$isGet = $req->getMethod() === 'GET';
-			$error = '';
-			$msg = '';
+            $action = $req->get('action');
+            $selfUrl = $app['url_generator']->generate('admin_main');
+            $isGet = $req->getMethod() === 'GET';
+            $error = '';
+            $msg = '';
 
-			/**
-			 * View caption file
-			 */
-			if ($action === 'view'){
+            /**
+             * View caption file
+             */
+            if ($action === 'view'){
 
-				$path = $req->get('path');
-				$content = $app['captions']->getCaptionContents($path, 'UTF-8');
+                $path = $req->get('path');
+                $content = $app['captions']->getCaptionContents($path, 'UTF-8');
 
-				if (!$content) $app->abort(404, 'Caption file not found.');
+                if (!$content) $app->abort(404, 'Caption file not found.');
 
-				return new Response($content, 200, array(
+                return new Response($content, 200, array(
 
-					'Content-type' => 'text/plain',
-				));
-			}
+                    'Content-type' => 'text/plain',
+                ));
+            }
 
-			/**
-			 * Maintenance Mode Toggle
-			 */
-			
-			if ($action === 'maintenance'){
+            /**
+             * Maintenance Mode Toggle
+             */
+            
+            if ($action === 'maintenance'){
 
-				if ($app['maintenance_mode']->isEnabled()){
-					$app['maintenance_mode']->disable();
-				} else {
-					$app['maintenance_mode']->enable();
-				}
-			}
+                if ($app['maintenance_mode']->isEnabled()){
+                    $app['maintenance_mode']->disable();
+                } else {
+                    $app['maintenance_mode']->enable();
+                }
 
-			/**
-			 * Reject caption file
-			 */
-			if ($action === 'reject'){
+                if ($isGet){
 
-				$path = $req->get('path');
+                    return $app->redirect($selfUrl);
+                }
+            }
 
-				try {
+            /**
+             * Reject caption file
+             */
+            if ($action === 'reject'){
 
-					$reason = $req->get('reason');
+                $path = $req->get('path');
 
-					if ($reason === 'other'){
+                try {
 
-						$reason = $req->get('other_reason');
-					}
+                    $reason = $req->get('reason');
 
-					$info = $app['captions']->extractCaptionInfo($path);
-					$abspath = $app['captions']->getBaseDir() . '/' . $path;
-					$app['captions_rejected']->manageCaptionFile($abspath, $info);
+                    if ($reason === 'other'){
 
-					$self->sendRejectionEmail(array(
-						'info' => $info,
-						'video' => $app['ytplaylist']->getVideoById($info['videoId']),
-					), $reason);
+                        $reason = $req->get('other_reason');
+                    }
 
-				} catch (\Exception $e){
+                    $info = $app['captions']->extractCaptionInfo($path);
+                    $abspath = $app['captions']->getBaseDir() . '/' . $path;
+                    $app['captions_rejected']->manageCaptionFile($abspath, $info);
 
-					$success = false;
-					$error = $e->getMessage();
+                    $self->sendRejectionEmail(array(
+                        'info' => $info,
+                        'video' => $app['ytplaylist']->getVideoById($info['videoId']),
+                    ), $reason);
 
-				}
+                } catch (\Exception $e){
 
-				if ($isGet){
+                    $success = false;
+                    $error = $e->getMessage();
 
-					return $app->redirect($selfUrl);
-				}
-			}
+                }
 
-			/**
-			 * Approve caption
-			 */
-			if (preg_match('/^approve/', $action)){
+                if ($isGet){
 
-				$path = $req->get('path')? $req->get('path') : str_replace('approve:', '', $action);
-				$content = $app['captions']->getCaptionContents($path, 'UTF-8');
+                    return $app->redirect($selfUrl);
+                }
+            }
 
-				if (!$content) $app->abort(404, 'Caption file not found.');
+            /**
+             * Approve caption
+             */
+            if (preg_match('/^approve/', $action)){
 
-				$info = $app['captions']->extractCaptionInfo($path);
-				$video = $app['ytplaylist']->getVideoById($info['videoId']);
+                $path = $req->get('path')? $req->get('path') : str_replace('approve:', '', $action);
+                $content = $app['captions']->getCaptionContents($path, 'UTF-8');
 
-				$caption = false;
+                if (!$content) $app->abort(404, 'Caption file not found.');
 
-				foreach ( $video['caption_links'] as $cap ){
+                $info = $app['captions']->extractCaptionInfo($path);
+                $video = $app['ytplaylist']->getVideoById($info['videoId']);
 
-					if ($cap['lang_code'] === $info['lang_code']){
-						$caption = $cap;
-						break;
-					}
-				}
+                $caption = false;
 
-				try{
+                foreach ( $video['caption_links'] as $cap ){
 
-					if (!$caption){
+                    if ($cap['lang_code'] === $info['lang_code']){
+                        $caption = $cap;
+                        break;
+                    }
+                }
 
-						$data = $app['api']->createYTCaption($app['oauth']->getValidAdminToken(), $info, $content);
-						//$app['refresh.data']();
+                try{
 
-					} else {
+                    if (!$caption){
 
-						$data = $app['api']->updateYTCaption($caption['src'], $app['oauth']->getValidAdminToken(), $info, $content);
-					}
+                        $data = $app['api']->createYTCaption($app['oauth']->getValidAdminToken(), $info, $content);
+                        //$app['refresh.data']();
 
-					if ($data['draft']){
+                    } else {
 
-						$msg = 'The approved subtitles were added to YouTube, but are in "draft mode" and will not get displayed on your video.';
-					}
+                        $data = $app['api']->updateYTCaption($caption['src'], $app['oauth']->getValidAdminToken(), $info, $content);
+                    }
 
-					if (array_key_exists('errors', $data)){
+                    if ($data['draft']){
 
-						foreach ($data['errors'] as $err) {
-							$error .= $err['msg'] . '<br/>';
-						}
+                        $msg = 'The approved subtitles were added to YouTube, but are in "draft mode" and will not get displayed on your video.';
+                    }
 
-					} else if (!$data['draft']) {
+                    if (array_key_exists('errors', $data)){
 
-						$self->sendApprovalEmail(array(
-							'info' => $info,
-							'video' => $video,
-						));
-					}
+                        foreach ($data['errors'] as $err) {
+                            $error .= $err['msg'] . '<br/>';
+                        }
 
-					$info = $app['captions']->extractCaptionInfo($path);
-					$abspath = $app['captions']->getBaseDir() . '/' . $path;
-					$app['captions_approved']->manageCaptionFile($abspath, $info);
+                    } else if (!$data['draft']) {
 
-				} catch (\Exception $e){
+                        $self->sendApprovalEmail(array(
+                            'info' => $info,
+                            'video' => $video,
+                        ));
+                    }
 
-					$error = $e->getMessage();
-				}
-				
-				if ($isGet){
+                    $info = $app['captions']->extractCaptionInfo($path);
+                    $abspath = $app['captions']->getBaseDir() . '/' . $path;
+                    $app['captions_approved']->manageCaptionFile($abspath, $info);
 
-					return $app->redirect($selfUrl);
-				}
-			}
+                } catch (\Exception $e){
 
-			/**
-			 * Batch approve
-			 */
-			if ($action === 'batch_approve' && $req->get('selected')) {
+                    $error = $e->getMessage();
+                }
+                
+                if ($isGet){
 
-				foreach ($req->get('selected') as $path) {
+                    return $app->redirect($selfUrl);
+                }
+            }
 
-					$content = $app['captions']->getCaptionContents($path, 'UTF-8');	
+            /**
+             * Batch approve
+             */
+            if ($action === 'batch_approve' && $req->get('selected')) {
 
-					if (!$content) continue;
+                foreach ($req->get('selected') as $path) {
 
-					$info = $app['captions']->extractCaptionInfo($path);
-					$video = $app['ytplaylist']->getVideoById($info['videoId']);
+                    $content = $app['captions']->getCaptionContents($path, 'UTF-8');    
 
-					$caption = false;
+                    if (!$content) continue;
 
-					foreach ( $video['caption_links'] as $cap ){
+                    $info = $app['captions']->extractCaptionInfo($path);
+                    $video = $app['ytplaylist']->getVideoById($info['videoId']);
 
-						if ($cap['lang_code'] === $info['lang_code']){
-							$caption = $cap;
-							break;
-						}
-					}
+                    $caption = false;
 
-					$batch[] = array(
-						'url' => $caption? $caption['src'] : false,
-						'info' => $info,
-						'content' => $content,
-						'video' => $video,
-					);
-				}
+                    foreach ( $video['caption_links'] as $cap ){
 
-				try {
+                        if ($cap['lang_code'] === $info['lang_code']){
+                            $caption = $cap;
+                            break;
+                        }
+                    }
 
-					$ret = $app['api']->batchSaveCaptions($batch, $app['oauth']->getValidAdminToken());
+                    $batch[] = array(
+                        'url' => $caption? $caption['src'] : false,
+                        'info' => $info,
+                        'content' => $content,
+                        'video' => $video,
+                    );
+                }
 
-					foreach ($ret as $key => $data) {
+                try {
 
-						$item = $batch[$key];
-						$filename = $item['info']['filename'];
-						
-						if (array_key_exists('errors', $data)){
+                    $ret = $app['api']->batchSaveCaptions($batch, $app['oauth']->getValidAdminToken());
 
-							$error .= "Problem saving caption: $filename <br/>";
+                    foreach ($ret as $key => $data) {
 
-							foreach ($data['errors'] as $err) {
-								$error .= $err['msg'] . '<br/>';
-							}
+                        $item = $batch[$key];
+                        $filename = $item['info']['filename'];
+                        
+                        if (array_key_exists('errors', $data)){
 
-						} else {
+                            $error .= "Problem saving caption: $filename <br/>";
 
-							$self->sendApprovalEmail($item);
+                            foreach ($data['errors'] as $err) {
+                                $error .= $err['msg'] . '<br/>';
+                            }
 
-							$path = $item['info']['path'];
-							
-							$info = $app['captions']->extractCaptionInfo($path);
-							$abspath = $app['captions']->getBaseDir() . '/' . $path;
-							$app['captions_approved']->manageCaptionFile($abspath, $info);
-						}
-					}
+                        } else {
 
-				} catch (\Exception $e){
+                            $self->sendApprovalEmail($item);
 
-					$error = $e->getMessage();
-				}
-			}
+                            $path = $item['info']['path'];
+                            
+                            $info = $app['captions']->extractCaptionInfo($path);
+                            $abspath = $app['captions']->getBaseDir() . '/' . $path;
+                            $app['captions_approved']->manageCaptionFile($abspath, $info);
+                        }
+                    }
 
-			return $app['twig']->render('page-admin.twig', array(
+                } catch (\Exception $e){
 
-				'submissions' => $app['captions']->getSubmissions(),
-				'error' => $error,
-				'msg' => $msg,
+                    $error = $e->getMessage();
+                }
+            }
 
-			));
-		})
-		->method('GET|POST')
-		->bind('admin_main');
+            return $app['twig']->render('page-admin.twig', array(
 
-		/**
-		 * Refresh video data
-		 */
-		$controller->match('/refresh', function(Request $req, Application $app){
+                'submissions' => $app['captions']->getSubmissions(),
+                'error' => $error,
+                'msg' => $msg,
 
-			$app['refresh.data']();
+            ));
+        })
+        ->method('GET|POST')
+        ->bind('admin_main');
 
-			return $app->redirect($app['url_generator']->generate('admin_main'));
-		})->bind('admin_refresh_data');
+        /**
+         * Refresh video data
+         */
+        $controller->match('/refresh', function(Request $req, Application $app){
 
-		/**
-		 * Main admin route
-		 */
-		$controller->match('/trash', function(Request $req, Application $app) use ($self) {
+            $app['refresh.data']();
 
-			$action = $req->get('action');
-			$error = '';
-			$msg = '';
+            return $app->redirect($app['url_generator']->generate('admin_main'));
+        })->bind('admin_refresh_data');
 
-			if (!$req->get('context')){
+        /**
+         * Main admin route
+         */
+        $controller->match('/trash', function(Request $req, Application $app) use ($self) {
 
-				$action = '';
+            $action = $req->get('action');
+            $error = '';
+            $msg = '';
 
-			} else {
+            if (!$req->get('context')){
 
-				$ctx = $app['captions_' . $req->get('context')];
-			}
+                $action = '';
 
-			/**
-			 * View caption file
-			 */
-			if ($action === 'view'){
+            } else {
 
-				$path = $req->get('path');
-				$content = $ctx->getCaptionContents($path, 'UTF-8');
+                $ctx = $app['captions_' . $req->get('context')];
+            }
 
-				if (!$content) $app->abort(404, 'Caption file not found.');
+            /**
+             * View caption file
+             */
+            if ($action === 'view'){
 
-				return new Response($content, 200, array(
+                $path = $req->get('path');
+                $content = $ctx->getCaptionContents($path, 'UTF-8');
 
-					'Content-type' => 'text/plain',
-				));
-			}
+                if (!$content) $app->abort(404, 'Caption file not found.');
 
-			/**
-			 * Delete caption file
-			 */
-			if (preg_match('/^delete/', $action)){
+                return new Response($content, 200, array(
 
-				$path = $req->get('path')? $req->get('path') : str_replace('delete:', '', $action);
+                    'Content-type' => 'text/plain',
+                ));
+            }
 
-				try {
+            /**
+             * Delete caption file
+             */
+            if (preg_match('/^delete/', $action)){
 
-					$success = $ctx->deleteCaption($path);
+                $path = $req->get('path')? $req->get('path') : str_replace('delete:', '', $action);
 
-					if (!$success){
+                try {
 
-						$error .= 'Problem deleting caption.';
+                    $success = $ctx->deleteCaption($path);
 
-					}
+                    if (!$success){
 
-				} catch (\Exception $e){
+                        $error .= 'Problem deleting caption.';
 
-					$success = false;
-					$error = $e->getMessage();
+                    }
 
-				}				
-			}
+                } catch (\Exception $e){
 
-			/**
-			 * Batch delete
-			 */
-			if ($action === 'batch_delete' && $req->get('selected')) {
+                    $success = false;
+                    $error = $e->getMessage();
 
-				foreach ($req->get('selected') as $path) {
+                }               
+            }
 
-					$success = $ctx->deleteCaption($path);
+            /**
+             * Batch delete
+             */
+            if ($action === 'batch_delete' && $req->get('selected')) {
 
-					if (!$success){
+                foreach ($req->get('selected') as $path) {
 
-						$error .= 'Problem deleting caption: '.$path;
+                    $success = $ctx->deleteCaption($path);
 
-					}
-				}
-			}
+                    if (!$success){
 
-			/**
-			 * Retrieve caption
-			 */
-			if (preg_match('/^retrieve/', $action)){
+                        $error .= 'Problem deleting caption: '.$path;
 
-				$path = $req->get('path')? $req->get('path') : str_replace('retrieve:', '', $action);
+                    }
+                }
+            }
 
-				try {
-				
-					$info = $ctx->extractCaptionInfo($path);
-					$abspath = $ctx->getBaseDir() . '/' . $path;
-					$app['captions']->manageCaptionFile($abspath, $info);
+            /**
+             * Retrieve caption
+             */
+            if (preg_match('/^retrieve/', $action)){
 
-				} catch (\Exception $e){
+                $path = $req->get('path')? $req->get('path') : str_replace('retrieve:', '', $action);
 
-					$error = $e->getMessage();
-				}
-			}
+                try {
+                
+                    $info = $ctx->extractCaptionInfo($path);
+                    $abspath = $ctx->getBaseDir() . '/' . $path;
+                    $app['captions']->manageCaptionFile($abspath, $info);
 
-			return $app['twig']->render('page-admin-trash.twig', array(
+                } catch (\Exception $e){
 
-				'rejected' => $app['captions_rejected']->getSubmissions(),
-				'approved' => $app['captions_approved']->getSubmissions(),
-				'error' => $error,
-				'msg' => $msg,
+                    $error = $e->getMessage();
+                }
+            }
 
-			));
-		})
-		->method('GET|POST')
-		->bind('admin_trash');
+            return $app['twig']->render('page-admin-trash.twig', array(
 
-		return $controller;
-	}
+                'rejected' => $app['captions_rejected']->getSubmissions(),
+                'approved' => $app['captions_approved']->getSubmissions(),
+                'error' => $error,
+                'msg' => $msg,
 
-	public function sendApprovalEmail(array $item){
+            ));
+        })
+        ->method('GET|POST')
+        ->bind('admin_trash');
 
-		$name = $item['info']['user'];
-		$user = $this->app['users']->getUser($name);
-		$settings = $user->getUserSettings();
+        /**
+         * Main admin route
+         */
+        $controller->match('/settings', function(Request $req, Application $app) use ($self) {
 
-		if (!$settings['email_notifications']) return; // don't spam if they don't want it
+            $settings = array(
+                'ytse.config' => array(
+                    'email_notify',
+                    'email_from',
+                ),
+                'swiftmailer.options' => array(
+                    'host',
+                    'port',
+                    'username',
+                    'password',
+                    'auth_mode',
+                ),
+                'api.config' => array(
+                    'thumbnail',
+                ),
+                'ytplaylist.config' => array(
+                    'playlist',
+                ),
+            );
 
-		$to = $user->getEmail();
-		$lang_code = $item['info']['lang_code'];
-		$lang = $this->app['ytplaylist']->getLanguageDataByLangCode($lang_code);
+            // if submiting a form...
+            if ($req->get('continue')){
 
-		$this->app['email_notification'](
-			$to, 
-			'Your translation has been approved!', 
-			'email-notify-approval.twig',
-			array(
-				'video' => $item['video'],
-				'lang' => $lang,
-				'user' => $user,
-				'info' => $item['info'],
-			)
-		);
-	}
+                $overrides = array();
 
-	public function sendRejectionEmail(array $item, $reason){
+                foreach ($settings as $key => $vals){
 
-		$name = $item['info']['user'];
-		$user = $this->app['users']->getUser($name);
-		$settings = $user->getUserSettings();
+                    $v = $req->get(str_replace('.', '_', $key));
 
-		if (!$settings['email_notifications']) return; // don't spam if they don't want it
+                    if (!$v) continue;
 
-		$to = $user->getEmail();
-		$lang_code = $item['info']['lang_code'];
-		$lang = $this->app['ytplaylist']->getLanguageDataByLangCode($lang_code);
+                    foreach ($vals as $setting){
 
-		$this->app['email_notification'](
-			$to, 
-			'Your translation was rejected', 
-			'email-notify-rejection.twig',
-			array(
-				'video' => $item['video'],
-				'lang' => $lang,
-				'user' => $user,
-				'info' => $item['info'],
-				'reason' => $reason,
-			)
-		);
-	}
+                        if ($v[$setting] !== null){
+
+                            if ("${key}:${setting}" === 'ytse.config:email_notify'){
+                                $v[$setting] = explode(',', str_replace(' ', '', $v[$setting]));
+                            }
+
+                            $overrides[$key][$setting] = $v[$setting];
+                        }
+                    }
+                }
+
+                // overwrite current settings too
+                $self->saveConfig($app, $overrides);
+            }
+
+            // get playlist data
+            if ($app['session']->get('cache_playlists') === null){
+
+                $client = new Client('https://gdata.youtube.com/feeds/api');
+                $client->setDefaultHeaders(array(
+                    'X-GData-Key' => 'key='.$app['api.config']['yt.api.key'],
+                ));
+
+                $resp = $client->get(array(
+                    'users/{user}/playlists{?params*}',
+                    array(
+                        'user' => $app['oauth']->getYTUserName(),
+                        'params' => array(
+                            'alt' => 'json',
+                            'v' => '2',
+                        )
+                    )
+                ))->send()->getBody(true);
+
+                $json = json_decode($resp, true);
+
+                foreach ($json['feed']['entry'] as $pl) {
+                    $playlists[] = array(
+                        'name' => $pl['title']['$t'],
+                        'id' => $pl['yt$playlistId']['$t'],
+                    );
+                }
+
+                $app['session']->set('cache_playlists', $playlists);
+            }
+
+            return $app['twig']->render('page-admin-settings.twig', array(
+                'playlists' => $app['session']->get('cache_playlists'),
+            ));
+
+        })->method('GET|POST')
+        ->bind('admin_settings');
+
+        return $controller;
+    }
+
+    public function saveConfig(Application $app, array $cfg = array()){
+
+        $config = array(
+            'ytse.config' => array(),
+            'api.config' => array(),
+            'ytplaylist.config' => array(),
+            'oauth.config' => array(),
+            'captions.config' => array(),
+            'swiftmailer.options' => array(),
+        );
+
+        foreach ($config as $key => $val) {
+            
+            $app[$key] = $config[$key] = array_key_exists($key, $cfg) ? 
+                    array_merge($app[$key], $cfg[$key]) : 
+                    $app[$key];
+
+        }
+
+        $yaml = Yaml::dump($config);
+
+        $yaml = str_replace($app['ytse.root'], '%ytse.root%', $yaml);
+
+        file_put_contents(YTSE_CONFIG_FILE, $yaml);
+    }
+
+    public function sendApprovalEmail(array $item){
+
+        $name = $item['info']['user'];
+        $user = $this->app['users']->getUser($name);
+        $settings = $user->getUserSettings();
+
+        if (!$settings['email_notifications']) return; // don't spam if they don't want it
+
+        $to = $user->getEmail();
+        $lang_code = $item['info']['lang_code'];
+        $lang = $this->app['ytplaylist']->getLanguageDataByLangCode($lang_code);
+
+        $this->app['email_notification'](
+            $to, 
+            'Your translation has been approved!', 
+            'email-notify-approval.twig',
+            array(
+                'video' => $item['video'],
+                'lang' => $lang,
+                'user' => $user,
+                'info' => $item['info'],
+            )
+        );
+    }
+
+    public function sendRejectionEmail(array $item, $reason){
+
+        $name = $item['info']['user'];
+        $user = $this->app['users']->getUser($name);
+        $settings = $user->getUserSettings();
+
+        if (!$settings['email_notifications']) return; // don't spam if they don't want it
+
+        $to = $user->getEmail();
+        $lang_code = $item['info']['lang_code'];
+        $lang = $this->app['ytplaylist']->getLanguageDataByLangCode($lang_code);
+
+        $this->app['email_notification'](
+            $to, 
+            'Your translation was rejected', 
+            'email-notify-rejection.twig',
+            array(
+                'video' => $item['video'],
+                'lang' => $lang,
+                'user' => $user,
+                'info' => $item['info'],
+                'reason' => $reason,
+            )
+        );
+    }
 }

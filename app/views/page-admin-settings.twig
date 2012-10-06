@@ -1,0 +1,111 @@
+{% extends 'page-admin.twig' %}
+
+{% block title %}Settings | Administration{% endblock %}
+{% block description %}{% endblock %}
+
+{% set tab = 'settings' %}
+{% set containerClasses = 'admin' %}
+  
+{% block tab_content %}
+
+<div class="row-fluid">
+  <div class="col12">
+    <form action="{{app.url_generator.generate('admin_settings')}}" method="POST" class="form-horizontal">
+
+      <input type="hidden" name="continue" value="true"/>
+
+      <legend>Playlist</legend>
+
+      <div class="control-group">
+        <label class="control-label" for="playlist">Select which playlist you want to translate for:</label>
+        <div class="controls">
+          <select id="playlist" name="ytplaylist_config[playlist]">
+            {% for pl in playlists %}
+            <option value="{{pl.id}}" {{app['ytplaylist.config'].playlist == pl.id ? 'selected="selected"' : ''}}>{{pl.name}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="thumb">What thumbnail type do you want:</label>
+        <div class="controls">
+          <select id="thumb" name="api_config[thumbnail]">
+            {% for thumb in ['default', 'mqdefault', 'hqdefault'] %}
+            <option value="{{thumb}}" {{app['api.config'].thumbnail == thumb ? 'selected="selected"' : ''}}>{{thumb}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="defaultlang">Enter the default language code you want to use:</label>
+        <div class="controls">
+          <input type="text" id="defaultlang" name="ytplaylist_config[default_lang]" value="{{app['ytplaylist.config'].default_lang}}"/>
+        </div>
+      </div>
+
+      <legend>Email</legend>
+
+      <div class="control-group">
+        <label class="control-label" for="emailnotify">Administrator Email Addresses (comma separated):</label>
+        <div class="controls">
+          <input type="text" id="emailnotify" name="ytse_config[email_notify]" value="{{app['ytse.config'].email_notify | join(', ')}}"/>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="emailfrom">No-reply Email Address:</label>
+        <div class="controls">
+          <input type="text" id="emailfrom" name="ytse_config[email_from]" value="{{app['ytse.config'].email_from}}"/>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="smtphost">SMTP host:</label>
+        <div class="controls">
+          <input type="text" id="smtphost" name="swiftmailer_options[host]" value="{{app['swiftmailer.options'].host | default('localhost')}}"/>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="smtpport">SMTP port:</label>
+        <div class="controls">
+          <input type="text" id="smtpport" name="swiftmailer_options[port]" value="{{app['swiftmailer.options'].port | default(25)}}"/>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="smtpauth">SMTP auth mode:</label>
+        <div class="controls">
+          <select id="smtpauth" name="swiftmailer_options[auth_mode]">
+            <option value="true" {{ app['swiftmailer.options'].auth_mode ? 'selected="selected"' : '' }}>On</option>
+            <option value="false" {{ not app['swiftmailer.options'].auth_mode ? 'selected="selected"' : '' }}>Off</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="smtpuser">SMTP username:</label>
+        <div class="controls">
+          <input type="text" id="smtpuser" name="swiftmailer_options[username]" value="{{app['swiftmailer.options'].username}}"/>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="smtppass">SMTP password:</label>
+        <div class="controls">
+          <input type="text" id="smtppass" name="swiftmailer_options[password]" value="{{app['swiftmailer.options'].password}}"/>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="controls">
+          <button type="submit" class="btn btn-warning">Save</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

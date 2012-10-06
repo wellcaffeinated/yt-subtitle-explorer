@@ -1,32 +1,14 @@
-{% extends 'page-skeleton.twig' %}
+{% extends 'page-admin.twig' %}
 
 {% import "videolist.twig" as videoList %}
 
 {% block title %}Trash | Administration{% endblock %}
 {% block description %}Trash page{% endblock %}
 
+{% set tab = 'trash' %}
 {% set containerClasses = 'admin trash' %}
 
-{% set mm_on = app.maintenance_mode.isEnabled() %}
-
-{% block content %}
-<h1 class="page-header">Trash <small>(Archive)</small>{% include 'right-nav.twig' %}</h1>
-
-<a href="{{app.url_generator.generate('admin_main')}}" class="btn">Back to Admin Page</a>
-
-{% if error is defined and error is not empty %}
-<div class="alert alert-error">
-  <p><strong>Error</strong></p>
-  <p>{{error}}</p>
-</div>
-{% endif %}
-
-{% if msg is defined and msg is not empty %}
-<div class="alert alert-warning">
-  <p><strong>Attention</strong></p>
-  <p>{{msg}}</p>
-</div>
-{% endif %}
+{% block tab_content %}
 
 <h2 class="page-header">Approved Captions</h2>
 

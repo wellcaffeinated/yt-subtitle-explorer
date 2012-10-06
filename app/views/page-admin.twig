@@ -12,13 +12,13 @@
 {% block content %}
 <h1 class="page-header">Administration {% include 'right-nav.twig' %}</h1>
 
-<form action="{{app.url_generator.generate('admin_main')}}" method="POST" class="ctrl-admin-main btn-toolbar">
-  <div class="btn-group">
-    <a href="{{app.url_generator.generate('admin_refresh_data')}}" class="btn btn-primary">Refresh Video Data</a>
-    <button type="submit" name="action" value="maintenance" class="btn {{mm_on ? 'btn-danger' : 'btn-success' }}">{{mm_on ? 'Disable' : 'Enable'}} Maintenance Mode</button>
-    <a href="{{app.url_generator.generate('admin_trash')}}" class="btn btn-inverse">View Trash</a>
-  </div>
-</form>
+{% if mm_on %}<div class="alert alert-warning">Maintenance Mode is ON</div>{% endif %}
+
+<ul class="nav nav-tabs">
+  <li class="{{tab is not defined or tab == 'main'? 'active' : ''}}"><a href="{{app.url_generator.generate('admin_main')}}">Main</a></li>
+  <li class="{{tab == 'trash'? 'active' : ''}}"><a href="{{app.url_generator.generate('admin_trash')}}">Trash</a></li>
+  <li class="{{tab == 'settings'? 'active' : ''}}"><a href="{{app.url_generator.generate('admin_settings')}}">Settings</a></li>
+</ul>
 
 {% if error is defined and error is not empty %}
 <div class="alert alert-error">
@@ -34,57 +34,73 @@
 </div>
 {% endif %}
 
-{% if submissions is empty %}
-  <p>All up to date! No new submissions.</p>
-{% endif %}
+{% block tab_content %}
 
-{% for sub in submissions %}
-{% set video = app.ytplaylist.getVideoById(sub.videoId) %}
-
-<div class="row-fluid">
-  
-  {{ videoList.video(video, 4, true) }}
-
-  <div class="span8">
-
-    <h3>Submissions Pending Approval</h3>
-
-    <form action="{{app.url_generator.generate('admin_main')}}" method="POST">
-      <table class="table captions select-root">
-        <thead>
-          <tr>
-            <th><input type="checkbox" class="ctrl-select-all"/></th>
-            <th>Language</th>
-            <th>Submitted By</th>
-            <th>Date</th>
-            <th><button class="btn btn-primary ctrl-approve-all" type="submit" name="action" value="batch_approve">Approve Selected</button></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for lang in sub.captions %}
-          {% for cap in lang %}
-          <tr>
-            <td><input type="checkbox" class="ctrl-select" name="selected[]" value="{{cap.path}}"/></td>
-            <td>{{cap.lang_code}}</td>
-            <td>{{cap.user}}</td>
-            <td>{{cap.timestamp | date('m/d/Y')}}</td>
-            <td class="btn-group">
-
-              <a class="btn ctrl-view" title="view" href="{{app.url_generator.generate('admin_main', { path: cap.path, action: 'view' })}}"><i class="icon-search"></i></a>
-
-              <button class="btn btn-success ctrl-approve" title="approve" type="submit" name="action" value="approve:{{cap.path}}"><i class="icon-ok"></i></button>
-
-              <a href="{{app.url_generator.generate('admin_main')}}" data-path="{{cap.path}}" class="btn btn-danger ctrl-reject" title="reject"><i class="icon-remove"></i></a>
-
-            </td>
-          </tr>
-          {% endfor %}
-          {% endfor %}
-        </tbody>
-      </table>
-    </form>
+  <div class="btn-group pull-right">
+    <a class="btn dropdown-toggle btn-primary" data-toggle="dropdown" href="#">
+      <i class="icon-wrench icon-white"></i> 
+      Tools
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+      <li><a tabindex="-1" href="{{app.url_generator.generate('admin_refresh_data')}}"><i class="icon-refresh"></i> Refresh Video Data</a></li>
+      <li><a tabindex="-1" href="{{app.url_generator.generate('admin_main', {action: 'maintenance'})}}"><i class="{{mm_on ? 'icon-ok-circle' : 'icon-minus-sign' }}"></i> {{mm_on ? 'Disable' : 'Enable'}} Maintenance Mode</a></li>
+    </ul>
   </div>
-</div>
-{% endfor %}
+
+  <h2 class="page-header">Submissions Pending Approval</h2>
+
+  {% if submissions is empty %}
+    <p>All up to date! No new submissions.</p>
+  {% endif %}
+
+  {% for sub in submissions %}
+  {% set video = app.ytplaylist.getVideoById(sub.videoId) %}
+
+  <div class="row-fluid">
+    
+    {{ videoList.video(video, 4, true) }}
+
+    <div class="span8">
+
+      <form action="{{app.url_generator.generate('admin_main')}}" method="POST">
+        <table class="table captions select-root">
+          <thead>
+            <tr>
+              <th><input type="checkbox" class="ctrl-select-all"/></th>
+              <th>Language</th>
+              <th>Submitted By</th>
+              <th>Date</th>
+              <th><button class="btn btn-primary ctrl-approve-all" type="submit" name="action" value="batch_approve">Approve Selected</button></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for lang in sub.captions %}
+            {% for cap in lang %}
+            <tr>
+              <td><input type="checkbox" class="ctrl-select" name="selected[]" value="{{cap.path}}"/></td>
+              <td>{{cap.lang_code}}</td>
+              <td>{{cap.user}}</td>
+              <td>{{cap.timestamp | date('m/d/Y')}}</td>
+              <td class="btn-group">
+
+                <a class="btn ctrl-view" title="view" href="{{app.url_generator.generate('admin_main', { path: cap.path, action: 'view' })}}"><i class="icon-search"></i></a>
+
+                <button class="btn btn-success ctrl-approve" title="approve" type="submit" name="action" value="approve:{{cap.path}}"><i class="icon-ok"></i></button>
+
+                <a href="{{app.url_generator.generate('admin_main')}}" data-path="{{cap.path}}" class="btn btn-danger ctrl-reject" title="reject"><i class="icon-remove"></i></a>
+
+              </td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+
+{% endblock %}
     
 {% endblock %}
