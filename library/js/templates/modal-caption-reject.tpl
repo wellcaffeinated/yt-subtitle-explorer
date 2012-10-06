@@ -6,12 +6,14 @@
 	<form action="{{action}}" method="POST">
 		<div class="modal-body">
 			<p>Please provide a reason for the rejection.</p>
-			<select name="reason">
-				<option>Incomplete Translation</option>
-				<option>Spam</option>
+			<select name="reason" class="rejection-reasons">
+				{{#reasons}}
+				<option>{{.}}</option>
+				{{/reasons}}
 				<option>other</option>
 			</select>
-			<input type="text" name="other_reason" placeholder="other reason (select other above)"/>
+			<br/>
+			<input type="text" name="other_reason" class="other-reason" placeholder="other reason"/>
 			<input type="hidden" name="path" value="{{path}}"/>
 		</div>
 		<div class="modal-footer">

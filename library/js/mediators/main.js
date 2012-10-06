@@ -11,9 +11,7 @@ define(
         'stapes',
         'modules/language-search',
         'modules/toggle-ctrl',
-        'plugins/tpl!templates/video-modal.tpl',
-        'plugins/tpl!templates/caption-modal.tpl',
-        'plugins/tpl!templates/modal-caption-reject.tpl',
+        'modules/video-modal',
         'bootstrap'
     ],
     function(
@@ -21,9 +19,7 @@ define(
         Stapes,
         languageSearch,
         toggleCtrl,
-        tplVideoModal,
-        tplCaptionModal,
-        tplModalCaptionReject
+        videoModal
     ){
         'use strict';
 
@@ -37,27 +33,8 @@ define(
                     ,negateCtrl
                     ;
 
-                // open overlays on watch click
-                $(document).on('click', '.video .ctrl-watch', function(e){
-
-                    var $this = $(this)
-                        ,$video = $this.parents('.video')
-                        ;
-
-                    e.preventDefault();
-
-                    $(tplVideoModal.render({
-
-                        title: $video.find('.video-title').text(),
-                        ytid: $video.data('ytid'),
-                        subtitle: $this.data('lang')
-
-                    })).modal().on('hidden', function () {
-                        
-                        // destroy it when closed so video stops
-                        $(this).remove();
-                    });
-
+                videoModal.init({
+                    'els': '.video .ctrl-watch'
                 });
 
                 negateCtrl = toggleCtrl().init({
@@ -115,65 +92,6 @@ define(
                     }, self);
 
                 });
-
-                /**
-                 * Admin controls
-                 */
-                $(document)
-                    .on('click', '.admin .captions .ctrl-view', function(e){
-
-                        e.preventDefault();
-                        
-                        var $this = $(this)
-                            ,href = $this.attr('href')
-                            ,btnApprove = $this.siblings('.ctrl-approve')
-                            ,approveHref = btnApprove.length? $this.parents('form').attr('action') + '?' + btnApprove.attr('name') + '=' + encodeURIComponent(btnApprove.attr('value')) : false
-                            ;
-
-                        self.showRemoteModal(href, {
-
-                            title: 'Caption',
-                            approveHref: approveHref
-                        });
-
-                    })
-                    .on('change', '.ctrl-select-all', function(e){
-
-                        var $this = $(this)
-                            ,checked = $this.is(':checked')
-                            ,checkboxes = $this.parents('.select-root').find('.ctrl-select')
-                            ;
-
-                        e.preventDefault();
-
-                        if (checked){
-
-                            checkboxes.attr('checked', 'checked');
-
-                        } else {
-
-                            checkboxes.removeAttr('checked');
-                        }
-
-                    })
-                    .on('click', '.admin .captions .ctrl-reject', function(e){
-
-                        e.preventDefault();
-                        var $this = $(this);
-
-                        $(tplModalCaptionReject.render({
-
-                            action: $this.attr('href'),
-                            path: $this.data('path')
-
-                        })).modal().on('hidden', function () {
-                            
-                            // destroy it when closed so video stops
-                            $(this).remove();
-                        });
-
-                    })
-                    ;
             },
 
             filterVids: function(){
@@ -195,30 +113,7 @@ define(
                         el.remove();
                     }
                 })
-            },
-
-            showRemoteModal: function(url, params){
-
-                $.ajax({
-
-                    url: url
-
-                }).done(function( content ){
-
-                    $(tplCaptionModal.render(
-                        $.extend({
-                        
-                            content: content
-
-                        }, params)
-                    )).modal().on('hidden', function () {
-                        
-                        // destroy it when closed so video stops
-                        $(this).remove();
-                    });
-                });      
             }
-
         });
 
         mediator.init();

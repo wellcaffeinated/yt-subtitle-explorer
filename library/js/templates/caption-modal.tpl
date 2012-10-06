@@ -16,7 +16,7 @@
       <form action="http://translate.google.com" method="POST" target="_blank" class="pull-left">
         <input type="hidden" name="text" value="{{content}}" />
         <input type="hidden" name="sl" value="auto" />
-        <button type="submit" class="btn ctrl-translate" title="translate" href="{{app.url_generator.generate('admin_main', { path: cap.path, action: 'translate' })}}"><i class="icon-globe"></i> View Translated</button>
+        <button type="submit" class="btn ctrl-translate" title="translate"><i class="icon-globe"></i> View Translated</button>
       </form>
       
       {{#approveHref}}

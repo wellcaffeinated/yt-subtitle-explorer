@@ -157,6 +157,10 @@ Modals
     box-sizing: border-box;
 }
 
+.caption-reject-modal .other-reason {
+    display: none;
+}
+
 /*
 Footer
  */

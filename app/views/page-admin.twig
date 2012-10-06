@@ -1,5 +1,7 @@
 {% extends 'page-skeleton.twig' %}
 
+{% block bootfile %}core-admin{% endblock %}
+
 {% import "videolist.twig" as videoList %}
 
 {% block title %}Administration{% endblock %}
@@ -10,6 +12,10 @@
 {% set mm_on = app.maintenance_mode.isEnabled() %}
 
 {% block content %}
+<script id="caption-rejection-reasons" type="text">
+{% include 'rejection-reasons.twig' %}
+</script>
+
 <h1 class="page-header">Administration {% include 'right-nav.twig' %}</h1>
 
 {% if mm_on %}<div class="alert alert-warning">Maintenance Mode is ON</div>{% endif %}
