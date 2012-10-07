@@ -464,6 +464,16 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
         })->method('GET|POST')
         ->bind('admin_settings');
 
+        /**
+         * Update route
+         */
+        $controller->match('/update', function(Request $req, Application $app) use ($self) {
+
+            return $app['twig']->render('page-admin-update.twig', array(
+            ));
+        })->method('GET|POST')
+        ->bind('admin_update');
+
         return $controller;
     }
 

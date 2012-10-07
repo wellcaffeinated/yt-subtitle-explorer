@@ -1,0 +1,31 @@
+{% extends 'page-admin.twig' %}
+
+{% block title %}Update | Administration{% endblock %}
+{% block description %}{% endblock %}
+
+{% set tab = 'update' %}
+{% set containerClasses = 'admin' %}
+  
+{% block tab_content %}
+
+<div class="row-fluid">
+  <div class="col12">
+
+    {% if app.auto_update.needsUpdate() %}
+    <div class="alert alert-info">
+      <p>New version available ({{app.auto_update.getLatestVersion()}}).</p>
+      <p><a href="{{app.url_generator.generate('admin_update', { action: 'update' })}}">Click here to Update Now.</a></p>
+    </div>
+    {% elseif app.auto_update.needsUpdate() is null %}
+    <div class="alert alert-error">
+      <p>Problem getting update data from server.</p>
+    </div>    
+    {% else %}
+    <div class="alert alert-success">
+      <p>All up to date!</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

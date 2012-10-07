@@ -12,11 +12,11 @@ namespace YTSE\Util;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
-class StateManagerProvider implements ServiceProviderInterface {
+class AutoUpdateProvider implements ServiceProviderInterface {
     
     public function register(Application $app){
 
-        $app['ytse_version'] = $app->share(function(){
+        $app['ytse_version'] = $app->share(function($app){
 
             return file_get_contents($app['ytse.root'].'/app/data/version.txt');
         });
