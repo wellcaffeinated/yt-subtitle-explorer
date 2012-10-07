@@ -8,7 +8,6 @@
 require.config({ 
       
     waitSeconds: 30,
-    urlArgs: 'v=0.2b',
 
     shim: {
         'bootstrap': ['jquery']
