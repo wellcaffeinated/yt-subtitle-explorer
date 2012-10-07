@@ -79,8 +79,9 @@
         <label class="control-label" for="smtpauth">SMTP auth mode:</label>
         <div class="controls">
           <select id="smtpauth" name="swiftmailer_options[auth_mode]">
-            <option value="true" {{ app['swiftmailer.options'].auth_mode ? 'selected="selected"' : '' }}>On</option>
-            <option value="false" {{ not app['swiftmailer.options'].auth_mode ? 'selected="selected"' : '' }}>Off</option>
+            {% set auth_mode = app['swiftmailer.options'] is defined and app['swiftmailer.options'].auth_mode is defined and app['swiftmailer.options'].auth_mode %}
+            <option value="true" {{ auth_mode ? 'selected="selected"' : '' }}>On</option>
+            <option value="false" {{ not auth_mode ? 'selected="selected"' : '' }}>Off</option>
           </select>
         </div>
       </div>
@@ -88,14 +89,14 @@
       <div class="control-group">
         <label class="control-label" for="smtpuser">SMTP username:</label>
         <div class="controls">
-          <input type="text" id="smtpuser" name="swiftmailer_options[username]" value="{{app['swiftmailer.options'].username}}"/>
+          <input type="text" id="smtpuser" name="swiftmailer_options[username]" value="{{app['swiftmailer.options'].username | default('')}}"/>
         </div>
       </div>
 
       <div class="control-group">
         <label class="control-label" for="smtppass">SMTP password:</label>
         <div class="controls">
-          <input type="text" id="smtppass" name="swiftmailer_options[password]" value="{{app['swiftmailer.options'].password}}"/>
+          <input type="text" id="smtppass" name="swiftmailer_options[password]" value="{{app['swiftmailer.options'].password | default('') }}"/>
         </div>
       </div>
 

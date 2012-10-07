@@ -22,8 +22,8 @@
 
 <ul class="nav nav-tabs">
   <li class="{{tab is not defined or tab == 'main'? 'active' : ''}}"><a href="{{app.url_generator.generate('admin_main')}}">Main</a></li>
-  <li class="{{tab == 'trash'? 'active' : ''}}"><a href="{{app.url_generator.generate('admin_trash')}}">Trash</a></li>
-  <li class="{{tab == 'settings'? 'active' : ''}}"><a href="{{app.url_generator.generate('admin_settings')}}">Settings</a></li>
+  <li class="{{tab is defined and tab == 'trash'? 'active' : ''}}"><a href="{{app.url_generator.generate('admin_trash')}}">Trash</a></li>
+  <li class="{{tab is defined and tab == 'settings'? 'active' : ''}}"><a href="{{app.url_generator.generate('admin_settings')}}">Settings</a></li>
 </ul>
 
 {% if error is defined and error is not empty %}
