@@ -267,7 +267,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
         })->bind('admin_refresh_data');
 
         /**
-         * Main admin route
+         * Trash admin route
          */
         $controller->match('/trash', function(Request $req, Application $app) use ($self) {
 
@@ -374,7 +374,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
         ->bind('admin_trash');
 
         /**
-         * Main admin route
+         * Settings admin route
          */
         $controller->match('/settings', function(Request $req, Application $app) use ($self) {
 
