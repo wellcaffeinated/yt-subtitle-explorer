@@ -469,6 +469,17 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
          */
         $controller->match('/update', function(Request $req, Application $app) use ($self) {
 
+            $action = $req->get('action');
+            $error = '';
+            $msg = '';
+
+            if ($action === 'update'){
+
+                $app['auto_update']->start();
+
+                return $app->redirect($app['url_generator']->generate('admin_update'));
+            }
+
             return $app['twig']->render('page-admin-update.twig', array(
             ));
         })->method('GET|POST')

@@ -13,8 +13,8 @@
 
     {% if app.auto_update.needsUpdate() %}
     <div class="alert alert-info">
-      <p>New version available ({{app.auto_update.getLatestVersion()}}).</p>
-      <p><a href="{{app.url_generator.generate('admin_update', { action: 'update' })}}">Click here to Update Now.</a></p>
+      <h3>New version available</h3>
+      <p><a class="btn btn-primary" data-loading-text="Updating..." href="{{app.url_generator.generate('admin_update', { action: 'update' })}}">Automatically update to version {{app.auto_update.getLatestVersion()}} now</a></p>
     </div>
     {% elseif app.auto_update.needsUpdate() is null %}
     <div class="alert alert-error">

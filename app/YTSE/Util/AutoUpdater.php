@@ -66,5 +66,10 @@ class AutoUpdater {
 
         return (version_compare($this->version, $this->getLatestVersion()) < 0);
     }
+
+    public function start(){
+
+        sleep(1);
+    }
     
 }
