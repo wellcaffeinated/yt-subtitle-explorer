@@ -8,7 +8,6 @@
 # debug: true
 
 ytse.config:
-    version: 0.2b
     # path to create sqlite database
     db.path: %ytse.root%/user/db/ytse.db
     # list of email addresses to notify about new submissions

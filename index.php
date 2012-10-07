@@ -59,6 +59,8 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
     ),
 ));
 
+// auto update
+$app->register(new YTSE\Util\AutoUpdateProvider());
 // state manager
 $app->register(new YTSE\Util\StateManagerProvider());
 // email notifications
