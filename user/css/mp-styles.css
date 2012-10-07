@@ -1,0 +1,52 @@
+
+.mp-header {
+    overflow: hidden;
+    padding: 0 19px;
+}
+
+.mp-header h1 {
+    background: url(../img/text-minute-physics.png) no-repeat 0 bottom;
+    width: 255px;
+    height: 142px;
+    overflow: hidden;
+    text-indent: -999em;
+    float: left;
+    margin: 0;
+}
+.mp-header .mp-collider {
+    float: right;
+}
+
+.mp-header-left {
+    overflow: hidden;
+    width: 520px;
+}
+
+.mp-header .inner {
+    overflow: hidden;
+}
+
+@media screen and (min-width: 980px) {
+    .mp-header-left {
+        float: left;
+    }
+    .mp-header .translate-text {
+        float: left;
+        width: 40%;
+        margin-top: 30px;
+        padding-left: 20px;
+    }
+}
+
+/*
+404 page
+ */
+
+.page-404 {
+    text-align: center;
+}
+
+.page-404 .msg {
+    font-size: 1.5em;
+    margin: 2em 0;
+}

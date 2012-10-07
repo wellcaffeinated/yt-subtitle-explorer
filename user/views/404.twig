@@ -1,0 +1,12 @@
+{% extends 'page-skeleton.twig' %}
+
+{% block title %}Not Found{% endblock %}
+{% block description %}{% endblock %}
+
+{% set containerClasses = 'page-404' %}
+
+{% block content %}
+  <h1 class="page-header">Umm...</h1>
+  <img src="{{root}}/user/img/404-cat.png" alt="Minute Physics 404 Cat"/>
+  <p class="msg">{{msg}}</p>
+{% endblock %}
