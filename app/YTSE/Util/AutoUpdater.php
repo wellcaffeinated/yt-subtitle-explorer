@@ -34,10 +34,14 @@ class AutoUpdater {
             
         ));
 
-        $this->getUpdateMetadata();
+        $this->fetchUpdateMetadata();
     }
 
-    private function getUpdateMetadata(){
+    /**
+     * Fetch metadata from server
+     * @return void
+     */
+    private function fetchUpdateMetadata(){
 
         try {
 
@@ -52,6 +56,10 @@ class AutoUpdater {
         $this->meta = json_decode($json, true);
     }
 
+    /**
+     * Get latest version
+     * @return string version string for latest
+     */
     public function getLatestVersion(){
 
         if (!$this->meta) return $this->version;
@@ -61,6 +69,10 @@ class AutoUpdater {
         return $latest['version'];
     }
     
+    /**
+     * Answer question. Do we need to update?
+     * @return boolean
+     */
     public function needsUpdate(){
 
         if (!$this->meta){
@@ -70,21 +82,37 @@ class AutoUpdater {
         return (version_compare($this->version, $this->getLatestVersion()) < 0);
     }
 
+    /**
+     * Is there a lockfile already?
+     * @return boolean
+     */
     private function hasLockfile(){
 
         return is_file($this->lockfile);
     }
 
+    /**
+     * Create a lockfile
+     */
     private function addLockfile(){
 
         touch($this->lockfile);
     }
 
+    /**
+     * remove the lockfile
+     * @return void
+     */
     private function removeLockfile(){
 
         unlink($this->lockfile);
     }
 
+    /**
+     * Start the update process
+     * @param  \Silex\Application $app The main silex application
+     * @return void
+     */
     public function start(\Silex\Application $app){
 
         if (!$this->needsUpdate()) return;
@@ -96,12 +124,14 @@ class AutoUpdater {
 
             // iterate up through versions
             $i = count($this->meta);
-            while ($i-- >= 0){
+            $continue;
+            while ($i-- >= 0 && $continue !== false){
 
                 // if current version is larger... keep going...
                 if (version_compare($this->version, $this->meta[$i]['version']) >= 0) continue;
 
-                $this->doUpdate($app, $this->meta[$i]);
+                // if continue is false, it's not an error... it just means we want to refresh the script before proceeding
+                $continue = $this->doUpdate($app, $this->meta[$i]);
             }
             
         } catch (\Exception $e) {
@@ -113,8 +143,15 @@ class AutoUpdater {
         $this->removeLockfile();
     }
     
+    /**
+     * Do a single update to version with specified metadata
+     * @param  \Silex\Application $app  Silex application
+     * @param  array             $meta  metadata
+     * @return boolean                  the return value of the update script.
+     */
     private function doUpdate(\Silex\Application $app, $meta){
 
+        $ret = true;
         $basedir = sys_get_temp_dir();
 
         // get package
@@ -149,12 +186,14 @@ class AutoUpdater {
 
             if (is_callable($fn)){
 
-                $fn($app);
+                $ret = $fn($app);
 
                 $app['monolog']->addDebug('Updater: ran update script in '.$script);
             }
         }
 
         $this->version = $meta['version'];
+
+        return $ret;
     }
 }
