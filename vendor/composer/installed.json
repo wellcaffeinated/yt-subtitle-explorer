@@ -1,56 +1,158 @@
 [
     {
-        "name": "swiftmailer/swiftmailer",
-        "version": "v4.1.8",
-        "version_normalized": "4.1.8.0",
+        "name": "pimple/pimple",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
         "source": {
             "type": "git",
-            "url": "git://github.com/swiftmailer/swiftmailer.git",
-            "reference": "v4.1.8"
+            "url": "git://github.com/fabpot/Pimple.git",
+            "reference": "b9f27b8dc18c08f00627dec02359b46a24791dc3"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/swiftmailer/swiftmailer/zipball/v4.1.8",
-            "reference": "v4.1.8",
+            "url": "https://github.com/fabpot/Pimple/zipball/b9f27b8dc18c08f00627dec02359b46a24791dc3",
+            "reference": "b9f27b8dc18c08f00627dec02359b46a24791dc3",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "time": "2012-09-10 12:09:48",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.0.x-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Pimple": "lib/"
+            }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            }
+        ],
+        "description": "Pimple is a simple Dependency Injection Container for PHP 5.3",
+        "homepage": "http://pimple.sensiolabs.org",
+        "keywords": [
+            "dependency injection",
+            "container"
+        ]
+    },
+    {
+        "name": "symfony/routing",
+        "version": "2.1.x-dev",
+        "version_normalized": "2.1.9999999.9999999-dev",
+        "target-dir": "Symfony/Component/Routing",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/Routing",
+            "reference": "0443e2f9a10f49cac77128eb7f11d055fcf4db9d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/symfony/Routing/zipball/0443e2f9a10f49cac77128eb7f11d055fcf4db9d",
+            "reference": "0443e2f9a10f49cac77128eb7f11d055fcf4db9d",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "symfony/config": "2.1.*",
+            "symfony/yaml": "2.1.*",
+            "symfony/http-kernel": "2.1.*",
+            "doctrine/common": ">=2.2,<2.4-dev"
+        },
+        "suggest": {
+            "doctrine/common": ">=2.2,<2.4-dev",
+            "symfony/config": "2.1.*",
+            "symfony/yaml": "2.1.*"
+        },
+        "time": "2012-10-04 08:17:57",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.1-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\Routing": ""
+            }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony Routing Component",
+        "homepage": "http://symfony.com"
+    },
+    {
+        "name": "twig/twig",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "git://github.com/fabpot/Twig.git",
+            "reference": "347bc81d6ed8e2bb793236aa9917c7e83f81c2b3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/fabpot/Twig/zipball/347bc81d6ed8e2bb793236aa9917c7e83f81c2b3",
+            "reference": "347bc81d6ed8e2bb793236aa9917c7e83f81c2b3",
             "shasum": ""
         },
         "require": {
             "php": ">=5.2.4"
         },
+        "time": "2012-10-08 06:20:00",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "4.1-dev"
+                "dev-master": "1.10-dev"
             }
         },
-        "installation-source": "dist",
+        "installation-source": "source",
         "autoload": {
-            "files": [
-                "lib/swift_required.php"
-            ]
+            "psr-0": {
+                "Twig_": "lib/"
+            }
         },
         "license": [
-            "LGPL"
+            "BSD-3"
         ],
         "authors": [
             {
                 "name": "Fabien Potencier",
-                "email": "fabien@symfony.com",
-                "homepage": null,
-                "role": null
+                "email": "fabien@symfony.com"
             },
             {
-                "name": "Chris Corbyn",
-                "email": "",
-                "homepage": null,
-                "role": null
+                "name": "Armin Ronacher",
+                "email": "armin.ronacher@active-4.com"
             }
         ],
-        "description": "Swiftmailer, free feature-rich PHP mailer",
-        "homepage": "http://swiftmailer.org",
+        "description": "Twig, the flexible, fast, and secure template language for PHP",
+        "homepage": "http://twig.sensiolabs.org",
         "keywords": [
-            "mail",
-            "mailer"
+            "templating"
         ]
     },
     {
@@ -71,183 +173,52 @@
         "require": {
             "php": ">=5.3.2"
         },
+        "time": "2012-08-29 08:04:14",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
             "psr-0": {
                 "Doctrine\\Common": "lib/"
             }
-        }
-    },
-    {
-        "name": "illuminate/socialite",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "http://github.com/illuminate/socialite",
-            "reference": "v1.0.1"
         },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/illuminate/socialite/zipball/v1.0.1",
-            "reference": "v1.0.1",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0",
-            "symfony/http-foundation": "2.*",
-            "guzzle/guzzle": "2.*"
-        },
-        "require-dev": {
-            "mockery/mockery": "0.7.*"
-        },
-        "type": "library",
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Illuminate\\Socialite": "src/"
+        "license": [
+            "LGPL"
+        ],
+        "authors": [
+            {
+                "name": "Jonathan Wage",
+                "email": "jonwage@gmail.com",
+                "homepage": "http://www.jwage.com/"
+            },
+            {
+                "name": "Guilherme Blanco",
+                "email": "guilhermeblanco@gmail.com",
+                "homepage": "http://www.instaclick.com"
+            },
+            {
+                "name": "Roman Borschel",
+                "email": "roman@code-factory.org"
+            },
+            {
+                "name": "Benjamin Eberlei",
+                "email": "kontakt@beberlei.de"
+            },
+            {
+                "name": "Johannes Schmitt",
+                "email": "schmittjoh@gmail.com",
+                "homepage": "https://github.com/schmittjoh",
+                "role": "Developer of wrapped JMSSerializerBundle"
             }
-        }
-    },
-    {
-        "name": "pimple/pimple",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "git://github.com/fabpot/Pimple.git",
-            "reference": "b9f27b8dc18c08f00627dec02359b46a24791dc3"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/fabpot/Pimple/zipball/b9f27b8dc18c08f00627dec02359b46a24791dc3",
-            "reference": "b9f27b8dc18c08f00627dec02359b46a24791dc3",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.0.x-dev"
-            }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Pimple": "lib/"
-            }
-        }
-    },
-    {
-        "name": "symfony/yaml",
-        "version": "2.1.x-dev",
-        "version_normalized": "2.1.9999999.9999999-dev",
-        "target-dir": "Symfony/Component/Yaml",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/Yaml",
-            "reference": "v2.1.0-RC2"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/symfony/Yaml/zipball/v2.1.0-RC2",
-            "reference": "v2.1.0-RC2",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.1-dev"
-            }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\Yaml": ""
-            }
-        }
-    },
-    {
-        "name": "igorw/config-service-provider",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/igorw/ConfigServiceProvider",
-            "reference": "ca8b3710cc3a6a397ec42d8163766920e90c920a"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/igorw/ConfigServiceProvider/zipball/ca8b3710cc3a6a397ec42d8163766920e90c920a",
-            "reference": "ca8b3710cc3a6a397ec42d8163766920e90c920a",
-            "shasum": ""
-        },
-        "require": {
-            "silex/silex": "1.0.*"
-        },
-        "require-dev": {
-            "symfony/yaml": "2.1.*"
-        },
-        "suggest": {
-            "symfony/yaml": "2.1.*"
-        },
-        "type": "library",
-        "extra": {
-            "branch-alias": [
-
-    ]
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Igorw\\Silex": "src"
-            }
-        }
-    },
-    {
-        "name": "monolog/monolog",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/Seldaek/monolog",
-            "reference": "0f3dc95c4a0ed7d17bec237d07af3da6c0c1071a"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/Seldaek/monolog/zipball/0f3dc95c4a0ed7d17bec237d07af3da6c0c1071a",
-            "reference": "0f3dc95c4a0ed7d17bec237d07af3da6c0c1071a",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "require-dev": {
-            "mlehner/gelf-php": "1.0.*"
-        },
-        "suggest": {
-            "mlehner/gelf-php": "Allow sending log messages to a GrayLog2 server",
-            "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
-            "ext-mongo": "Allow sending log messages to a MongoDB server"
-        },
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.3.x-dev"
-            }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Monolog": "src/"
-            }
-        }
+        ],
+        "description": "Common Library for Doctrine projects",
+        "homepage": "http://www.doctrine-project.org",
+        "keywords": [
+            "collections",
+            "spl",
+            "eventmanager",
+            "annotations",
+            "persistence"
+        ]
     },
     {
         "name": "symfony/http-foundation",
@@ -257,17 +228,18 @@
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/HttpFoundation",
-            "reference": "v2.1.1"
+            "reference": "5f18e1d5b901b320d05230aa91934e7d81f64bb4"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/symfony/HttpFoundation/zipball/v2.1.1",
-            "reference": "v2.1.1",
+            "url": "https://github.com/symfony/HttpFoundation/zipball/5f18e1d5b901b320d05230aa91934e7d81f64bb4",
+            "reference": "5f18e1d5b901b320d05230aa91934e7d81f64bb4",
             "shasum": ""
         },
         "require": {
             "php": ">=5.3.3"
         },
+        "time": "2012-10-06 12:54:37",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -280,7 +252,22 @@
                 "Symfony\\Component\\HttpFoundation": "",
                 "SessionHandlerInterface": "Symfony/Component/HttpFoundation/Resources/stubs"
             }
-        }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony HttpFoundation Component",
+        "homepage": "http://symfony.com"
     },
     {
         "name": "symfony/event-dispatcher",
@@ -290,12 +277,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/EventDispatcher",
-            "reference": "v2.1.1"
+            "reference": "fb273317c0505ba657aa3d727530d36ae671fb82"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/symfony/EventDispatcher/zipball/v2.1.1",
-            "reference": "v2.1.1",
+            "url": "https://github.com/symfony/EventDispatcher/zipball/fb273317c0505ba657aa3d727530d36ae671fb82",
+            "reference": "fb273317c0505ba657aa3d727530d36ae671fb82",
             "shasum": ""
         },
         "require": {
@@ -308,6 +295,7 @@
             "symfony/dependency-injection": "2.1.*",
             "symfony/http-kernel": "2.1.*"
         },
+        "time": "2012-10-04 08:17:57",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -319,7 +307,22 @@
             "psr-0": {
                 "Symfony\\Component\\EventDispatcher": ""
             }
-        }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony EventDispatcher Component",
+        "homepage": "http://symfony.com"
     },
     {
         "name": "symfony/http-kernel",
@@ -329,12 +332,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/HttpKernel",
-            "reference": "584499e64026f41c4be938ed35d8f0a9a9eebd38"
+            "reference": "676a7bb2c6c4d5669ca073cceae3ac393748752a"
         },
         "dist": {
             "type": "zip",
-            "url": "https://github.com/symfony/HttpKernel/zipball/584499e64026f41c4be938ed35d8f0a9a9eebd38",
-            "reference": "584499e64026f41c4be938ed35d8f0a9a9eebd38",
+            "url": "https://github.com/symfony/HttpKernel/zipball/676a7bb2c6c4d5669ca073cceae3ac393748752a",
+            "reference": "676a7bb2c6c4d5669ca073cceae3ac393748752a",
             "shasum": ""
         },
         "require": {
@@ -360,6 +363,7 @@
             "symfony/dependency-injection": "2.1.*",
             "symfony/finder": "2.1.*"
         },
+        "time": "2012-10-06 12:54:37",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -371,208 +375,22 @@
             "psr-0": {
                 "Symfony\\Component\\HttpKernel": ""
             }
-        }
-    },
-    {
-        "name": "symfony/routing",
-        "version": "2.1.x-dev",
-        "version_normalized": "2.1.9999999.9999999-dev",
-        "target-dir": "Symfony/Component/Routing",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/Routing",
-            "reference": "v2.1.1"
         },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/symfony/Routing/zipball/v2.1.1",
-            "reference": "v2.1.1",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "symfony/config": "2.1.*",
-            "symfony/yaml": "2.1.*",
-            "symfony/http-kernel": "2.1.*",
-            "doctrine/common": ">=2.2,<2.4-dev"
-        },
-        "suggest": {
-            "doctrine/common": ">=2.2,<2.4-dev",
-            "symfony/config": "2.1.*",
-            "symfony/yaml": "2.1.*"
-        },
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.1-dev"
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
             }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\Routing": ""
-            }
-        }
-    },
-    {
-        "name": "twig/twig",
-        "version": "dev-master",
-        "version_normalized": "9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "git://github.com/fabpot/Twig.git",
-            "reference": "347bc81d6ed8e2bb793236aa9917c7e83f81c2b3"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/fabpot/Twig/zipball/347bc81d6ed8e2bb793236aa9917c7e83f81c2b3",
-            "reference": "347bc81d6ed8e2bb793236aa9917c7e83f81c2b3",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.2.4"
-        },
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.10-dev"
-            }
-        },
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Twig_": "lib/"
-            }
-        }
-    },
-    {
-        "name": "guzzle/guzzle",
-        "version": "v2.8.7",
-        "version_normalized": "2.8.7.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/guzzle/guzzle",
-            "reference": "v2.8.7"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/guzzle/guzzle/zipball/v2.8.7",
-            "reference": "v2.8.7",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.2",
-            "ext-curl": "*",
-            "symfony/event-dispatcher": "2.1.*"
-        },
-        "replace": {
-            "guzzle/common": "self.version",
-            "guzzle/http": "self.version",
-            "guzzle/parser": "self.version"
-        },
-        "require-dev": {
-            "doctrine/common": "*",
-            "symfony/class-loader": "*",
-            "monolog/monolog": "1.*",
-            "zendframework/zend-cache": "2.0.0beta4",
-            "zendframework/zend-log": "2.0.0beta4",
-            "zendframework/zend-loader": "2.0.0beta4",
-            "zendframework/zend-stdlib": "2.0.0beta4",
-            "zendframework/zend-eventmanager": "2.0.0beta4",
-            "zendframework/zend-servicemanager": "2.0.0beta4",
-            "zend/zend-log1": "1.12",
-            "zend/zend-cache1": "1.12"
-        },
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Guzzle\\Tests": "tests/",
-                "Guzzle": "src/"
-            }
-        }
-    },
-    {
-        "name": "heartsentwined/arg-validator",
-        "version": "1.1.3",
-        "version_normalized": "1.1.3.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/heartsentwined/arg-validator",
-            "reference": "1.1.3"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/heartsentwined/arg-validator/zipball/1.1.3",
-            "reference": "1.1.3",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Heartsentwined\\ArgValidator": "src/"
-            }
-        }
-    },
-    {
-        "name": "heartsentwined/file-system-manager",
-        "version": "1.1.3",
-        "version_normalized": "1.1.3.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/heartsentwined/file-system-manager",
-            "reference": "1.1.3"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/heartsentwined/file-system-manager/zipball/1.1.3",
-            "reference": "1.1.3",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3",
-            "heartsentwined/arg-validator": "1.*"
-        },
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Heartsentwined\\FileSystemManager": "src/"
-            }
-        }
-    },
-    {
-        "name": "doctrine/dbal",
-        "version": "2.2.x-dev",
-        "version_normalized": "2.2.9999999.9999999-dev",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/doctrine/dbal",
-            "reference": "912c2de3a7b702db9568f7da147c5c65a792eb98"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://github.com/doctrine/dbal/zipball/912c2de3a7b702db9568f7da147c5c65a792eb98",
-            "reference": "912c2de3a7b702db9568f7da147c5c65a792eb98",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.2",
-            "doctrine/common": ">=2.2.0,<=2.2.99"
-        },
-        "type": "library",
-        "installation-source": "source",
-        "autoload": {
-            "psr-0": {
-                "Doctrine\\DBAL": "lib/"
-            }
-        }
+        ],
+        "description": "Symfony HttpKernel Component",
+        "homepage": "http://symfony.com"
     },
     {
         "name": "silex/silex",
@@ -620,6 +438,7 @@
             "symfony/css-selector": "2.1.*",
             "symfony/dom-crawler": "2.1.*"
         },
+        "time": "2012-09-30 06:59:50",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -631,6 +450,503 @@
             "psr-0": {
                 "Silex": "src/"
             }
-        }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Igor Wiedler",
+                "email": "igor@wiedler.ch",
+                "homepage": "http://wiedler.ch/igor/"
+            }
+        ],
+        "description": "The PHP micro-framework based on the Symfony2 Components",
+        "homepage": "http://silex.sensiolabs.org",
+        "keywords": [
+            "microframework"
+        ]
+    },
+    {
+        "name": "doctrine/dbal",
+        "version": "2.2.x-dev",
+        "version_normalized": "2.2.9999999.9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/doctrine/dbal",
+            "reference": "912c2de3a7b702db9568f7da147c5c65a792eb98"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/doctrine/dbal/zipball/912c2de3a7b702db9568f7da147c5c65a792eb98",
+            "reference": "912c2de3a7b702db9568f7da147c5c65a792eb98",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.2",
+            "doctrine/common": ">=2.2.0,<=2.2.99"
+        },
+        "time": "2012-10-06 03:22:57",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Doctrine\\DBAL": "lib/"
+            }
+        },
+        "license": [
+            "LGPL"
+        ],
+        "authors": [
+            {
+                "name": "Jonathan Wage",
+                "email": "jonwage@gmail.com",
+                "homepage": "http://www.jwage.com/"
+            },
+            {
+                "name": "Guilherme Blanco",
+                "email": "guilhermeblanco@gmail.com",
+                "homepage": "http://www.instaclick.com"
+            },
+            {
+                "name": "Roman Borschel",
+                "email": "roman@code-factory.org"
+            },
+            {
+                "name": "Benjamin Eberlei",
+                "email": "kontakt@beberlei.de"
+            }
+        ],
+        "description": "Database Abstraction Layer",
+        "homepage": "http://www.doctrine-project.org",
+        "keywords": [
+            "database",
+            "persistence",
+            "dbal",
+            "queryobject"
+        ]
+    },
+    {
+        "name": "monolog/monolog",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Seldaek/monolog",
+            "reference": "09b3a80cfaf3e323e348a5e817afeee98d5e6b48"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/Seldaek/monolog/zipball/09b3a80cfaf3e323e348a5e817afeee98d5e6b48",
+            "reference": "09b3a80cfaf3e323e348a5e817afeee98d5e6b48",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "mlehner/gelf-php": "1.0.*"
+        },
+        "suggest": {
+            "mlehner/gelf-php": "Allow sending log messages to a GrayLog2 server",
+            "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
+            "ext-mongo": "Allow sending log messages to a MongoDB server"
+        },
+        "time": "2012-09-18 08:50:48",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.3.x-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Monolog": "src/"
+            }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jordi Boggiano",
+                "email": "j.boggiano@seld.be",
+                "homepage": "http://seld.be",
+                "role": "Developer"
+            }
+        ],
+        "description": "Logging for PHP 5.3",
+        "homepage": "http://github.com/Seldaek/monolog",
+        "keywords": [
+            "log",
+            "logging"
+        ]
+    },
+    {
+        "name": "swiftmailer/swiftmailer",
+        "version": "v4.1.8",
+        "version_normalized": "4.1.8.0",
+        "source": {
+            "type": "git",
+            "url": "git://github.com/swiftmailer/swiftmailer.git",
+            "reference": "v4.1.8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/swiftmailer/swiftmailer/zipball/v4.1.8",
+            "reference": "v4.1.8",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2.4"
+        },
+        "time": "2012-06-17 20:55:34",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "4.1-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "files": [
+                "lib/swift_required.php"
+            ]
+        },
+        "license": [
+            "LGPL"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Chris Corbyn"
+            }
+        ],
+        "description": "Swiftmailer, free feature-rich PHP mailer",
+        "homepage": "http://swiftmailer.org",
+        "keywords": [
+            "mail",
+            "mailer"
+        ]
+    },
+    {
+        "name": "guzzle/guzzle",
+        "version": "v2.8.7",
+        "version_normalized": "2.8.7.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/guzzle/guzzle",
+            "reference": "v2.8.7"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/guzzle/guzzle/zipball/v2.8.7",
+            "reference": "v2.8.7",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.2",
+            "ext-curl": "*",
+            "symfony/event-dispatcher": "2.1.*"
+        },
+        "replace": {
+            "guzzle/common": "self.version",
+            "guzzle/http": "self.version",
+            "guzzle/parser": "self.version"
+        },
+        "require-dev": {
+            "doctrine/common": "*",
+            "symfony/class-loader": "*",
+            "monolog/monolog": "1.*",
+            "zendframework/zend-cache": "2.0.0beta4",
+            "zendframework/zend-log": "2.0.0beta4",
+            "zendframework/zend-loader": "2.0.0beta4",
+            "zendframework/zend-stdlib": "2.0.0beta4",
+            "zendframework/zend-eventmanager": "2.0.0beta4",
+            "zendframework/zend-servicemanager": "2.0.0beta4",
+            "zend/zend-log1": "1.12",
+            "zend/zend-cache1": "1.12"
+        },
+        "time": "2012-09-30 20:48:10",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Guzzle\\Tests": "tests/",
+                "Guzzle": "src/"
+            }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Michael Dowling",
+                "email": "mtdowling@gmail.com",
+                "homepage": "https://github.com/mtdowling"
+            },
+            {
+                "name": "Guzzle Community",
+                "homepage": "https://github.com/guzzle/guzzle/contributors"
+            }
+        ],
+        "description": "Guzzle is a PHP HTTP client library and framework for building RESTful web service clients",
+        "homepage": "http://guzzlephp.org/",
+        "keywords": [
+            "framework",
+            "curl",
+            "http",
+            "rest",
+            "http client",
+            "client",
+            "web service"
+        ]
+    },
+    {
+        "name": "illuminate/socialite",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "http://github.com/illuminate/socialite",
+            "reference": "v1.0.1"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/illuminate/socialite/zipball/v1.0.1",
+            "reference": "v1.0.1",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0",
+            "symfony/http-foundation": "2.*",
+            "guzzle/guzzle": "2.*"
+        },
+        "require-dev": {
+            "mockery/mockery": "0.7.*"
+        },
+        "time": "2012-08-09 12:40:11",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Illuminate\\Socialite": "src/"
+            }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Taylor Otwell",
+                "email": "taylorotwell@gmail.com"
+            }
+        ],
+        "description": "A simple library for OAuth 2 authentication."
+    },
+    {
+        "name": "symfony/yaml",
+        "version": "2.1.x-dev",
+        "version_normalized": "2.1.9999999.9999999-dev",
+        "target-dir": "Symfony/Component/Yaml",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/Yaml",
+            "reference": "c02e2fbb794dae841d00765c37d66d9e9b6f40ea"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/symfony/Yaml/zipball/c02e2fbb794dae841d00765c37d66d9e9b6f40ea",
+            "reference": "c02e2fbb794dae841d00765c37d66d9e9b6f40ea",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2012-10-04 08:17:57",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.1-dev"
+            }
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\Yaml": ""
+            }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            },
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            }
+        ],
+        "description": "Symfony Yaml Component",
+        "homepage": "http://symfony.com"
+    },
+    {
+        "name": "igorw/config-service-provider",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/igorw/ConfigServiceProvider",
+            "reference": "ca8b3710cc3a6a397ec42d8163766920e90c920a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/igorw/ConfigServiceProvider/zipball/ca8b3710cc3a6a397ec42d8163766920e90c920a",
+            "reference": "ca8b3710cc3a6a397ec42d8163766920e90c920a",
+            "shasum": ""
+        },
+        "require": {
+            "silex/silex": "1.0.*"
+        },
+        "require-dev": {
+            "symfony/yaml": "2.1.*"
+        },
+        "suggest": {
+            "symfony/yaml": "2.1.*"
+        },
+        "time": "2012-08-29 15:45:16",
+        "type": "library",
+        "extra": {
+            "branch-alias": [
+
+    ]
+        },
+        "installation-source": "source",
+        "autoload": {
+            "psr-0": {
+                "Igorw\\Silex": "src"
+            }
+        },
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Igor Wiedler",
+                "email": "igor@wiedler.ch",
+                "homepage": "http://wiedler.ch/igor/"
+            },
+            {
+                "name": "Contributors",
+                "homepage": "https://github.com/igorw/ConfigServiceProvider/contributors"
+            }
+        ],
+        "description": "A JSON/Yaml-based config ServiceProvider for Silex.",
+        "keywords": [
+            "silex"
+        ]
+    },
+    {
+        "name": "heartsentwined/arg-validator",
+        "version": "1.1.3",
+        "version_normalized": "1.1.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/heartsentwined/arg-validator",
+            "reference": "1.1.3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/heartsentwined/arg-validator/zipball/1.1.3",
+            "reference": "1.1.3",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "time": "2012-10-03 12:54:08",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Heartsentwined\\ArgValidator": "src/"
+            }
+        },
+        "license": [
+            "GPL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "heartsentwined",
+                "email": "heartsentwined@cogito-lab.com",
+                "role": "Developer"
+            }
+        ],
+        "description": "Validate function arguments, extending typehinting capabilities of PHP.",
+        "homepage": "https://github.com/heartsentwined/arg-validator",
+        "keywords": [
+            "validator",
+            "typehint",
+            "validate",
+            "argument",
+            "typehinting"
+        ]
+    },
+    {
+        "name": "heartsentwined/file-system-manager",
+        "version": "1.1.3",
+        "version_normalized": "1.1.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/heartsentwined/file-system-manager",
+            "reference": "1.1.3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://github.com/heartsentwined/file-system-manager/zipball/1.1.3",
+            "reference": "1.1.3",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3",
+            "heartsentwined/arg-validator": "1.*"
+        },
+        "time": "2012-10-03 12:54:08",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Heartsentwined\\FileSystemManager": "src/"
+            }
+        },
+        "license": [
+            "GPL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "heartsentwined",
+                "email": "heartsentwined@cogito-lab.com",
+                "role": "Developer"
+            }
+        ],
+        "description": "A collection of file and directory management functions.",
+        "homepage": "https://github.com/heartsentwined/file-system-manager",
+        "keywords": [
+            "file",
+            "manager",
+            "directory",
+            "system",
+            "dir"
+        ]
     }
 ]
