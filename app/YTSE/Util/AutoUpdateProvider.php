@@ -23,7 +23,7 @@ class AutoUpdateProvider implements ServiceProviderInterface {
 
         $app['auto_update'] = $app->share(function($app){
 
-            return new AutoUpdater($app['ytse_version']);
+            return new AutoUpdater($app['ytse_version'], $app['ytse.root'].'/config/auto_update.lock');
         });
     }
 

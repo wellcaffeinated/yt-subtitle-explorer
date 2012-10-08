@@ -475,7 +475,14 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 
             if ($action === 'update'){
 
-                $app['auto_update']->start();
+                try {
+
+                    $app['auto_update']->start($app);
+                    
+                } catch (\Exception $e) {
+                    
+                    $app->abort(500, $e->getMessage());
+                }
 
                 return $app->redirect($app['url_generator']->generate('admin_update'));
             }
