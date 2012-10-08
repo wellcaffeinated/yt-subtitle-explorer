@@ -19,6 +19,8 @@ return array(
     'Monolog' => $vendorDir . '/monolog/monolog/src/',
     'Illuminate\\Socialite' => $vendorDir . '/illuminate/socialite/src/',
     'Igorw\\Silex' => $vendorDir . '/igorw/config-service-provider/src',
+    'Heartsentwined\\FileSystemManager' => $vendorDir . '/heartsentwined/file-system-manager/src/',
+    'Heartsentwined\\ArgValidator' => $vendorDir . '/heartsentwined/arg-validator/src/',
     'Guzzle\\Tests' => $vendorDir . '/guzzle/guzzle/tests/',
     'Guzzle' => $vendorDir . '/guzzle/guzzle/src/',
     'Doctrine\\DBAL' => $vendorDir . '/doctrine/dbal/lib/',
