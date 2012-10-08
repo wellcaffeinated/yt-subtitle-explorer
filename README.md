@@ -4,6 +4,13 @@
 
 The **YouTube Subtitle Explorer** is a tool you can install on your website to display a videos from one of your playlists. Users can then search by languages to find videos that contain or don't contain subtitles for a particular language. Users can also easily submit caption files that can be then uploaded directly to youtube.
 
+## Donate
+
+All donations go first towards maintenance of YTSE, then to future open-source projects.
+
+<a href="http://flattr.com/thing/928532/wellcaffeinatedyt-subtitle-explorer-on-GitHub" target="_blank">
+<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
+
 ## Features
 
 * Positive and Negative search for videos by one or more subtitles by language name.
