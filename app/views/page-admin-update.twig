@@ -14,6 +14,10 @@
     {% if app.auto_update.needsUpdate() %}
     <div class="alert alert-info">
       <h3>New version available</h3>
+      <div class="alert alert-danger">
+        <h4>Warning:</h4>
+        You should ALWAYS backup your data before updating.
+      </div>
       <p><a class="btn btn-primary" data-loading-text="Updating..." href="{{app.url_generator.generate('admin_update', { action: 'update' })}}">Automatically update to version {{app.auto_update.getLatestVersion()}} now</a></p>
     </div>
     {% elseif app.auto_update.needsUpdate() is null %}
