@@ -88,7 +88,7 @@ class AutoUpdater {
     public function start(\Silex\Application $app){
 
         if (!$this->needsUpdate()) return;
-        if ($this->hasLockfile()) throw new \Exception('Lockfile found. Update process has already been started.');
+        if ($this->hasLockfile()) throw new LockfileException('Lockfile found. Update process has already been started.');
 
         $this->addLockfile();
 
@@ -123,6 +123,8 @@ class AutoUpdater {
         $package = tempnam($basedir, $ext);
         copy($remotePackage, $package);
 
+        $app['monolog']->addDebug('Updater: downloaded package to '.$package);
+
         // extract package
         $packagedir = $basedir . '/' . $meta['version'];
         $zip = new \ZipArchive;
@@ -131,6 +133,8 @@ class AutoUpdater {
             
             $zip->extractTo($packagedir);
             $zip->close();
+
+            $app['monolog']->addDebug('Updater: extracted package to '.$packagedir);
 
         } else {
 
@@ -146,6 +150,8 @@ class AutoUpdater {
             if (is_callable($fn)){
 
                 $fn($app);
+
+                $app['monolog']->addDebug('Updater: ran update script in '.$script);
             }
         }
 

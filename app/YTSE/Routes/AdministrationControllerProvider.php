@@ -479,6 +479,12 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 
                     $app['auto_update']->start($app);
                     
+                } catch (\YTSE\Util\LockfileException $e){
+
+                    return $app['twig']->render('page-admin-update.twig', array(
+                        'error' => $e->getMessage(),
+                    ));
+
                 } catch (\Exception $e) {
                     
                     $app->abort(500, $e->getMessage());

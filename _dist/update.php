@@ -1,11 +1,11 @@
 <?php
 
 return function($app){
+
+    $base = __DIR__;
     
-    $test = $app['ytse.root'] . '/blarg.txt';
+    if (is_dir($app['ytse.root'])){
 
-    if(is_dir($app['ytse.root']){
-
-        touch($test);
+        copy($base.'/app', $app['ytse.root'].'/app');
     }
 };
