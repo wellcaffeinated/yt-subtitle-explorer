@@ -12,6 +12,7 @@ use Guzzle\Http\ClientInterface;
 use Guzzle\Http\EntityBody;
 use Guzzle\Http\EntityBodyInterface;
 use Guzzle\Http\Url;
+use Guzzle\Parser\ParserRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -567,15 +568,12 @@ class Request extends AbstractMessage implements RequestInterface
      */
     public function getCookies()
     {
-        $cookieData = new Collection();
-        if ($cookies = $this->getHeader('Cookie')) {
-            foreach ($cookies as $cookie) {
-                $parts = explode('=', $cookie, 2);
-                $cookieData->add($parts[0], isset($parts[1]) ? $parts[1] : '');
-            }
+        if ($cookie = $this->getHeader('Cookie')) {
+            $data = ParserRegistry::get('cookie')->parseCookie($cookie);
+            return $data['cookies'];
         }
 
-        return $cookieData->getAll();
+        return array();
     }
 
     /**
@@ -686,7 +684,7 @@ class Request extends AbstractMessage implements RequestInterface
     {
         parent::changedHeader($header);
 
-        if ($header === 'host') {
+        if ($header == 'host') {
             // If the Host header was changed, be sure to update the internal URL
             $this->setHost((string) $this->getHeader('Host'));
         }

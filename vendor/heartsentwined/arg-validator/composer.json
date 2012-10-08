@@ -1,0 +1,22 @@
+{
+    "name": "heartsentwined/arg-validator",
+    "description": "Validate function arguments, extending typehinting capabilities of PHP.",
+    "license": "GPL-3.0",
+    "keywords": ["argument", "validator", "validate", "typehint", "typehinting"],
+    "homepage": "https://github.com/heartsentwined/arg-validator",
+    "authors": [
+        {
+            "name": "heartsentwined",
+            "email": "heartsentwined@cogito-lab.com",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Heartsentwined\\ArgValidator": "src/"
+        }
+    },
+    "require": {
+        "php": ">=5.3.3"
+    }
+}

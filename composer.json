@@ -8,7 +8,8 @@
         "illuminate/socialite": "*",
         "guzzle/guzzle": "*",
         "symfony/yaml": "2.1.*",
-        "igorw/config-service-provider": "*"
+        "igorw/config-service-provider": "*",
+        "heartsentwined/file-system-manager": "1.*"
     },
     "minimum-stability": "dev",
     "autoload": {

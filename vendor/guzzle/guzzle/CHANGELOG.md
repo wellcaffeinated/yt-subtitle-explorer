@@ -1,6 +1,34 @@
 CHANGELOG
 =========
 
+* 2.8.7 (09-30-2012)
+
+    * Bug: Fixed config file aliases for JSON includes
+    * Bug: Fixed cookie bug on a request object by using CookieParser to parse cookies on requests
+    * Bug: Removing the path to a file when sending a Content-Disposition header on a POST upload
+    * Bug: Hardening request and response parsing to account for missing parts
+    * Bug: Fixed PEAR packaging
+    * Bug: Fixed Request::getInfo
+    * Bug: Fixed cases where CURLM_CALL_MULTI_PERFORM return codes were causing curl transactions to fail
+    * Adding the ability for the namespace Iterator factory to look in multiple directories
+    * Added more getters/setters/removers from service descriptions
+    * Added the ability to remove POST fields from OAuth signatures
+    * OAuth plugin now supports 2-legged OAuth
+
+* 2.8.6 (09-05-2012)
+
+    * Added the ability to modify and build service descriptions
+    * Added the use of visitors to apply parameters to locations in service descriptions using the dynamic command
+    * Added a `json` parameter location
+    * Now allowing dot notation for classes in the CacheAdapterFactory
+    * Using the union of two arrays rather than an array_merge when extending service builder services and service params
+    * Ensuring that a service is a string before doing strpos() checks on it when substituting services for references
+      in service builder config files.
+    * Services defined in two different config files that include one another will by default replace the previously
+      defined service, but you can now create services that extend themselves and merge their settings over the previous
+    * The JsonLoader now supports aliasing filenames with different filenames. This allows you to alias something like
+      '_default' with a default JSON configuration file.
+
 * 2.8.5 (08-29-2012)
 
     * Bug: Suppressed empty arrays from URI templates

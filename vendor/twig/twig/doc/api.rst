@@ -128,6 +128,9 @@ Here is a list of the built-in loaders Twig provides:
 ``Twig_Loader_Filesystem``
 ..........................
 
+.. versionadded:: 1.10
+    The ``prependPath()`` and support for namespaces were added in Twig 1.10.
+
 ``Twig_Loader_Filesystem`` loads templates from the file system. This loader
 can find templates in folders on the file system and is the preferred way to
 load them::
@@ -141,6 +144,26 @@ It can also look for templates in an array of directories::
 With such a configuration, Twig will first look for templates in
 ``$templateDir1`` and if they do not exist, it will fallback to look for them
 in the ``$templateDir2``.
+
+You can add or prepend paths via the ``addPath()`` and ``prependPath()``
+methods::
+
+    $loader->addPath($templateDir3);
+    $loader->prependPath($templateDir4);
+
+The filesystem loader also supports namespaced templates. This allows to group
+your templates under different namespaces which have their own template paths.
+
+When using the ``setPaths()``, ``addPath()``, and ``prependPath()`` methods,
+specify the namespace as the second argument (when not specified, these
+methods act on the "main" namespace)::
+
+    $loader->addPath($templateDir, 'admin');
+
+Namespaced templates can be accessed via the special
+``@namespace_name/template_path`` notation::
+
+    $twig->render('@admin/index.html', array());
 
 ``Twig_Loader_String``
 ......................
