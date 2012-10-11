@@ -147,11 +147,12 @@ class CurlHandleTest extends \Guzzle\Tests\GuzzleTestCase
         @curl_exec($handle);
 
         $errors = array(
-            CURLE_COULDNT_CONNECT     => "couldn't connect to host",
-            CURLE_OPERATION_TIMEOUTED => 'timeout was reached'
+            CURLE_COULDNT_CONNECT      => "couldn't connect to host",
+            CURLE_OPERATION_TIMEOUTED  => 'timeout was reached',
+            CURLE_COULDNT_RESOLVE_HOST => 'connection time-out'
         );
 
-        $this->assertTrue(in_array(strtolower($h->getError()), $errors));
+        $this->assertTrue(in_array(strtolower($h->getError()), $errors), $h->getError() . ' was not the error');
         $this->assertTrue($h->getErrorNo() > 0);
 
         $this->assertEquals($this->getServer()->getUrl(), $h->getInfo(CURLINFO_EFFECTIVE_URL));
@@ -159,6 +160,23 @@ class CurlHandleTest extends \Guzzle\Tests\GuzzleTestCase
 
         curl_close($handle);
         $this->assertEquals(null, $h->getInfo('url'));
+    }
+
+    /**
+     * @covers Guzzle\Http\Curl\CurlHandle::getInfo
+     */
+    public function testGetInfoWithoutDebugMode()
+    {
+        $client = new Client($this->getServer()->getUrl());
+        $this->getServer()->enqueue("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\ndata");
+        $request = RequestFactory::getInstance()->create('PUT', $this->getServer()->getUrl());
+        $request->getCurlOptions()->set('debug', false);
+        $request->setClient($client);
+        $response = $request->send();
+
+        $info = $response->getInfo();
+        $this->assertFalse(empty($info));
+        $this->assertEquals($this->getServer()->getUrl(), $info['url']);
     }
 
     /**
@@ -377,7 +395,7 @@ class CurlHandleTest extends \Guzzle\Tests\GuzzleTestCase
                 CURLOPT_ENCODING => '',
                 CURLOPT_POST => 1,
                 CURLOPT_POSTFIELDS => array(
-                    'file' => '@' . $testFile . ';type=application/xml'
+                    'file' => '@' . $testFile . ';type=application/xml;filename=phpunit.xml.dist'
                 ),
                 CURLOPT_HTTPHEADER => array (
                     'Host: localhost:8124',

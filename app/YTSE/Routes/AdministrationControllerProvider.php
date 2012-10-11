@@ -535,6 +535,40 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
         })->method('GET|POST')
         ->bind('admin_settings');
 
+        /**
+         * Update route
+         */
+        $controller->match('/update', function(Request $req, Application $app) use ($self) {
+
+            $action = $req->get('action');
+            $error = '';
+            $msg = '';
+
+            if ($action === 'update'){
+
+                try {
+
+                    $app['auto_update']->start($app);
+                    
+                } catch (\YTSE\Util\LockfileException $e){
+
+                    return $app['twig']->render('page-admin-update.twig', array(
+                        'error' => $e->getMessage(),
+                    ));
+
+                } catch (\Exception $e) {
+                    
+                    $app->abort(500, $e->getMessage());
+                }
+
+                return $app->redirect($app['url_generator']->generate('admin_update'));
+            }
+
+            return $app['twig']->render('page-admin-update.twig', array(
+            ));
+        })->method('GET|POST')
+        ->bind('admin_update');
+
         return $controller;
     }
 

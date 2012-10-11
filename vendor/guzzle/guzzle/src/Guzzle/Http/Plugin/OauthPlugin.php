@@ -25,12 +25,13 @@ class OauthPlugin implements EventSubscriberInterface
      * Create a new OAuth 1.0 plugin
      *
      * @param array $config Configuration array containing these parameters:
-     *     - string 'consumer_key'     Consumer key
-     *     - string 'consumer_secret'  Consumer secret
-     *     - string 'token'            Token
-     *     - string 'token_secret'     Token secret
-     *     - string 'version'          OAuth version.  Defaults to 1.0
-     *     - string 'signature_method' Custom signature method
+     *     - string 'consumer_key'         Consumer key
+     *     - string 'consumer_secret'      Consumer secret
+     *     - string 'token'                Token
+     *     - string 'token_secret'         Token secret
+     *     - string 'version'              OAuth version.  Defaults to 1.0
+     *     - string 'signature_method'     Custom signature method
+     *     - bool   'disable_post_params'  Set to true to prevent POST parameters from being signed
      *     - array|Closure 'signature_callback' Custom signature callback that accepts a string to sign and a signing key
      */
     public function __construct($config)
@@ -45,7 +46,7 @@ class OauthPlugin implements EventSubscriberInterface
             }
         ), array(
             'signature_method', 'signature_callback', 'version',
-            'consumer_key', 'consumer_secret', 'token', 'token_secret'
+            'consumer_key', 'consumer_secret'
         ));
     }
 
@@ -79,7 +80,9 @@ class OauthPlugin implements EventSubscriberInterface
             'oauth_token'            => $this->config['token'],
             'oauth_version'          => $this->config['version'],
         ) as $key => $val) {
-            $authString .= $key . '="' . urlencode($val) . '", ';
+            if ($val) {
+                $authString .= $key . '="' . urlencode($val) . '", ';
+            }
         }
 
         // Add Authorization header
@@ -127,8 +130,8 @@ class OauthPlugin implements EventSubscriberInterface
         // Add query string parameters
         $params->merge($request->getQuery());
         // Add POST fields to signing string
-        if ($request instanceof EntityEnclosingRequestInterface
-            && $request->getHeader('Content-Type') == 'application/x-www-form-urlencoded') {
+        if (!$this->config->get('disable_post_params') && $request instanceof EntityEnclosingRequestInterface
+            && (string) $request->getHeader('Content-Type') == 'application/x-www-form-urlencoded') {
             $params->merge($request->getPostFields());
         }
 

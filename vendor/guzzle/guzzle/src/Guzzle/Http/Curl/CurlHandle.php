@@ -401,14 +401,16 @@ class CurlHandle
      */
     public function updateRequestFromTransfer(RequestInterface $request)
     {
-        $log = $this->getStderr(true);
-
-        if (!$log || !$request->getResponse()) {
+        if (!$request->getResponse()) {
             return;
         }
 
         // Update the transfer stats of the response
         $request->getResponse()->setInfo($this->getInfo());
+
+        if (!$log = $this->getStderr(true)) {
+            return;
+        }
 
         // Parse the cURL stderr output for outgoing requests
         $headers = '';
