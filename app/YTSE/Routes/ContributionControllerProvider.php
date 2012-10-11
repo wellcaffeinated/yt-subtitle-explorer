@@ -167,6 +167,7 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
             if (!$error){
 
+                $app['users']->incrementUploads($app['oauth']->getUserName());
                 $self->emailNotification($request, $lang, $videoId);
 
             } else {

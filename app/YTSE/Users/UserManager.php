@@ -63,6 +63,9 @@ class UserManager {
 
 		$this->conn->query("CREATE TABLE {$this->tables['users']} (
             username TEXT UNIQUE,
+            uploads INTEGER NOT NULL DEFAULT 0,
+            accepted INTEGER NOT NULL DEFAULT 0,
+            rejected INTEGER NOT NULL DEFAULT 0,
             settings BLOB
             )"
         );
@@ -77,22 +80,72 @@ class UserManager {
 
 		$userdata = $this->conn->fetchAssoc("SELECT * FROM {$this->tables['users']} WHERE username = ?", array($username));
 
-		if (!isset($userdata['settings'])){
+		if (!$userdata){
 
-			return new User($username);	
+			return $this->newUser($username);
 		}
 
-		return new User($username, unserialize($userdata['settings']));
+		if (!isset($userdata['settings'])){
+
+			return new User($username, array(), $userdata);	
+		}
+
+		return new User($username, unserialize($userdata['settings']), $userdata);
+	}
+
+	private function newUser($username){
+
+		$ret = $this->conn->executeQuery(
+			"INSERT OR REPLACE INTO {$this->tables['users']} (username, settings) VALUES (?, ?)",
+			array(
+				$username,
+				serialize(array()),
+			)
+		);
+
+		if (!$ret) return null;
+
+		$userdata = $this->conn->fetchAssoc("SELECT * FROM {$this->tables['users']} WHERE username = ?", array($username));
+
+		return new User($username, unserialize($userdata['settings']), $userdata);
 	}
 
 	public function saveUser(User $user){
 
 		$this->conn->executeQuery(
-			"INSERT OR REPLACE INTO {$this->tables['users']} (username, settings) VALUES (?, ?)",
+			"INSERT OR REPLACE INTO {$this->tables['users']} (username, uploads, accepted, rejected, settings) VALUES (?, ?, ?, ?, ?)",
 			array(
 				$user->getUserName(),
+				$user->get('uploads'),
+				$user->get('accepted'),
+				$user->get('rejected'),
 				serialize($user->getUserSettings()),
 			)
 		);
+	}
+
+	public function incrementUploads($username){
+
+		return $this->incrementValue($username, 'uploads');
+	}
+
+	public function incrementAccepted($username){
+
+		return $this->incrementValue($username, 'accepted');
+	}
+
+	public function incrementRejected($username){
+
+		return $this->incrementValue($username, 'rejected');
+	}
+
+	private function incrementValue($username, $column){
+
+		$ret = $this->conn->executeQuery(
+			"UPDATE {$this->tables['users']} SET $column = $column + 1 WHERE username = ?", 
+			array($username)
+		);
+
+		return !!$ret;
 	}
 }

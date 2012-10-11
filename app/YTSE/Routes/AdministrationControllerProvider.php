@@ -91,7 +91,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
                     $abspath = $app['captions']->getBaseDir() . '/' . $path;
                     $app['captions_rejected']->manageCaptionFile($abspath, $info);
 
-                    $self->sendRejectionEmail(array(
+                    $self->rejectCaption(array(
                         'info' => $info,
                         'video' => $app['ytplaylist']->getVideoById($info['videoId']),
                     ), $reason);
@@ -157,7 +157,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 
                     } else if (!$data['draft']) {
 
-                        $self->sendApprovalEmail(array(
+                        $self->approveCaption(array(
                             'info' => $info,
                             'video' => $video,
                         ));
@@ -229,13 +229,13 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
 
                         } else {
 
-                            $self->sendApprovalEmail($item);
-
                             $path = $item['info']['path'];
                             
                             $info = $app['captions']->extractCaptionInfo($path);
                             $abspath = $app['captions']->getBaseDir() . '/' . $path;
                             $app['captions_approved']->manageCaptionFile($abspath, $info);
+
+                            $self->approveCaption($item);
                         }
                     }
 
@@ -495,9 +495,10 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
         file_put_contents(YTSE_CONFIG_FILE, $yaml);
     }
 
-    public function sendApprovalEmail(array $item){
+    public function approveCaption(array $item){
 
         $name = $item['info']['user'];
+        $this->app['users']->incrementAccepted($name);
         $user = $this->app['users']->getUser($name);
         $settings = $user->getUserSettings();
 
@@ -520,9 +521,10 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
         );
     }
 
-    public function sendRejectionEmail(array $item, $reason){
+    public function rejectCaption(array $item, $reason){
 
         $name = $item['info']['user'];
+        $this->app['users']->incrementRejected($name);
         $user = $this->app['users']->getUser($name);
         $settings = $user->getUserSettings();
 
