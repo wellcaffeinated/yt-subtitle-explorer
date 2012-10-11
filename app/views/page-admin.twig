@@ -88,7 +88,7 @@
               <td><input type="checkbox" class="ctrl-select" name="selected[]" value="{{cap.path}}"/></td>
               <td>{{cap.lang_code}}</td>
               <td>{{cap.user}}</td>
-              <td>{{cap.timestamp | date('m/d/Y')}}</td>
+              <td>{{cap.timestamp | date('m/d/Y @ h:m a')}}</td>
               <td class="btn-group">
 
                 <a class="btn ctrl-view" title="view" href="{{app.url_generator.generate('admin_main', { path: cap.path, action: 'view' })}}"><i class="icon-search"></i></a>
