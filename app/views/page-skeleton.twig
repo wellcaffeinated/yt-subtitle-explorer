@@ -22,6 +22,7 @@
 
   {% block js %}
     <script src="{{root}}/library/js/libs/modernizr.js{{cache_query}}"></script>
+    <script>window.require = { urlArgs: "v={{app['ytse.config'].version}}" };</script>
     <script src="{{root}}/library/js/require.js{{cache_query}}" data-main="{{root}}/library/js/{% block bootfile %}core{% endblock %}"></script>
   {% endblock %}
   
