@@ -31,6 +31,8 @@ api.config:
 # Youtube Playlist to use
 ytplaylist.config:
     playlist: YOUR_PLAYLIST_ID
+    orderby: position
+    direction: desc
     lang_file: %ytse.root%/app/data/languages.csv
     # the default language code to highlight
     default_lang: en

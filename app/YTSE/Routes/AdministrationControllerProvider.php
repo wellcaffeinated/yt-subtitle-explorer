@@ -395,6 +395,8 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
                 ),
                 'ytplaylist.config' => array(
                     'playlist',
+                    'orderby',
+                    'direction',
                 ),
             );
 

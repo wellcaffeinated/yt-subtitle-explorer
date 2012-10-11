@@ -28,6 +28,28 @@
       </div>
 
       <div class="control-group">
+        <label class="control-label" for="plorderby">Order videos by property:</label>
+        <div class="controls">
+          <select id="plorderby" name="ytplaylist_config[orderby]">
+            {% for col in ['position', 'published', 'updated'] %}
+            <option {{app['ytplaylist.config'].orderby == col ? 'selected="selected"' : ''}}>{{col}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="pldir">Ordering direction:</label>
+        <div class="controls">
+          <select id="pldir" name="ytplaylist_config[direction]">
+            {% for dir in ['asc', 'desc'] %}
+            <option {{app['ytplaylist.config'].direction == dir ? 'selected="selected"' : ''}}>{{dir}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="control-group">
         <label class="control-label" for="thumb">What thumbnail type do you want:</label>
         <div class="controls">
           <select id="thumb" name="api_config[thumbnail]">

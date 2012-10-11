@@ -296,9 +296,12 @@ $app->before(function(Request $request) use ($app) {
  */
 $app->get('/', function(Silex\Application $app) {
 
+    $orderby = $app['ytplaylist.config']['orderby'];
+    $direction = strtolower($app['ytplaylist.config']['direction']) === 'asc';
+
     return $app['twig']->render('page-video-search.twig', array(
         'playlist' => $app['ytplaylist']->getData(),
-        'videos' => $app['ytplaylist']->getVideos(),
+        'videos' => $app['ytplaylist']->getVideos($orderby, $direction),
     ));
 })->bind('search_page');
 

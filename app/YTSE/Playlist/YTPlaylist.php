@@ -290,22 +290,31 @@ class YTPlaylist {
 
     /**
      * Get all video records
+     * @param  string $orderby The column to order by
+     * @param  boolean $asc Sort in ascending order?
      * @return array
      */
     private function fetchAllVideos($orderby = 'position', $asc = false){
     
         $dir = $asc ? 'ASC' : 'DESC';
         
-        return $this->conn->fetchAll("SELECT * FROM {$this->tables['videos']} WHERE playlist_id = ? ORDER BY ? $dir", array($this->ytid, $orderby));
+        if (!in_array($orderby, $this->videoKeys)){
+            
+            $orderby = 'position';
+        }
+
+        return $this->conn->fetchAll("SELECT * FROM {$this->tables['videos']} WHERE playlist_id = ? ORDER BY $orderby $dir", array($this->ytid));
     }
 
     /**
      * Get all video data for playlist
+     * @param  string $orderby The column to order by
+     * @param  boolean $asc Sort in ascending order?
      * @return array video data
      */
-    public function getVideos(){
+    public function getVideos($orderby = 'position', $asc = false){
 
-        $vids = $this->fetchAllVideos();
+        $vids = $this->fetchAllVideos($orderby, $asc);
 
         foreach ($vids as &$vid){
             $this->filterVidData($vid);
