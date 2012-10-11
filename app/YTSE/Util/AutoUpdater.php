@@ -14,7 +14,7 @@ use Doctrine\DBAL\Connection;
 
 class AutoUpdater {
 
-    public static $metaDataURL = 'https://raw.github.com/wellcaffeinated/yt-subtitle-explorer/feature-auto-update/_dist/update.json';
+    public static $metaDataURL = 'https://raw.github.com/wellcaffeinated/yt-subtitle-explorer/master/_dist/update.json';
     private $client;
     private $meta;
     private $version;
