@@ -51,6 +51,7 @@
     <ul class="dropdown-menu">
       <li><a tabindex="-1" href="{{app.url_generator.generate('admin_refresh_data')}}"><i class="icon-refresh"></i> Refresh Video Data</a></li>
       <li><a tabindex="-1" href="{{app.url_generator.generate('admin_main', {action: 'maintenance'})}}"><i class="{{mm_on ? 'icon-ok-circle' : 'icon-minus-sign' }}"></i> {{mm_on ? 'Disable' : 'Enable'}} Maintenance Mode</a></li>
+      <li><a tabindex="-1" href="{{app.url_generator.generate('admin_broadcast_email')}}" class="ctrl-broadcast"><i class="icon-envelope"></i>  Broadcast Email...</a></li>
     </ul>
   </div>
 

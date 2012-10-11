@@ -16,7 +16,7 @@ class EmailNotificationProvider implements ServiceProviderInterface {
     
     public function register(Application $app){
 
-        $app['email_notification'] = $app->protect(function($to, $subject, $tpl, array $params = array()) use ($app) {
+        $app['email_notification'] = $app->protect(function($to, $subject, $tpl, array $params = array(), $useBCC = false) use ($app) {
 
 			$config = $app['ytse.config'];
 
@@ -31,8 +31,16 @@ class EmailNotificationProvider implements ServiceProviderInterface {
 	        $email = \Swift_Message::newInstance()
 	            ->setSubject($subject)
 	            ->setFrom($config['email_from'])
-	            ->setTo($to)
 	            ->setBody($msg);
+
+            if ($useBCC){
+
+                $email->setBcc($to);
+
+            } else {
+
+                $email->setTo($to);
+            }
 
 	        $count = $app['mailer']->send($email);
 	        

@@ -1,0 +1,22 @@
+<div class="modal broadcast-modal" tabindex="-1" role="dialog" aria-labelledby="broadcast-modal-title" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="broadcast-modal-title">Send Broadcast Email</h3>
+	</div>
+	<form action="{{app.url_generator.generate('admin_broadcast_email')}}" method="POST">
+		<div class="modal-body">
+			<div class="controls controls-row">
+				<input type="text" name="subject" placeholder="subject..." class="span6"  required="required"/>
+			</div>
+			<div class="controls controls-row">
+				<textarea name="body" placeholder="Dear translators..." rows="8" required="required"></textarea>
+			</div>
+			<div class="alert alert-error" style="display: none;">
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn ctrl-cancel" data-dismiss="modal" aria-hidden="true">Cancel</button>
+			<button class="btn btn-success ctrl-send" type="submit" data-loading-text="Sending...">Send</button>
+		</div>
+	</form>
+</div>

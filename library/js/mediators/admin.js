@@ -10,6 +10,7 @@ define(
         'jquery',
         'stapes',
         'modules/video-modal',
+        'modules/broadcast-modal',
         'plugins/tpl!templates/caption-modal.tpl',
         'plugins/tpl!templates/modal-caption-reject.tpl',
         'bootstrap'
@@ -18,6 +19,7 @@ define(
         $,
         Stapes,
         videoModal,
+        broadcastModal,
         tplCaptionModal,
         tplModalCaptionReject
     ){
@@ -34,6 +36,10 @@ define(
                     'els': '.video .ctrl-watch'
                 });
 
+                broadcastModal.init({
+                    'els': '.ctrl-broadcast'
+                });
+
                 /**
                  * Admin controls
                  */
@@ -48,7 +54,7 @@ define(
                             ,approveHref = btnApprove.length? $this.parents('form').attr('action') + '?' + btnApprove.attr('name') + '=' + encodeURIComponent(btnApprove.attr('value')) : false
                             ;
 
-                        self.showRemoteModal(href, {
+                        self.showCaptionModal(href, {
 
                             title: 'Caption',
                             approveHref: approveHref
@@ -107,7 +113,7 @@ define(
                     ;
             },
 
-            showRemoteModal: function(url, params){
+            showCaptionModal: function(url, params){
 
                 $.ajax({
 

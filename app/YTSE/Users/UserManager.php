@@ -66,6 +66,7 @@ class UserManager {
             uploads INTEGER NOT NULL DEFAULT 0,
             accepted INTEGER NOT NULL DEFAULT 0,
             rejected INTEGER NOT NULL DEFAULT 0,
+            status TEXT,
             settings BLOB
             )"
         );
@@ -91,6 +92,19 @@ class UserManager {
 		}
 
 		return new User($username, unserialize($userdata['settings']), $userdata);
+	}
+
+	public function getContributors(){
+
+		$ret = array();
+		$users = $this->conn->fetchAll("SELECT * FROM {$this->tables['users']} WHERE uploads > 0");
+
+		foreach ($users as $userdata){
+
+			$ret[] = new User($userdata['username'], unserialize($userdata['settings']), $userdata);
+		}
+
+		return $ret;
 	}
 
 	private function newUser($username){

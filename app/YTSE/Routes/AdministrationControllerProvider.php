@@ -257,6 +257,75 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
         ->bind('admin_main');
 
         /**
+         * Settings admin route
+         */
+        $controller->match('/email', function(Request $req, Application $app) use ($self) {
+
+            if ($req->getMethod() === 'POST'){
+
+                $sent = 0;
+
+                try {
+
+                    $to = array();
+
+                    if ($app['ytse.config']['email_notify']){
+
+                        $to = $app['ytse.config']['email_notify'];
+
+                        if (!is_array($to)){
+
+                            $to = array($to);
+                        }
+                    }
+
+                    $contribs = $app['users']->getContributors();
+
+                    foreach ($contribs as $user){
+
+                        $settings = $user->getUserSettings();
+
+                        if ($settings['email_notifications']){ // only notify if they want it
+
+                            $to[] = $user->getEmail();
+                        }
+                    }
+                    
+                    if (count($to)){
+
+                        $subject = $req->get('subject');
+                        $body = $req->get('body');
+
+                        if (!isset($body) || empty($body) || !isset($subject) || empty($subject)){
+
+                            throw new \Exception('Subject or Body is empty');
+                        }
+
+                        $sent = $app['email_notification'](
+                            $to, 
+                            $subject,
+                            'email-broadcast.twig',
+                            array(
+                                'body' => $body,
+                            ),
+                            true
+                        );
+                    }
+
+                } catch (\Exception $e) {
+                    
+                    return $app->json(array('error' => $e->getMessage()), 500);
+                }
+                
+                return $app->json(array('sent' => $sent));
+            }
+
+            return $app['twig']->render('modal-admin-broadcast-email.twig', array(
+            ));
+        })->method('GET|POST')
+        ->bind('admin_broadcast_email');
+
+        /**
          * Refresh video data
          */
         $controller->match('/refresh', function(Request $req, Application $app){
