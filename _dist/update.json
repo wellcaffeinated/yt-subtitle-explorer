@@ -1,6 +1,10 @@
 [
     {
+        "version": "0.4.0",
+        "package": "https://github.com/downloads/wellcaffeinated/yt-subtitle-explorer/YTSE-update-0.4.0.zip"
+    },
+    {
         "version": "0.3.0",
-        "package": "https://github.com/downloads/wellcaffeinated/yt-subtitle-explorer/update-0.3.0.zip"
+        "package": "NONE"
     }
 ]
