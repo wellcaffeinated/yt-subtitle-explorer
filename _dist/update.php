@@ -30,57 +30,63 @@ return function($app){
 
     foreach ($approvals as $sub){
 
-        foreach ($sub['captions'] as $cap){
+        foreach ($sub['captions'] as &$lang){
+            foreach ($lang as &$cap){
 
-            if (!isset($userdata[ $cap['user'] ])){
+                if (!isset($userdata[ $cap['user'] ])){
 
-                $userdata[ $cap['user'] ] = array(
-                    'uploads' => 0,
-                    'accepted' => 0,
-                    'rejected' => 0,
-                );
+                    $userdata[ $cap['user'] ] = array(
+                        'uploads' => 0,
+                        'accepted' => 0,
+                        'rejected' => 0,
+                    );
+                }
+
+                $data = &$userdata[ $cap['user'] ];
+                $data['uploads']++;
+                $data['accepted']++;
             }
-
-            $data = $userdata[ $cap['user'] ];
-            $data['uploads']++;
-            $data['accepted']++;
         }
     }
 
     foreach ($rejections as $sub){
 
-        foreach ($sub['captions'] as $cap){
+        foreach ($sub['captions'] as &$lang){
+            foreach ($lang as &$cap){
 
-            if (!isset($userdata[ $cap['user'] ])){
+                if (!isset($userdata[ $cap['user'] ])){
 
-                $userdata[ $cap['user'] ] = array(
-                    'uploads' => 0,
-                    'accepted' => 0,
-                    'rejected' => 0,
-                );
+                    $userdata[ $cap['user'] ] = array(
+                        'uploads' => 0,
+                        'accepted' => 0,
+                        'rejected' => 0,
+                    );
+                }
+
+                $data = &$userdata[ $cap['user'] ];
+                $data['uploads']++;
+                $data['rejected']++;
             }
-
-            $data = $userdata[ $cap['user'] ];
-            $data['uploads']++;
-            $data['rejected']++;
         }
     }
 
     foreach ($pending as $sub){
 
-        foreach ($sub['captions'] as $cap){
+        foreach ($sub['captions'] as &$lang){
+            foreach ($lang as &$cap){
 
-            if (!isset($userdata[ $cap['user'] ])){
+                if (!isset($userdata[ $cap['user'] ])){
 
-                $userdata[ $cap['user'] ] = array(
-                    'uploads' => 0,
-                    'accepted' => 0,
-                    'rejected' => 0,
-                );
+                    $userdata[ $cap['user'] ] = array(
+                        'uploads' => 0,
+                        'accepted' => 0,
+                        'rejected' => 0,
+                    );
+                }
+
+                $data = &$userdata[ $cap['user'] ];
+                $data['uploads']++;
             }
-
-            $data = $userdata[ $cap['user'] ];
-            $data['uploads']++;
         }
     }
 

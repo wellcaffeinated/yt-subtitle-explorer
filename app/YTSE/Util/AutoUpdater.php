@@ -128,10 +128,14 @@ class AutoUpdater {
             // iterate up through versions
             $i = count($this->meta);
             $continue;
-            while ($i-- >= 0 && (!isset($continue) || $continue !== false)){
+            while ($i > 0 && (!isset($continue) || $continue !== false)){
+
+                $i--;
 
                 // if current version is larger... keep going...
                 if (version_compare($this->version, $this->meta[$i]['version']) >= 0) continue;
+
+                $app['monolog']->addDebug('Updater: Beginning update to version '.$this->meta[$i]['version']);
 
                 // if continue is false, it's not an error... it just means we want to refresh the script before proceeding
                 $continue = $this->doUpdate($app, $this->meta[$i]);
