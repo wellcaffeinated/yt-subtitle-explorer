@@ -119,13 +119,16 @@ class AutoUpdater {
         if ($this->hasLockfile()) throw new LockfileException('Lockfile found. Update process has already been started.');
 
         $this->addLockfile();
+        set_error_handler(function ($errno, $errstr, $errfile, $errline ) {
+            throw new \ErrorException($errstr, $errno, 0, $errfile, $errline);
+        });
 
         try {
 
             // iterate up through versions
             $i = count($this->meta);
             $continue;
-            while ($i-- >= 0 && $continue !== false){
+            while ($i-- >= 0 && (!isset($continue) || $continue !== false)){
 
                 // if current version is larger... keep going...
                 if (version_compare($this->version, $this->meta[$i]['version']) >= 0) continue;
@@ -140,6 +143,7 @@ class AutoUpdater {
             throw $e;
         }
 
+        restore_error_handler();
         $this->removeLockfile();
     }
     
@@ -158,7 +162,16 @@ class AutoUpdater {
         $remotePackage = $meta['package'];
         $ext = pathinfo($remotePackage, PATHINFO_EXTENSION);
         $package = tempnam($basedir, $ext);
-        copy($remotePackage, $package);
+
+        // test for 404.. throw error of can't find it
+        $this->client->head($remotePackage)->send()->getStatusCode();
+
+        $success = copy($remotePackage, $package);
+
+        if (!$success){
+
+            throw new \Exception("Failed to download update package");
+        }
 
         $app['monolog']->addDebug('Updater: downloaded package to '.$package);
 
