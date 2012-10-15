@@ -32,6 +32,13 @@
                 'util/hogan',
                 'util/hogan-compile'
             ]
+        },
+        {
+            name: 'core-admin',
+            excludeShallow: [
+                'util/hogan',
+                'util/hogan-compile'
+            ]
         }
     ]
 })
