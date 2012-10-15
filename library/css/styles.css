@@ -144,6 +144,10 @@ Videos
     display: block;
 }
 
+#cap-upload-lang ul.token-input-list {
+    width: 100%;
+}
+
 /*
 Modals
  */
