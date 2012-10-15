@@ -61,6 +61,10 @@ For YouTube:
 
 **SECURITY NOTE**: if your system ever becomes comprimised, or you suspect it may be comprimised, the above URLs will allow you to *change your client secret* and invalidate API keys. This is the first thing you should do if you think someone has hacked your system.
 
+## Admin Panel
+
+Simply visit `/admin` in your web browser to login to the admin panel.
+
 ## Email Notifications
 
 After you have finished installing the app, you can set up email notifications to be sent when you get a new submission. To do this, visit the admin panel and click on the "settings" tab.
