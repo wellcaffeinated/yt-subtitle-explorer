@@ -26,6 +26,7 @@ if (!$app['debug']){
 
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile' => YTSE_ROOT.'/logs/ytse.log',
+    'monolog.level' => Monolog\Logger::WARNING,
 ));
 
 // email service provider
