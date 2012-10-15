@@ -62,7 +62,7 @@ class UserManager {
 		}
 
 		$this->conn->query("CREATE TABLE {$this->tables['users']} (
-            username TEXT UNIQUE,
+            username TEXT UNIQUE NOT NULL,
             uploads INTEGER NOT NULL DEFAULT 0,
             accepted INTEGER NOT NULL DEFAULT 0,
             rejected INTEGER NOT NULL DEFAULT 0,

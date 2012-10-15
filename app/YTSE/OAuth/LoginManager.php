@@ -65,7 +65,7 @@ class LoginManager extends GoogleProvider {
         }
 
         $this->conn->query("CREATE TABLE {$this->tables['admin']} (
-            username TEXT UNIQUE,
+            username TEXT UNIQUE NOT NULL,
             access_token TEXT,
             refresh_token TEXT,
             expires TEXT,
