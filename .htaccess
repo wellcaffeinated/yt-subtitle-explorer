@@ -2,12 +2,15 @@
     Options -MultiViews
 
     RewriteEngine On
-    ## You only need to set the RewriteBase if this is in a subdirectory
+
+    ## If this is inside a subdirectory (not webroot), uncomment and set RewriteBase to that subdirectory
+    ## eg: if you installed this to http://awesome.com/YTSE/ then set 'RewriteBase /YTSE'
     #RewriteBase /path/to/this/dir
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 
-    ## redirect index.php to root
+    ## Redirect index.php to root (without infinite loop) 
+    ## IE: visiting http://awesome.com/index.php redirects to http://awesome.com/
     # RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ (.*)/index\.php\ HTTP/
     # RewriteRule ^index\.php$ %1/ [R=301,L]
 </IfModule>

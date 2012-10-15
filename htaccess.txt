@@ -1,9 +1,0 @@
-<IfModule mod_rewrite.c>
-    Options -MultiViews
-
-    RewriteEngine On
-    ## You only need to set the RewriteBase if this is in a subdirectory
-    #RewriteBase /path/to/this/dir
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ index.php [L]
-</IfModule>
