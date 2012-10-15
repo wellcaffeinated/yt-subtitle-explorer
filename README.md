@@ -8,6 +8,10 @@ The **YouTube Subtitle Explorer** is a tool you can install on your server to pr
 
 Like the software? Why not buy me a coffee? All donations go first towards maintenance of YTSE, then to future open-source projects (and/or coffee).
 
+[Donate with PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=M3RP2R63AAX6E&lc=CA&item_name=wellcaffeinated%2enet&item_number=YouTube%20Subtitle%20Explorer&currency_code=CAD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
+
+or
+
 <a href="http://flattr.com/thing/928532/wellcaffeinatedyt-subtitle-explorer-on-GitHub" target="_blank">
 <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
 
