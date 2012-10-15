@@ -61,7 +61,7 @@ For YouTube:
 
 **SECURITY NOTE**: if your system ever becomes comprimised, or you suspect it may be comprimised, the above URLs will allow you to *change your client secret* and invalidate API keys. This is the first thing you should do if you think someone has hacked your system.
 
-### Email Notifications
+## Email Notifications
 
 After you have finished installing the app, you can set up email notifications to be sent when you get a new submission. To do this, visit the admin panel and click on the "settings" tab.
 
@@ -81,8 +81,6 @@ Whatever you do, ensure that these directories are not accessible by the public 
 Also, please remember that you shouldn't share the API keys. If your system ever becomes compromized you can always invalidate the keys through google, and paste any newly created keys into the `config/config.yaml` file.
 
 If you ever suspect that your system has been compromized (and someone could have downloaded your database), then immediately unauthorize this app from your [google authorized applications and websites page](https://www.google.com/settings/security).
-
-*Note: no contributor user information is stored permanently by the app. Only administrator information is stored.**
 
 ## Automatic Updates
 
