@@ -338,7 +338,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
         /**
          * Trash admin route
          */
-        $controller->match('/trash', function(Request $req, Application $app) use ($self) {
+        $controller->match('/archive', function(Request $req, Application $app) use ($self) {
 
             $action = $req->get('action');
             $error = '';
