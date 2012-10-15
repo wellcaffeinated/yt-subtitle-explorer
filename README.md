@@ -33,7 +33,7 @@ Like the software? Why not buy me a coffee? All donations go first towards maint
 
 ## Installation
 
-1. Download the source from [GitHub](https://github.com/wellcaffeinated/yt-subtitle-explorer)
+1. Download the latest source from [GitHub](https://github.com/wellcaffeinated/yt-subtitle-explorer/downloads)
 2. Extract the zip contents into a folder on your web server.
 3. If the folder isn't the root directory, edit the `.htaccess` file contents to point it to the subfolder. (Look for the helpful comments)
 4. Visit the directory in a browser and follow the instructions (it will tell you to visit `/install`)
