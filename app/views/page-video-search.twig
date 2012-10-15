@@ -33,6 +33,10 @@
 	  <input type="text" name="lang-search" data-autocomplete-url="{{app.url_generator.generate("langmeta")}}"/>
   </div>
 
+  {% set numVids = videos | length %}
+
+  <p class="results-count pull-left muted"><data value="{{numVids}}">{{numVids}}</data> videos found</p>
+
   <p style="text-align: right; margin: 1em 0 0; font-size: 12px;">
     {% include 'credit.twig' %}
   </p>

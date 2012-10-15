@@ -17,6 +17,11 @@ Search box
     width: 100%;
 }
 
+#language-search-wrap .results-count {
+    margin-top: 1em;
+    margin-right: 1em;
+}
+
 div.token-input-dropdown-facebook {
     width: 80%;
 }

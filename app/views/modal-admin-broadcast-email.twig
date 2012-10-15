@@ -1,7 +1,7 @@
 <div class="modal broadcast-modal" tabindex="-1" role="dialog" aria-labelledby="broadcast-modal-title" aria-hidden="true">
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-		<h3 id="broadcast-modal-title">Send Broadcast Email</h3>
+		<h3 id="broadcast-modal-title">Send Broadcast Email <small>to {{app.users.getNumContributors()}} users</small></h3>
 	</div>
 	<form action="{{app.url_generator.generate('admin_broadcast_email')}}" method="POST">
 		<div class="modal-body">

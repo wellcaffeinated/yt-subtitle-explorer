@@ -54,6 +54,7 @@ define(
 
                     wrap = $('#language-search-wrap');
                     self.set('all-langs-url', wrap.attr('data-all-langs'));
+                    self.set('el.results', wrap.find('.results-count data'));
 
                     languageSearch.create().init({
                         
@@ -96,7 +97,8 @@ define(
 
             filterVids: function(){
 
-                var langs = this.get('languages') || []
+                var self = this
+                    ,langs = this.get('languages') || []
                     ,url = this.get('all-langs-url') + (
                             langs.length? 
                                 '/' + this.get('ctrl.negate').get('state') + '/' + this.get('ctrl.scope').get('state') + '/' + langs.join('~') 
@@ -111,6 +113,9 @@ define(
                         var el = $('.video-list');
                         el.after(xhr.responseText);
                         el.remove();
+
+                        var numResults = $('.video-list .video').length;
+                        self.get('el.results').attr('value', numResults).text(numResults);
                     }
                 })
             }

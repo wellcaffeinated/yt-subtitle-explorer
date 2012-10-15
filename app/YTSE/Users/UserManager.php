@@ -107,6 +107,12 @@ class UserManager {
 		return $ret;
 	}
 
+	public function getNumContributors(){
+
+		$count = $this->conn->executeQuery("SELECT COUNT(*) FROM {$this->tables['users']} WHERE uploads > 0")->fetch();
+		return $count[0];
+	}
+
 	private function newUser($username){
 
 		$ret = $this->conn->executeQuery(
