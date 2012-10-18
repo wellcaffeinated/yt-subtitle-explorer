@@ -41,6 +41,7 @@ return function($app){
 
     // // copy app changes
     FileSystemManager::rcopy($base.'/app', $app['ytse.root'].'/app');
+    copy($base.'/index.php', $app['ytse.root'].'/index.php');
 
     // clear cache
     // $perms = fileperms($app['ytse.root'].'/cache');

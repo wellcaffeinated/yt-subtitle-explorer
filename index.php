@@ -180,7 +180,7 @@ $app->error(function (\Exception $e, $code) use ($app) {
 
 $app->mount('/', new YTSE\Routes\AuthenticationControllerProvider( $app['oauth'] ));
 
-if (!$app['oauth']->isDbSetup()){
+if ($app['state']->get('ytse_installed') !== 'yes'){
     // do installation
     $app->mount('/', new YTSE\Routes\InstallationControllerProvider());
     $app->run();

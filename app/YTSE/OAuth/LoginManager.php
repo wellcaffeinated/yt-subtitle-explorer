@@ -47,6 +47,11 @@ class LoginManager extends GoogleProvider {
         parent::__construct(new StateStorer($session), $key, $secret);
 
         $this->scope = $this->getDefaultScope();
+
+        if (!$this->isDbSetup()){
+
+            $this->initDb();
+        }
     }
     
     /**
@@ -305,7 +310,7 @@ class LoginManager extends GoogleProvider {
         $val = $token->getValue();
         $refresh = $token->get('refresh_token');
 
-        if (!$token || !$val || !$refresh) return;
+        if (!$token || !$val || !$refresh) throw new InvalidRefreshTokenException();
 
         $expires = new \Datetime('now');
         $expires->add( \DateInterval::createFromDateString($token->get('expires_in') . ' seconds') );

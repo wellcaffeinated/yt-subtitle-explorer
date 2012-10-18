@@ -102,7 +102,7 @@ class InstallationControllerProvider implements ControllerProviderInterface {
 
             }
 
-            $token = $app['session']->get('admin_token');
+            $token = $app['oauth']->getValidAdminToken();
             if ( !$token || !$token->get('refresh_token') ){
 
                 $app['oauth']->logOut();
@@ -176,12 +176,8 @@ class InstallationControllerProvider implements ControllerProviderInterface {
                 return $app->abort(401, "You are not authorized to complete the installation. Check your admin youtube username setting in the config file.");
             }
 
-            $app['ytplaylist']->initDb(true);
-            $app['oauth']->initDb(true);
-
-            // save the current admin token as the one to use to get subtitle text
-            $app['oauth']->saveAdminToken();
             $app['oauth']->logout();
+            $app['state']->set('ytse_installed', 'yes');
 
             $app['refresh.data']();
 
