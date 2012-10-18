@@ -70,12 +70,12 @@ $app->register(new YTSE\Util\EmailNotificationProvider());
 $app->register(new YTSE\API\APIMediatorProvider());
 // register playlist provider
 $app->register(new YTSE\Playlist\YTPlaylistProvider());
+// user manager
+$app->register(new YTSE\Users\UserManagerProvider());
 // register oauth login manager
 $app->register(new YTSE\OAuth\OAuthProvider());
 // caption manager
 $app->register(new YTSE\Captions\CaptionManagerProvider());
-// user manager
-$app->register(new YTSE\Users\UserManagerProvider());
 // maintenance mode provider
 $app->register(new YTSE\Util\MaintenanceModeProvider(), array(
     'maintenance_mode.options' => array(

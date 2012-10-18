@@ -67,6 +67,7 @@ class UserManager {
             accepted INTEGER NOT NULL DEFAULT 0,
             rejected INTEGER NOT NULL DEFAULT 0,
             status TEXT,
+            ytusername TEXT,
             settings BLOB
             )"
         );
@@ -133,12 +134,13 @@ class UserManager {
 	public function saveUser(User $user){
 
 		$this->conn->executeQuery(
-			"INSERT OR REPLACE INTO {$this->tables['users']} (username, uploads, accepted, rejected, settings) VALUES (?, ?, ?, ?, ?)",
+			"INSERT OR REPLACE INTO {$this->tables['users']} (username, uploads, accepted, rejected, ytusername, settings) VALUES (?, ?, ?, ?, ?, ?)",
 			array(
 				$user->getUserName(),
 				$user->get('uploads'),
 				$user->get('accepted'),
 				$user->get('rejected'),
+				$user->get('ytusername'),
 				serialize($user->getUserSettings()),
 			)
 		);
