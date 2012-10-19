@@ -338,14 +338,6 @@ $admin = $admin->connect($app);
 $admin->before($needYoutubeAuth);
 $admin->before($checkAuthentication);
 $admin->before($checkAuthorization);
-$admin->before(function() use ($app) {
-
-    // re-save auth token if unavailable
-    if (!$app['oauth']->adminTokenAvailable()){
-
-        $app['oauth']->saveAdminToken();
-    }
-});
 $app->mount('/admin', $admin);
 
 /**
