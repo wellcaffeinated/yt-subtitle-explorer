@@ -70,12 +70,12 @@ $app->register(new YTSE\Util\EmailNotificationProvider());
 $app->register(new YTSE\API\APIMediatorProvider());
 // register playlist provider
 $app->register(new YTSE\Playlist\YTPlaylistProvider());
+// user manager
+$app->register(new YTSE\Users\UserManagerProvider());
 // register oauth login manager
 $app->register(new YTSE\OAuth\OAuthProvider());
 // caption manager
 $app->register(new YTSE\Captions\CaptionManagerProvider());
-// user manager
-$app->register(new YTSE\Users\UserManagerProvider());
 // maintenance mode provider
 $app->register(new YTSE\Util\MaintenanceModeProvider(), array(
     'maintenance_mode.options' => array(
@@ -180,7 +180,7 @@ $app->error(function (\Exception $e, $code) use ($app) {
 
 $app->mount('/', new YTSE\Routes\AuthenticationControllerProvider( $app['oauth'] ));
 
-if (!$app['oauth']->isDbSetup()){
+if ($app['state']->get('ytse_installed') !== 'yes'){
     // do installation
     $app->mount('/', new YTSE\Routes\InstallationControllerProvider());
     $app->run();
@@ -271,7 +271,7 @@ $needYoutubeAuth = function(Request $req, Silex\Application $app){
  */
 $app->before(function(Request $request) use ($app) {
 
-    if (!$app['oauth']->getValidAdminToken()){
+    if (!$app['oauth']->isAdminTokenValid()){
 
         sendTokenEmailWarning();
     }
@@ -338,14 +338,6 @@ $admin = $admin->connect($app);
 $admin->before($needYoutubeAuth);
 $admin->before($checkAuthentication);
 $admin->before($checkAuthorization);
-$admin->before(function() use ($app) {
-
-    // re-save auth token if unavailable
-    if (!$app['oauth']->adminTokenAvailable()){
-
-        $app['oauth']->saveAdminToken();
-    }
-});
 $app->mount('/admin', $admin);
 
 /**

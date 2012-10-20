@@ -75,10 +75,13 @@ class AuthenticationControllerProvider implements ControllerProviderInterface {
 			}
 			catch(\Exception $e){
 
+				$app['monolog']->addError('Authentication Error: '. $e->getMessage());
 				$app->abort(400, 'Problem Authenticating');
 			}
 
 			if ( !$self->isLoggedIn() ) {
+
+				$app['monolog']->addError('Authentication Error: User is not logged in');
 				$app->abort(400, 'Problem Authenticating');
 			}
 

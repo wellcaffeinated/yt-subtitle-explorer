@@ -11,10 +11,12 @@ namespace YTSE\OAuth;
 
 use Illuminate\Socialite\OAuthTwo\GoogleProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Doctrine\DBAL\Connection;
 use Illuminate\Socialite\UserData;
 use Illuminate\Socialite\OAuthTwo\AccessToken;
 use Guzzle\Service\Client;
+use YTSE\Users\UserManager;
 
 // manages google oauth
 class LoginManager extends GoogleProvider {
@@ -22,6 +24,7 @@ class LoginManager extends GoogleProvider {
     private $session; // the symfony session
     private $conn; // the dbal connection
     private $admin;
+    private $userManager;
     private $ytdataScope = 'https://gdata.youtube.com';
     private $adminToken;
     private $tables = array(
@@ -32,16 +35,23 @@ class LoginManager extends GoogleProvider {
      * Constructor
      * @param Session       $session The symfony session
      * @param Connection    $conn    The dbal connection
+     * @param UserManager   $um      The YTSE user manager
      * @param string        $key     The oauth key
      * @param string        $secret  The oauth secret
      */
-    public function __construct(\Symfony\Component\HttpFoundation\Session\Session $session, Connection $conn, $key, $secret){
+    public function __construct(Session $session, Connection $conn, UserManager $um, $key, $secret){
 
         $this->session = $session;
         $this->conn = $conn;
+        $this->userManager = $um;
         parent::__construct(new StateStorer($session), $key, $secret);
 
         $this->scope = $this->getDefaultScope();
+
+        if (!$this->isDbSetup()){
+
+            $this->initDb();
+        }
     }
     
     /**
@@ -110,7 +120,7 @@ class LoginManager extends GoogleProvider {
      */
     public function isLoggedIn(){
 
-        return ( null !== $this->session->get('user_data') );
+        return ( null !== $this->session->get('user_object') );
     }
 
     /**
@@ -128,12 +138,20 @@ class LoginManager extends GoogleProvider {
      */
     public function getUserName(){
 
-        return $this->session->get('username');
+        $user = $this->session->get('user_object');
+
+        if (!$user) return null;
+
+        return $user->getUserName();
     }
 
     public function getYTUserName(){
 
-        return $this->session->get('youtube_user');
+        $user = $this->session->get('user_object');
+
+        if (!$user) return null;
+
+        return $user->get('ytusername');
     }
 
     /**
@@ -147,25 +165,29 @@ class LoginManager extends GoogleProvider {
             throw \Exception('Invalid Token');
         }
 
-        if ($this->session->get('user_data') === null){
+        if ($this->session->get('user_object') === null){
 
-            $user = $this->getUserData( $token );
+            $data = $this->getUserData( $token );
 
-            if ($user->get('email') && $user->get('verified_email')){       
-                $this->session->set('user_data', $user);
-                $this->session->set('username', $user->get('email'));
+            if ($data->get('email') && $data->get('verified_email')){
+
+                $user = $this->userManager->getUser($data->get('email'));
+                $this->session->set('user_object', $user);
             }
         }
 
         if ($this->session->get('youtube_auth')){
 
+            $this->session->set('youtube_auth', false);
+
             $ytdata = $this->getYoutubeData( $token );
 
             if ($ytdata['entry']['yt$username']['$t']){
 
-                $this->session->set('admin_token', $token);
-                $this->session->set('youtube_data', $ytdata);
-                $this->session->set('youtube_user', $ytdata['entry']['yt$username']['$t']);
+                $user->set('ytusername', $ytdata['entry']['yt$username']['$t']);
+                $this->userManager->saveUser($user);
+
+                $this->saveAdminToken($token);
             }
         }
     }
@@ -246,7 +268,7 @@ class LoginManager extends GoogleProvider {
 
         $token = $this->getAdminToken();
 
-        if (!$token) return null;
+        if (!$this->isAdminTokenValid()) return null;
 
         if ($this->isAdminTokenExpired()){
 
@@ -264,33 +286,28 @@ class LoginManager extends GoogleProvider {
     }
 
     /**
-     * Determine if admin token is available in database
+     * Determine if admin token is available in database and valid
      * @return boolean
      */
-    public function adminTokenAvailable(){
+    public function isAdminTokenValid(){
 
-        if ($this->getAdminToken() !== null){
+        $token = $this->getAdminToken();
 
-            return true;
-        }
-
-        return false;
+        return ($token !== null && $token->getValue() && $token->get('refresh_token'));
     }
 
     /**
      * Save access token in current session as admin token
      * @return void
      */
-    public function saveAdminToken(){
+    public function saveAdminToken(AccessToken $token){
 
         if (!$this->isAuthorized()) return;
-
-        $token = $this->session->get('admin_token');
 
         $val = $token->getValue();
         $refresh = $token->get('refresh_token');
 
-        if (!$token || !$val || !$refresh) return;
+        if (!$token || !$val || !$refresh) throw new InvalidRefreshTokenException();
 
         $expires = new \Datetime('now');
         $expires->add( \DateInterval::createFromDateString($token->get('expires_in') . ' seconds') );
@@ -298,7 +315,7 @@ class LoginManager extends GoogleProvider {
         $this->conn->executeQuery(
             "INSERT OR REPLACE INTO {$this->tables['admin']} (username, access_token, refresh_token, expires, revoked) VALUES (?,?,?,?,?)",
             array(
-                $this->session->get('youtube_user'),
+                $this->getYTUserName(),
                 $val,
                 $refresh,
                 $expires->format('c'),
@@ -386,7 +403,9 @@ class LoginManager extends GoogleProvider {
      */
     public function hasYoutubeAuth(){
 
-        return (null !== $this->session->get('youtube_data'));
+        $user = $this->session->get('user_object');
+
+        return ($user && null !== $user->get('ytusername'));
     }
 
     /**

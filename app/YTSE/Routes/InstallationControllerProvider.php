@@ -102,10 +102,10 @@ class InstallationControllerProvider implements ControllerProviderInterface {
 
             }
 
-            $token = $app['session']->get('admin_token');
-            if ( !$token || !$token->get('refresh_token') ){
+            if ( $app['oauth']->isAdminTokenValid() ){
 
                 $app['oauth']->logOut();
+                $app['monolog']->addError('Install: Invalid admin token.');
 
                 return $app['twig']->render('page-error-msg.twig', array(
                     'ok_action' => $app['url_generator']->generate('install_authenticate'),
@@ -176,12 +176,8 @@ class InstallationControllerProvider implements ControllerProviderInterface {
                 return $app->abort(401, "You are not authorized to complete the installation. Check your admin youtube username setting in the config file.");
             }
 
-            $app['ytplaylist']->initDb(true);
-            $app['oauth']->initDb(true);
-
-            // save the current admin token as the one to use to get subtitle text
-            $app['oauth']->saveAdminToken();
             $app['oauth']->logout();
+            $app['state']->set('ytse_installed', 'yes');
 
             $app['refresh.data']();
 
