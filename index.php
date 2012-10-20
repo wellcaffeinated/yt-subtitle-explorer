@@ -271,7 +271,7 @@ $needYoutubeAuth = function(Request $req, Silex\Application $app){
  */
 $app->before(function(Request $request) use ($app) {
 
-    if (!$app['oauth']->getValidAdminToken()){
+    if (!$app['oauth']->isAdminTokenValid()){
 
         sendTokenEmailWarning();
     }

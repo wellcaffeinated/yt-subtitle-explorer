@@ -102,10 +102,10 @@ class InstallationControllerProvider implements ControllerProviderInterface {
 
             }
 
-            $token = $app['oauth']->getValidAdminToken();
-            if ( !$token || !$token->get('refresh_token') ){
+            if ( $app['oauth']->isAdminTokenValid() ){
 
                 $app['oauth']->logOut();
+                $app['monolog']->addError('Install: Invalid admin token.');
 
                 return $app['twig']->render('page-error-msg.twig', array(
                     'ok_action' => $app['url_generator']->generate('install_authenticate'),

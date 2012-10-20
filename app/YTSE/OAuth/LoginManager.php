@@ -268,7 +268,7 @@ class LoginManager extends GoogleProvider {
 
         $token = $this->getAdminToken();
 
-        if (!$token) return null;
+        if (!$this->isAdminTokenValid()) return null;
 
         if ($this->isAdminTokenExpired()){
 
@@ -286,17 +286,14 @@ class LoginManager extends GoogleProvider {
     }
 
     /**
-     * Determine if admin token is available in database
+     * Determine if admin token is available in database and valid
      * @return boolean
      */
-    public function adminTokenAvailable(){
+    public function isAdminTokenValid(){
 
-        if ($this->getAdminToken() !== null){
+        $token = $this->getAdminToken();
 
-            return true;
-        }
-
-        return false;
+        return ($token !== null && $token->getValue() && $token->get('refresh_token'));
     }
 
     /**
