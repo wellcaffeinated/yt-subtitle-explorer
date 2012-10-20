@@ -38,6 +38,8 @@ el,Modern Greek,Ελληνικά
 en,English,English
 eo,Esperanto,Esperanto
 es,Spanish,Castilian
+es-ES,Spanish (Spain),Español (España)
+es-MX,Spanish (Latin America),Español (Latinoamérica)
 et,Estonian,eesti
 eu,Basque,euskara
 fa,Persian,فارسی
@@ -129,6 +131,8 @@ pi,Pali,Pāli
 pl,Polish,polski
 ps,Pashto,Pushto
 pt,Portuguese,Português
+pt-BR,Portuguese (Brazil),Português (Brasil)
+pt-PT,Portuguese (Portugal),Português (Portugal)
 qu,Quechua,Runa Simi
 rm,Romansh,rumantsch grischun
 rn,Kirundi,kiRundi
@@ -181,4 +185,6 @@ yi,Yiddish,ייִדיש
 yo,Yoruba,Yorùbá
 za,Zhuang,Chuang
 zh,Chinese,中文 (Zhōngwén)
+zh-Hans,Chinese (Simplified),中文 (简体)
+zh-Hant,Chinese (Traditional),中文 (繁體)
 zu,Zulu,isiZulu

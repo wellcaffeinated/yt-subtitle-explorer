@@ -112,6 +112,19 @@ class YTPlaylist {
             )"
         );
 
+        if ( !$this->updateLanguageDb() ) {
+
+            throw new \Exception('Can not find language file at '.$this->language_file_path);
+        }
+
+        $this->sqlSelect = $this->conn->prepare("SELECT * FROM {$this->tables['playlists']} WHERE ytid = ?");
+        $this->fetchLocal( $this->ytid );
+    }
+
+    public function updateLanguageDb(){
+
+        $this->conn->query("DELETE FROM {$this->tables['languages']}");
+
         if (($handle = fopen($this->language_file_path, "r")) !== FALSE) {
 
             $langs = $this->tables['languages'];
@@ -129,11 +142,10 @@ class YTPlaylist {
 
         } else {
 
-            throw new \Exception('Can not find language file at '.$this->language_file_path);
+            return false;
         }
 
-        $this->sqlSelect = $this->conn->prepare("SELECT * FROM {$this->tables['playlists']} WHERE ytid = ?");
-        $this->fetchLocal( $this->ytid );
+        return true;
     }
 
     /**
