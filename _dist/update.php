@@ -30,12 +30,15 @@ return function($app){
 
     $app['maintenance_mode']->enable();
 
+    $app['state']->set('ytse_installed', 'yes');
+
     // update database
     $app['db']->executeQuery('ALTER TABLE ytse_users ADD COLUMN ytusername TEXT');
 
     // update admin data
     $user = $userManager->getUser($app['oauth']->getUserName());
-    $ret = $app['db']->update('ytse_users', array('ytusername', $ytusername), array('username', $user->getUserName()));
+    $app['monolog']->addInfo("Recording ytusername $ytusername in ytse_users for user ".$user->getUserName());
+    $ret = $app['db']->update('ytse_users', array('ytusername' => $ytusername), array('username' => $user->getUserName()));
 
     if (!$ret) throw new \Exception('Problem updating admin data.');
 
@@ -49,7 +52,7 @@ return function($app){
     mkdir($app['ytse.root'].'/cache', $perms);
 
     // update language data
-    $app['db']->query("DELETE FROM {$this->tables['languages']}");
+    $app['db']->query("DELETE FROM ytse_languages");
 
     if (($handle = fopen($app['ytplaylist.config']['lang_file'], "r")) !== FALSE) {
 
