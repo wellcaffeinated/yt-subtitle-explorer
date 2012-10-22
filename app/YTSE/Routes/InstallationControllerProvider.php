@@ -102,7 +102,7 @@ class InstallationControllerProvider implements ControllerProviderInterface {
 
             }
 
-            if ( $app['oauth']->isAdminTokenValid() ){
+            if ( !$app['oauth']->isAdminTokenValid() ){
 
                 $app['oauth']->logOut();
                 $app['monolog']->addError('Install: Invalid admin token.');

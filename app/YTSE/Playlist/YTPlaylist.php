@@ -49,6 +49,9 @@ class YTPlaylist {
 
             $this->sqlSelect = $this->conn->prepare("SELECT * FROM {$this->tables['playlists']} WHERE ytid = ?");
             $this->fetchLocal( $id );
+        } else {
+
+            $this->initDb();
         }
     }
 
