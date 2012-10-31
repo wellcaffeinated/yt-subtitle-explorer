@@ -15,7 +15,13 @@
 </div>
 
 <div class="row-fluid">
-  
+
+  <div class="span12 alert alert-info">
+    <h3>Review</h3>
+    <p>Just to make sure everything is ok, play the video and make sure your subtitles look alright.</p>
+    <p>If you need to make a change, hit the "cancel" button and re-upload your caption. (sorry no inline editing yet)</p>
+  </div>
+
   <div id="video-preview" class="video-ctrl" data-subtitle-file="{{app.url_generator.generate('contribute_cap', { videoId: video.ytid, capId: 'user' })}}" data-subtitle-format="{{preview_data.format}}" data-video-url="{{video.url}}">
     <!-- Populated by popcorn.js -->
   </div>
