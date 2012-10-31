@@ -81,7 +81,25 @@ class ContributionControllerProvider implements ControllerProviderInterface {
             $capId = $request->get('capId');
             $caption = false;
 
-            foreach( $video['caption_links'] as $cap ){
+            if ($capId === 'user'){
+
+                $data = $app['session']->get('contribute_data');
+
+                if (!$data){
+
+                    $app->abort(404, 'Caption not found.'); 
+                }
+
+                $content = $data['content'];
+
+                return new Response($content, 200, array(
+
+                    'Content-type' => 'application/octet-stream',
+                    //'Content-disposition' => "attachment; filename=\"$filename\"",
+                ));
+            }
+
+            foreach ( $video['caption_links'] as $cap ){
 
                 if ($cap['lang_code'] === $capId){
                     $caption = $cap;
@@ -124,8 +142,10 @@ class ContributionControllerProvider implements ControllerProviderInterface {
         /**
          * Upload a caption file
          */
-        $controller->post('/{videoId}/upload', function(Request $request, Application $app, $videoId) use ($self) {
+        $controller->match('/{videoId}/upload', function(Request $request, Application $app, $videoId) use ($self) {
 
+            $isGet = $request->getMethod() === 'GET';
+            $data = $app['session']->get('contribute_data');
             $video = $app['ytplaylist']->getVideoById($videoId);
 
             if (!$video){
@@ -133,28 +153,103 @@ class ContributionControllerProvider implements ControllerProviderInterface {
                 $app->abort(404, 'Video not found.');
             }
 
-            $file = $request->files->get('cap_file');
-            $lang = $request->get('lang_code');
+            if (!$isGet){
+            
+                $file = $request->files->get('cap_file');
+                $lang = $request->get('lang_code');
 
-            // if form data invalid, redirect with error messages
-            if (empty($file) || empty($lang)){
+                // if form data invalid, redirect with error messages
+                if (empty($file) || empty($lang)){
 
+                    return $app->redirect(
+                        $app['url_generator']->generate('contribute',
+                            array(
+                                'videoId' => $videoId,
+                                'error_file' => empty($file),
+                                'error_lang' => empty($lang),
+                            )
+                        )
+                    );
+                }
+
+                if ( !$app['captions']->isValidExtension($file) ){
+
+                    // if someone tries to upload a .php file, for example... stop them.
+                    $app->abort(415, "Invalid File Type.");
+                }
+
+                if ( !$app['captions']->isValidEncoding($file) ){
+
+                    $app->abort(415, "File contains invalid characters. Please use UTF-8 encoding.");
+                }
+
+                if ( !$app['captions']->isValidSize($file) ){
+
+                    $app->abort(413, "File too big.");
+                }
+
+                $data = array(
+                    //'file' => $file,
+                    'content' => file_get_contents($file->getRealPath()),
+                    'lang' => $lang,
+                    'format' => $app['captions']->getFileExtension($file),
+                );
+
+                $app['session']->set('contribute_data', $data);
+            }
+
+            if (!$data){
+
+                // if there is no data to save... then redirect to start
                 return $app->redirect(
                     $app['url_generator']->generate('contribute',
                         array(
                             'videoId' => $videoId,
-                            'error_file' => empty($file),
-                            'error_lang' => empty($lang),
+                        )
+                    )
+                );
+            }
+            
+            return $app['twig']->render('page-contribute-preview.twig', array(
+
+                'video' => $video,
+                'preview_data' => $data,
+
+            ));
+        })
+        ->method('GET|POST')
+        ->bind('contribute_upload');
+
+        $controller->post('/{videoId}/finish', function(Request $request, Application $app, $videoId) use ($self) {
+
+            $error = false;
+            $data = $app['session']->get('contribute_data');
+            $video = $app['ytplaylist']->getVideoById($videoId);
+
+            if (!$video){
+
+                $app->abort(404, 'Video not found.');
+            }
+
+            if (!$data){
+
+                // if there is no data to save... then redirect to start
+                return $app->redirect(
+                    $app['url_generator']->generate('contribute',
+                        array(
+                            'videoId' => $videoId,
                         )
                     )
                 );
             }
 
-            $error = false;
+            $content = $data['content'];
+            $format = $data['format'];
+            $lang = $data['lang'];
 
             try {
 
-                $app['captions']->saveCaption($file, $videoId, $lang, $app['oauth']->getUserName(), $format);
+                $app['captions']->saveCaption($content, $format, $videoId, $lang, $app['oauth']->getUserName());
 
             } catch (\YTSE\Captions\InvalidFileFormatException $e){
 
@@ -169,6 +264,7 @@ class ContributionControllerProvider implements ControllerProviderInterface {
 
                 $app['users']->incrementUploads($app['oauth']->getUserName());
                 $self->emailNotification($request, $lang, $videoId);
+                $app['session']->remove('contribute_data');
 
             } else {
 
@@ -183,8 +279,7 @@ class ContributionControllerProvider implements ControllerProviderInterface {
                     )
                 )
             );
-
-        })->bind('contribute_upload');
+        })->bind('contribute_finish');
 
         return $controller;
     }

@@ -179,6 +179,41 @@ Modals
 }
 
 /*
+Contribution review stage
+ */
+
+.preview-ctrl,
+#video-preview {
+    width: 560px;
+    height: 315px;
+    margin: auto;
+}
+
+.preview-ctrl {
+    padding: 1em 0;
+    height: auto;
+}
+
+.preview-ctrl textarea {
+    width: 100%;
+    height: 450px;
+}
+
+@media (min-width: 1200px) {
+
+    .preview-ctrl {
+
+        float: right;
+        padding: 0;
+    }
+
+    #video-preview {
+
+        float: left;
+    }
+}
+
+/*
 Footer
  */
 

@@ -1,0 +1,39 @@
+{% extends 'page-skeleton.twig' %}
+
+{% block bootfile %}core-preview{% endblock %}
+
+{% import "videolist.twig" as videoList %}
+
+{% block title %}Contribute{% endblock %}
+{% block description %}Contribute translations for {{video.title}}{% endblock %}
+
+{% set containerClasses = 'contribute' %}
+  
+{% block content %}
+<div class="page-header">
+  <h1>Help Translate {% include 'right-nav.twig' %}</h1>
+</div>
+
+<div class="row-fluid">
+  
+  <div id="video-preview" class="video-ctrl" data-subtitle-file="{{app.url_generator.generate('contribute_cap', { videoId: video.ytid, capId: 'user' })}}" data-subtitle-format="{{preview_data.format}}" data-video-url="{{video.url}}">
+    <!-- Populated by popcorn.js -->
+  </div>
+
+  <div class="preview-ctrl">
+
+    <form action="{{app.url_generator.generate('contribute_finish', { videoId: video.ytid })}}" method="POST">
+      <textarea name="content" class="caption-content" readonly="readonly">
+        {{-preview_data.content-}}
+      </textarea>
+
+      <div class="btn-group">
+        <a class="btn" href="{{app.url_generator.generate('contribute', { videoId: video.ytid })}}">Cancel</a>
+        <button type="submit" class="btn btn-primary">Finish</button>
+      </div>
+    </form>
+    
+  </div>
+
+</div>
+{% endblock %}

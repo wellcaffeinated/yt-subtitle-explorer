@@ -240,34 +240,27 @@ class CaptionManager {
 
     /**
      * Save a caption submission from a form upload
-     * @param  UploadedFile $file      the uploaded file
+     * @param  string       $content   the uploaded file contents
+     * @param  string       $format    the format of the caption (txt,srt,etc...)
      * @param  string       $videoId   the youtube id of the video
      * @param  string       $lang_code the language code of the submission
      * @param  string       $username  the username of user who submitted it
      * @return void
      */
-    public function saveCaption(UploadedFile $file, $videoId, $lang_code, $username){
+    public function saveCaption($content, $format, $videoId, $lang_code, $username){
 
-        preg_match('/\.([a-zA-Z]*)$/', $file->getClientOriginalName(), $matches);
-        $format = isset($matches[1])? $matches[1] : 'txt';
-        
         $dir = $this->getCaptionPath($videoId, $lang_code);
         $name = $this->getNewCaptionFilename($username, $format);
 
-        if ( !$this->isSafeExtension($format) ){
+        if ( !$this->isValidFormat($format) ){
 
             // if someone tries to upload a .php file, for example... stop them.
             throw new InvalidFileFormatException("Invalid File Type. Will not accept files of type: .$format");
         }
 
-        if ( !$this->isValidEncoding($file) ){
+        if ( mb_detect_encoding($content) === false ){
 
             throw new InvalidFileFormatException("File contains invalid characters. Please use UTF-8 encoding.");
-        }
-
-        if ( $file->getSize() > CaptionManager::$maxAcceptedSize ){
-
-            throw new \Exception("File too big.");
         }
 
         if (!is_dir($dir)){
@@ -275,14 +268,23 @@ class CaptionManager {
             mkdir($dir, 0777, true);
         }
 
-        $file->move($dir, $name);
-
+        $path = $dir . '/' . $name;
         // convert to utf-8
-        // $path = $dir . '/' . $name;
-        // $content = mb_convert_encoding(file_get_contents($path), 'UTF-8', 'auto');
-        // file_put_contents($path, $content);
+        // $content = mb_convert_encoding($content, 'UTF-8', 'auto');
+        $ret = file_put_contents($path, $content);
+
+        if ($ret === false){
+
+            throw new \Exception("Trouble saving caption file.");
+        }
     }
 
+    /**
+     * Take control of a caption file previously managed by another manager
+     * @param  string $absPath The absolute path to the caption file
+     * @param  array  $info    The caption info
+     * @return void
+     */
     public function manageCaptionFile($absPath, array $info){
 
         if (!is_file($absPath)){
@@ -305,15 +307,52 @@ class CaptionManager {
 
     /**
      * Determine if the extension of caption submission is acceptable
-     * @param  string  $format extension to check
+     * @param  UploadedFile  $file file to check
      * @return boolean true if safe/accepted extension
      */
-    protected function isSafeExtension($format){
+    public function isValidExtension(UploadedFile $file){
+
+        return $this->isValidFormat($this->getFileExtension($file));
+    }
+
+    /**
+     * Determine if format is accepted by caption manager
+     * @param  string  $format the format (txt,srt,etc...)
+     * @return boolean         True if ok
+     */
+    public function isValidFormat($format){
 
         return in_array($format, explode(' ', CaptionManager::$acceptedExts));
     }
 
-    protected function isValidEncoding(File $file){
+    /**
+     * Determine if the file is not too big
+     * @param  UploadedFile $file The uploaded file
+     * @return boolean            True if it's ok
+     */
+    public function isValidSize(UploadedFile $file){
+
+        return $file->getSize() < CaptionManager::$maxAcceptedSize;
+    }
+
+    /**
+     * Get the file extension
+     * @param  UploadedFile $file The uploaded file
+     * @return string             The extension
+     */
+    public function getFileExtension(UploadedFile $file){
+
+        preg_match('/\.([a-zA-Z]*)$/', $file->getClientOriginalName(), $matches);
+        $format = isset($matches[1])? $matches[1] : 'txt';
+        return $format;
+    }
+
+    /**
+     * Determine if file is an acceptable encoding
+     * @param  File    $file The file
+     * @return boolean       True if acceptable
+     */
+    public function isValidEncoding(File $file){
 
         $enc = mb_detect_encoding(file_get_contents($file->getRealPath()));
 

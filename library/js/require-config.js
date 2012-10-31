@@ -10,13 +10,17 @@ require.config({
     waitSeconds: 30,
 
     shim: {
-        'bootstrap': ['jquery']
+        'bootstrap': ['jquery'],
+        'popcorn' : {
+            exports: 'Popcorn'
+        }
     },
     
     paths: {
         'jquery': 'libs/jquery',
         'stapes': 'libs/stapes',
-        'bootstrap': 'libs/bootstrap.min'
+        'bootstrap': 'libs/bootstrap.min',
+        'popcorn': 'libs/popcorn-complete'
     },
 
     map: {
