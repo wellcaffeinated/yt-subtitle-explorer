@@ -1,5 +1,9 @@
 [
     {
+        "version": "1.1.0",
+        "package": "https://github.com/downloads/wellcaffeinated/yt-subtitle-explorer/YTSE-update-1.1.0.zip"
+    },
+    {
         "version": "1.0.1",
         "package": "https://github.com/downloads/wellcaffeinated/yt-subtitle-explorer/YTSE-update-1.0.1.zip"
     },
