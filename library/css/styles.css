@@ -197,6 +197,10 @@ Contribution review stage
 .preview-ctrl textarea {
     width: 100%;
     height: 450px;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 @media (min-width: 1200px) {
