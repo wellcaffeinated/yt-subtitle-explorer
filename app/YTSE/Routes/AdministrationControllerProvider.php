@@ -572,6 +572,72 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
         })->method('GET|POST')
         ->bind('admin_update');
 
+        /** begin caption data patch **/
+        $controller->get('/_datedata', function(Request $req, Application $app){
+
+            $pl = $app['ytplaylist'];
+
+            $data = $app['api']->getYTPlaylist($pl->getId());
+            $languages = $app['ytplaylist']->getAvailableLanguagesLike(); //all
+
+            if (!$data){
+
+                return 'empty playlist';
+            }
+
+            $ids = array();
+
+            foreach ($data['videos'] as &$video){
+
+                $ids[] = $video['ytid'];
+            }
+
+            $capData = $app['api']->getYTCaptionData($ids, $app['oauth']->getValidAdminToken());
+            $fmtCapData = array();
+
+            foreach ($capData as $key => $vid){
+
+                $dat = array();
+
+                foreach ($vid as $entry){
+
+                    $dat[ $entry['lang_code'] ] = $entry['published_date'];
+                }
+
+                $fmtCapData[ $key ] = $dat;
+            }
+
+            $content = '';
+
+            foreach ($data['videos'] as &$video){
+
+                foreach ($languages as &$lang){
+
+                    $row = array( $video['title'], $video['ytid'], $lang['lang_code'] );
+
+                    if ( isset($fmtCapData[ $video['ytid'] ][ $lang['lang_code'] ]) ){
+
+                        $date = $fmtCapData[ $video['ytid'] ][ $lang['lang_code'] ];
+                        $row[] = $date;
+                        $row[] = preg_replace('/T.*/', '', $date); // no time
+
+                    } else {
+
+                        $row[] = '-1';
+                        $row[] = '-1';
+                    }
+
+                    $content .= implode(',', $row) . PHP_EOL;
+                }
+            }
+
+            return new Response($content, 200, array(
+
+                'Content-type' => 'text/plain',
+            ));
+        });
+        /** end caption data patch **/
+
         return $controller;
     }
 

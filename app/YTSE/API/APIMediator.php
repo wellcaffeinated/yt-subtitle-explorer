@@ -445,6 +445,86 @@ class APIMediator {
     }
 
     /**
+     * Get caption data available for a video
+     * @param  array|string      $ytids array of youtube ids for videos
+     * @param  AccessToken $token the access token object to authorize youtube access
+     * @return array caption data
+     */
+    public function getYTCaptionData($ytids, AccessToken $token){
+
+        $ret = array();
+        $requests = array();
+
+        if (!is_array($ytids)){
+
+            $ret = $this->getYTCaptions( array($ytids) );
+            return $ret[ $ytids ];
+        }
+
+        foreach ($ytids as &$id){
+
+            // queue up requests
+            $requests[] = $this->gdataAPI->get(
+                array('videos/{video}/captions{?params*}',
+                    array(
+                        'video' => $id,
+                        'params' => array(
+                            'alt' => 'json'
+                        )
+                    )
+                ),
+                array(
+                    'Authorization' => 'Bearer ' . $token->getValue(),
+                )
+            );
+        }
+
+        try {
+            // send a batch
+            $responses = $this->ytAPI->send( $requests );
+        } catch (\Guzzle\Common\Exception\ExceptionCollection $e){
+            foreach ($e as $exception) {
+                if ($exception instanceof \Guzzle\Http\Exception\BadResponseException
+                    && $exception->getResponse()->getStatusCode() !== 403 // means you weren't authorized to view the captions of this video
+                ){
+                    throw $exception;
+                }
+            }
+        }
+
+        if (!$responses) return $ret;
+
+        // process the responses
+        foreach ($responses as $key => &$r){
+
+            if ($r->isSuccessful()){
+                
+                $json = json_decode($r->getBody(true), true);
+                $json = $json['feed'];
+
+                if ($json['openSearch$totalResults']['$t'] > 0){
+
+                    $caps = array();
+
+                    foreach ($json['entry'] as $caption){
+
+                        if (!array_key_exists('yt$derived', $caption) || $caption['yt$derived']['$t'] !== 'speechRecognition'){
+                            $caps[] = array(
+                                'lang_code' => $caption['content']['xml$lang'],
+                                'published_date' => $caption['published']['$t'],
+                            );
+                        }
+                    }
+
+                    $ret[ $ytids[$key] ] = $caps;
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
      * Get playlist data for a playlist
      * @param  string $ytid the playlist id
      * @return array playlist data
