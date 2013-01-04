@@ -627,7 +627,7 @@ class AdministrationControllerProvider implements ControllerProviderInterface {
                         $row[] = '-1';
                     }
 
-                    $content .= implode(',', $row) . PHP_EOL;
+                    $content .= '"' . implode('","', $row) . '"' . PHP_EOL;
                 }
             }
 
