@@ -159,7 +159,7 @@ class LoginManager extends GoogleProvider {
      * @param  AccessToken $token The access token object
      * @return void
      */
-    public function authenticate(AccessToken $token){
+    public function authenticate(AccessToken $token, $install = false){
 
         if ($token->getValue() === null || strlen($token->getValue()) === 0){
             throw \Exception('Invalid Token');
@@ -186,6 +186,11 @@ class LoginManager extends GoogleProvider {
 
                 $user->set('ytusername', $ytdata['entry']['yt$username']['$t']);
                 $this->userManager->saveUser($user);
+                
+                if ($install){
+
+                    $this->setAdmin( $this->getYTUserName() );
+                }
 
                 $this->saveAdminToken($token);
             }

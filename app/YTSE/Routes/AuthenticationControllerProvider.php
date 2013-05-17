@@ -70,8 +70,15 @@ class AuthenticationControllerProvider implements ControllerProviderInterface {
 		 */
 		$controller->get('/login/authenticate/callback', function(Request $request) use ($app, $self) {
 
+			$install = false;
+        
+        	if ($app['session']->get('installing') === 'yes'){
+
+                $install = true;
+            }
+
 			try {
-				$self->authenticate($request, $app['url_generator']->generate('auth_callback', array(), true));
+				$self->authenticate($request, $app['url_generator']->generate('auth_callback', array(), true), $install);
 			}
 			catch(\Exception $e){
 
@@ -101,13 +108,13 @@ class AuthenticationControllerProvider implements ControllerProviderInterface {
 		$this->oauth->logOut();
 	}
 
-	public function authenticate(Request $request, $redirectUri){
-		
+	public function authenticate(Request $request, $redirectUri, $install = false){
+
 		$token = $this->oauth->getAccessToken($request, array(
 			'redirect_uri' => $redirectUri
 		));
 
-		$this->oauth->authenticate( $token );
+		$this->oauth->authenticate( $token, $install );
 	}
 
 	public function getAuthUrl($redirect_url){

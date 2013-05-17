@@ -15,6 +15,13 @@ or
 <a href="http://flattr.com/thing/928532/wellcaffeinatedyt-subtitle-explorer-on-GitHub" target="_blank">
 <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
 
+or
+
+<iframe style="border: 0; margin: 0; padding: 0;"
+src="https://www.gittip.com/wellcaffeinated/widget.html"
+width="48pt" height="22pt">
+</iframe>
+
 ## Features
 
 * Positive and Negative search for videos by one or more subtitles by language name.
@@ -44,6 +51,13 @@ or
 
 You will need to create your own developer API keys to install this app. You will need a google Project with API OAuth access and a YouTube developer key.
 
+For YouTube:
+
+1. Visit [YouTube's API Dashboard](https://code.google.com/apis/youtube/dashboard).
+2. Click to create a "New Product"
+3. Enter a name like "YTSE"
+4. Click save
+
 For Google:
 
 1. Visit [google's api console](https://code.google.com/apis/console).
@@ -52,14 +66,9 @@ For Google:
 4. Click "Create an OAuth 2.0 client ID..."
 5. Enter the product name: "YTSE"
 6. Select Application Type = "Web Application"
-7. In the url input, enter the url to get to the app, followed by login/authenticate/callback (eg: if your installation is on example.com in the subfolder translations/, you would enter: example.com/translations/login/authenticate/callback)
-
-For YouTube:
-
-1. Visit [YouTube's API Dashboard](https://code.google.com/apis/youtube/dashboard).
-2. Click to create a "New Product"
-3. Enter a name like "YTSE"
-4. Click save
+7. In the "Your site or hostname" section, unless you have a secure site, change the protocol to `http` and enter the url to get to the app. (i.e. if your installation is on example.com in the subfolder translations/, you would enter: example.com/translations/ ). Click Continue.
+8. You'll need to click "more options" in order to specify the "Authorized Redirect URIs" field. Specify it as your homepage with the path login/authenticate/callback (eg: if your installation is on http://example.com in the subfolder translations/, the field should end up being: http://example.com/translations/login/authenticate/callback)
+9. The "Javascript Origins" field should be the top-level (sub)-domain (eg: http://example.com)
 
 **SECURITY NOTE**: if your system ever becomes comprimised, or you suspect it may be comprimised, the above URLs will allow you to *change your client secret* and invalidate API keys. This is the first thing you should do if you think someone has hacked your system.
 

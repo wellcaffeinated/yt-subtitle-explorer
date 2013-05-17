@@ -93,6 +93,7 @@ class InstallationControllerProvider implements ControllerProviderInterface {
                 
                 $app['oauth']->doYoutubeAuth();
                 $app['session']->set('login_referrer', $req->getRequestUri());
+                $app['session']->set('installing', 'yes');
 
                 return $app['twig']->render('page-info-msg.twig', array(
     
@@ -101,6 +102,8 @@ class InstallationControllerProvider implements ControllerProviderInterface {
                 ));
 
             }
+
+            $app['oauth']->setAdmin($app['oauth']->getYTUserName());
 
             if ( !$app['oauth']->isAdminTokenValid() ){
 
