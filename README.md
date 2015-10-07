@@ -70,7 +70,7 @@ For Google:
 8. You'll need to click "more options" in order to specify the "Authorized Redirect URIs" field. Specify it as your homepage with the path login/authenticate/callback (eg: if your installation is on http://example.com in the subfolder translations/, the field should end up being: http://example.com/translations/login/authenticate/callback)
 9. The "Javascript Origins" field should be the top-level (sub)-domain (eg: http://example.com)
 
-**SECURITY NOTE**: if your system ever becomes comprimised, or you suspect it may be comprimised, the above URLs will allow you to *change your client secret* and invalidate API keys. This is the first thing you should do if you think someone has hacked your system.
+**SECURITY NOTE**: if your system ever becomes compromised, or you suspect it may be compromised, the above URLs will allow you to *change your client secret* and invalidate API keys. This is the first thing you should do if you think someone has hacked your system.
 
 ## Admin Panel
 
